@@ -1,0 +1,16 @@
+region 1:
+- 1 VPC with 1 public subnet and 3 private subnets (3 AZs)
+- 1 bastion EC2 instance in public subnet
+- 3 websrv EC2 instancs in private subnets (to be replaced by auto-scaling group)
+- 1 ALB in public subnet in front of 3 websrv
+- 1 EFS for /var/www/html, mounted on 3 instances
+- 1 DNS hostname for ALB (in existing hosted zone) with DNS failover from region1 to region2
+- 1 DNS hostname for DR instance in region2
+- 1 TLS certificate for ALB ?
+
+region2:
+- 1 VPC with 1 public subnet
+- 1 websrv instance in public subnet (DR)
+
+peering between the 2 VPCs
+

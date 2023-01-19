@@ -1,0 +1,38 @@
+# ---- region
+aws_region1    = "eu-west-2"    # London
+aws_region2    = "eu-west-1"    # Dublin
+
+# ---- CIDR network
+cidr_vpc_r1      = "192.168.0.0/16"
+cidr_bastion_r1  = "192.168.0.0/24"
+cidrs_alb_r1     = [ "192.168.1.0/24",  "192.168.2.0/24",  "192.168.3.0/24"]
+cidrs_websrv_r1  = [ "192.168.11.0/24", "192.168.12.0/24", "192.168.13.0/24"]
+cidr_vpc_r2      = "10.0.0.0/16"
+cidr_public_r2   = "10.0.0.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- EC2 Instances
+az_bastion          = "a"
+az_dr               = "a"
+inst_type           = "t4g.medium"
+public_sshkey_path  = [ "sshkeys_generated/ssh_key_cr3_r1_bastion.pub", 
+                        "sshkeys_generated/ssh_key_cr3_r1_websrv.pub", 
+                        "sshkeys_generated/ssh_key_cr3_r2_dr.pub" ]
+private_sshkey_path = [ "sshkeys_generated/ssh_key_cr3_r1_bastion", 
+                        "sshkeys_generated/ssh_key_cr3_r1_websrv", 
+                        "sshkeys_generated/ssh_key_cr3_r2_dr" ]
+cloud_init_script_bastion = "cloud_init/cloud_init_bastion_TEMPLATE.sh"
+cloud_init_script_websrv  = "cloud_init/cloud_init_websrv_TEMPLATE.sh"
+cloud_init_script_dr      = "cloud_init/cloud_init_dr.sh"
+web_page_zip              = "website.zip"
+
+# ---- EFS filesystem
+efs_mount_point     = "/mnt/efs1"
+
+# ---- DNS (route 53)
+dns_name_primary   = "checkride.cpauliat.eu"
+dns_name_secondary = "checkride-dr.cpauliat.eu"
+dns_domain         = "cpauliat.eu"
+dns_zone_id        = "Z06256241A7PAEVSA5GLV"
