@@ -1,0 +1,17 @@
+# ---- region
+aws_region     = "eu-west-3"    # Paris
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- Windows Instance
+az                  = "a"
+public_rsakey_path  = "rsa_key_demo02_public.pem"
+private_rsakey_path = "rsa_key_demo02_private.pem"
+crypted_pwd_file    = "demo02_inst1_crypted_password_b64"
+decrypted_pwd_file  = "demo02_inst1_password"
+inst1_type          = "t2.large"

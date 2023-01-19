@@ -1,0 +1,10 @@
+variable "aws_region" {}
+variable "cidr_vpc" {}
+variable "cidr_subnet1" {}
+variable "authorized_ips" {}
+variable "az" {}
+variable "public_rsakey_path" {}
+variable "private_rsakey_path" {}
+variable "crypted_pwd_file" {}
+variable "decrypted_pwd_file" {}
+variable "inst1_type" {}
