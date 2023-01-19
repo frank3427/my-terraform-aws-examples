@@ -1,0 +1,34 @@
+# ---- region
+aws_region     = "eu-west-3"    # Paris
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+cidr_subnet2   = "192.168.1.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- generated SSH key pair
+public_sshkey_path   = "sshkeys_generated/ssh_key_demo11.pub"
+private_sshkey_path  = "sshkeys_generated/ssh_key_demo11"
+
+# ---- Availability Zone 
+az                       = "b"
+az2                      = "a"
+
+# ---- Instance Amazon Linux 2
+al2_private_ip         = "192.168.0.11"
+al2_inst_type          = "t3a.large"
+al2_cloud_init_script  = "cloud_init/cloud_init_al2_TEMPLATE.sh"
+
+# ---- RDS mysql
+mysql_identifier             = "demo11-rds-mysql"
+mysql_instance_class         = "db.r6g.xlarge"
+mysql_size_in_gbs            = "20"
+mysql_max_size_in_gbs        = "60"
+mysql_db_name                = "demo11"
+mysql_version                = "8.0"
+mysql_storage_type           = "gp2"       # problem with gp3: accepted but gp2 used !
+mysql_multi_az               = true
+mysql_backups_retention_days = "3"

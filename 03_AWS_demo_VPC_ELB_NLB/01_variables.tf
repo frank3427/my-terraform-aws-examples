@@ -1,0 +1,14 @@
+variable "aws_region" {}
+variable "cidr_vpc" {}
+variable "cidr_subnet_public" {}
+variable "cidr_subnet_private" {}
+variable "authorized_ips" {}
+variable "az" {}
+variable "websrv_inst_type" {}
+variable "websrv_public_sshkey_path" {}
+variable "websrv_private_sshkey_path" {}
+variable "websrv_cloud_init_script" {}
+variable "bastion_inst_type" {}
+variable "bastion_public_sshkey_path" {}
+variable "bastion_private_sshkey_path" {}
+variable "bastion_cloud_init_script" {}

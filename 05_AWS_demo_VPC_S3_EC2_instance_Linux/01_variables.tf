@@ -1,0 +1,9 @@
+variable "aws_region" {}
+variable "cidr_vpc" {}
+variable "cidr_subnet1" {}
+variable "authorized_ips" {}
+variable "az" {}
+variable "inst1_type" {}
+variable "public_sshkey_path" {}
+variable "private_sshkey_path" {}
+variable "cloud_init_script" {}

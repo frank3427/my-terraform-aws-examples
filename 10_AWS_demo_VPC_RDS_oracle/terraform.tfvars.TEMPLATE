@@ -1,0 +1,36 @@
+# ---- region
+aws_region     = "eu-west-3"    # Paris
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+cidr_subnet2   = "192.168.1.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- generated SSH key pair
+public_sshkey_path   = "sshkeys_generated/ssh_key_demo10.pub"
+private_sshkey_path  = "sshkeys_generated/ssh_key_demo10"
+
+# ---- Availability Zone 
+az                       = "b"
+az2                      = "a"
+
+# ---- Instance Amazon Linux 2
+al2_private_ip         = "192.168.0.11"
+al2_inst_type          = "t3a.large"
+al2_cloud_init_script  = "cloud_init/cloud_init_al2_TEMPLATE.sh"
+
+# ---- RDS Oracle
+oracle_identifier      = "demo10-rds-oracle"
+oracle_instance_class  = "db.m6i.2xlarge"
+oracle_edition         = "oracle-ee" #or "oracle-se" 
+oracle_charset         = "AL32UTF8"
+oracle_size_in_gbs     = "20"
+oracle_max_size_in_gbs = "40"
+oracle_sid             = "DEMO10"
+oracle_version         = "19.0.0.0.ru-2022-10.rur-2022-10.r1"  # Oracle EE
+#oracle_version         = "19.0.0.0.ru-2022-10.rur-2022-10.r1"  # Oracle SE
+#oracle_family          = "oracle-ee-19" # DB parameter group
+oracle_license_model   = "bring-your-own-license" # or "license-included"

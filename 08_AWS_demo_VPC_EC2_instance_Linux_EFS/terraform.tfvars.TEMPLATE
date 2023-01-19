@@ -1,0 +1,24 @@
+# ---- region
+aws_region     = "eu-west-3"    # Paris
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- generated SSH key pair
+public_sshkey_path   = "sshkeys_generated/ssh_key_demo08.pub"
+private_sshkey_path  = "sshkeys_generated/ssh_key_demo08"
+
+# ---- Availability Zone 
+az                       = "b"
+
+# ---- Instance Amazon Linux 2
+al2_private_ip           = "192.168.0.11"
+al2_inst_type            = "m6g.medium"
+al2_cloud_init_script    = "cloud_init/cloud_init_al2.sh"
+
+# ---- EFS filesystem
+efs_mount_point          = "/mnt/efs1"

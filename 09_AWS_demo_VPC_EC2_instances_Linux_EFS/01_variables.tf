@@ -1,0 +1,16 @@
+variable "aws_region" {}
+variable "cidr_vpc" {}
+variable "cidr_subnet1" {}
+variable "cidr_subnet2" {}
+variable "authorized_ips" {}
+variable "public_sshkey_path" {}
+variable "private_sshkey_path" {}
+variable "el2_az" {}
+variable "al2_private_ip" {}
+variable "al2_inst_type" {}
+variable "al2_cloud_init_script" {}
+variable "ubuntu_az" {}
+variable "ubuntu_private_ip" {}
+variable "ubuntu_inst_type" {}
+variable "ubuntu_cloud_init_script" {}
+variable "efs_mount_point" {}
