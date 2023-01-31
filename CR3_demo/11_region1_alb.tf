@@ -38,7 +38,7 @@ resource aws_lb_target_group_attachment cr3_r1_websrv {
   port             = 80
 }
 
-# ------ Create a HTTP listener for the ALB
+# ------ Create a HTTP listener for the ALB (redirect to HTTPS)
 resource aws_lb_listener cr3_r1_listener80 {
   provider          = aws.r1
   load_balancer_arn = aws_lb.cr3_r1_alb.arn
@@ -46,8 +46,13 @@ resource aws_lb_listener cr3_r1_listener80 {
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.cr3_r1_tg1.arn
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
 

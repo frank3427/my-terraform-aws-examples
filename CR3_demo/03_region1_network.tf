@@ -21,10 +21,10 @@ resource aws_default_route_table cr3_r1 {
   default_route_table_id = aws_vpc.cr3_r1.default_route_table_id
   tags                   = { Name = "cr3-r1-public-rt" }
 
-  # route {
-  #   cidr_block = var.cidr_public_r2
-  #   gateway_id = aws_vpc_peering_connection.cr3_r1.id
-  # }
+  route {
+    cidr_block = var.cidr_public_r2
+    gateway_id = aws_vpc_peering_connection.cr3_r1.id
+  }
 
   route {
     cidr_block = "0.0.0.0/0"

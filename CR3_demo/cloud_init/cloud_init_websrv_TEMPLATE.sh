@@ -37,6 +37,18 @@ ln -s ${mount_point}/var_www_html html
 systemctl start httpd
 systemctl enable httpd
 
+echo "========== Configure SSH to connect to DR web server"
+echo "${dr_ssh_key}" > /home/ec2-user/.ssh/id_rsa_ws_dr
+cat > /home/ec2-user/.ssh/config <<EOF
+Host ws_dr
+        Hostname ${dr_private_ip}
+        User ec2-user
+        IdentityFile /home/ec2-user/.ssh/id_rsa_ws_dr
+        StrictHostKeyChecking no
+EOF
+chown ec2-user:ec2-user /home/ec2-user/.ssh/id_rsa_ws_dr /home/ec2-user/.ssh/config
+chmod 600               /home/ec2-user/.ssh/id_rsa_ws_dr /home/ec2-user/.ssh/config
+
 # echo "========== Install latest updates"
 # yum update -y
 

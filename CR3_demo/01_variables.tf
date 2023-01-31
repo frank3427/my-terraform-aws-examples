@@ -6,6 +6,9 @@ variable "cidrs_alb_r1" {}
 variable "cidrs_websrv_r1" {}
 variable "cidr_vpc_r2" {}
 variable "cidr_public_r2" {}
+variable "priv_ip_ws_dr" {}
+variable "priv_ip_bastion" {}
+variable "priv_ip_ws" {}
 variable "authorized_ips" {}
 variable "az_bastion" {}
 variable "az_dr" {}

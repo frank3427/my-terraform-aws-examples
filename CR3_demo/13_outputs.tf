@@ -18,7 +18,7 @@ Host ws2
           IdentityFile ${var.private_sshkey_path[1]}
           StrictHostKeyChecking no
           ProxyJump bastion
-Host ws2
+Host ws3
           Hostname ${aws_instance.cr3_r1_websrv[2].private_ip}
           User ec2-user
           IdentityFile ${var.private_sshkey_path[1]}
@@ -52,8 +52,9 @@ output CONNECTIONS {
      ssh -F sshcfg wsdr                to connect to DR Web server on region #2
 
   2) ---- HTTP connection
-     Open the following URLs in your Web browser: 
-     - Primary site (Application Load Balancer): https://${var.dns_name_primary}
+     Wait 2 minutes for the load balancer health checks to be OK then open the following URLs in your Web browser: 
+     - Primary site (Application Load Balancer): https://${var.dns_name_primary} 
+                                              or http://${var.dns_name_primary} (redirected to https)
      - Secondary site (standalone EC2 instance): http://${var.dns_name_secondary}
 
 EOF

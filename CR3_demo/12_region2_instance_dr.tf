@@ -21,6 +21,7 @@ resource aws_instance cr3_r2_dr {
   ami                    = data.aws_ami.al2_arm64_r2.id
   key_name               = aws_key_pair.cr3_r2_kp.id
   subnet_id              = aws_subnet.cr3_public_r2.id
+  private_ip             = var.priv_ip_ws_dr
   vpc_security_group_ids = [ aws_security_group.cr3_sg_r2.id ] 
   tags                   = { Name = "cr3-r2-dr" }
   user_data_base64       = base64encode(file(var.cloud_init_script_dr))         
@@ -37,11 +38,11 @@ resource aws_security_group cr3_sg_r2 {
 
   # ingress rule: allow SSH
   ingress {
-    description = "allow SSH access from authorized public IP addresses"
+    description = "allow SSH access from authorized public IP addresses and from VPC in region 1"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = var.authorized_ips
+    cidr_blocks = concat(var.authorized_ips, [var.cidr_vpc_r1])
   }
 
   # ingress rule: allow HTTP
@@ -70,4 +71,36 @@ resource aws_security_group cr3_sg_r2 {
     protocol    = "-1"    # all protocols
     cidr_blocks = [ "0.0.0.0/0" ]
   }
+}
+
+# ------ Post provisioning by remote-exec
+resource null_resource cr3_r2_dr {
+
+  provisioner file {
+    connection {
+        agent       = false
+        timeout     = "10m"
+        host        = aws_eip.cr3_r2_dr.public_ip
+        user        = "ec2-user"
+        private_key = file(var.private_sshkey_path[2])
+    }
+    source      = var.web_page_zip
+    destination = "/tmp/${var.web_page_zip}"
+  }
+
+  provisioner remote-exec {
+    connection {
+        agent       = false
+        timeout     = "10m"
+        host        = aws_eip.cr3_r2_dr.public_ip
+        user        = "ec2-user"
+        private_key = file(var.private_sshkey_path[2])
+    }
+    inline = [
+      "sudo cloud-init status --wait",
+      "sudo unzip -d /var/www/html /tmp/${var.web_page_zip}",
+      "sudo chown -R ec2-user:ec2-user /var/www/html/*"
+    ]
+  }
+
 }

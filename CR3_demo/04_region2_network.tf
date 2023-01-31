@@ -19,10 +19,10 @@ resource aws_default_route_table cr3_r2 {
   default_route_table_id = aws_vpc.cr3_r2.default_route_table_id
   tags                   = { Name = "cr3-r2-public-rt" }
 
-  # route {
-  #   cidr_block = var.cidr_vpc_r1
-  #   gateway_id = aws_vpc_peering_connection.cr3_r1.id
-  # }
+  route {
+    cidr_block = var.cidr_vpc_r1
+    gateway_id = aws_vpc_peering_connection.cr3_r1.id
+  }
   
   route {
     cidr_block = "0.0.0.0/0"
@@ -79,6 +79,16 @@ resource aws_default_network_acl cr3_r2 {
     cidr_block = var.cidr_vpc_r1
     from_port  = 0
     to_port    = 0
+  }
+
+  # allow SSH from VPC in region #1
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 500
+    action     = "allow"
+    cidr_block = var.cidr_vpc_r1
+    from_port  = 22
+    to_port    = 22
   }
 
   egress {

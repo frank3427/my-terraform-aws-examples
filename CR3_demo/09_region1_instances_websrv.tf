@@ -14,12 +14,15 @@ resource aws_instance cr3_r1_websrv {
   ami                    = data.aws_ami.al2_arm64_r1.id
   key_name               = aws_key_pair.cr3_r1_kp[1].id
   subnet_id              = aws_subnet.cr3_private_r1[count.index].id
+  private_ip             = var.priv_ip_ws[count.index]
   vpc_security_group_ids = [ aws_security_group.cr3_sg_r1_websrv.id ] 
   tags                   = { Name = "cr3-r1-websrv${count.index+1}" }
   user_data_base64       = base64encode(templatefile(var.cloud_init_script_websrv, {
-                              ws_nb       = count.index + 1,
-                              mount_point = var.efs_mount_point,
-                              dns_name    = aws_efs_file_system.cr3_r1.dns_name
+                              ws_nb         = count.index + 1,
+                              mount_point   = var.efs_mount_point,
+                              dns_name      = aws_efs_file_system.cr3_r1.dns_name
+                              dr_ssh_key    = tls_private_key.ssh-cr3[2].private_key_pem
+                              dr_private_ip = var.priv_ip_ws_dr
                            }))   
   #iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
 }

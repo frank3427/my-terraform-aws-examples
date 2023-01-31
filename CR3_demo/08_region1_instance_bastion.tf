@@ -22,6 +22,7 @@ resource aws_instance cr3_r1_bastion {
   ami                    = data.aws_ami.al2_arm64_r1.id
   key_name               = aws_key_pair.cr3_r1_kp[0].id
   subnet_id              = aws_subnet.cr3_r1_bastion.id
+  private_ip             = var.priv_ip_bastion
   vpc_security_group_ids = [ aws_security_group.cr3_sg_r1_bastion.id ] 
   tags                   = { Name = "cr3-r1-bastion" }
   user_data_base64       = base64encode(templatefile(var.cloud_init_script_bastion, {
@@ -57,10 +58,9 @@ resource null_resource cr3_bastion {
     inline = [
       "sudo cloud-init status --wait",
       "sudo unzip -d ${var.efs_mount_point}/var_www_html /tmp/${var.web_page_zip}",
-      "sudo chown ec2-user:ec2-user ${var.efs_mount_point}/var_www_html/*"
+      "sudo chown -R ec2-user:ec2-user ${var.efs_mount_point}/var_www_html/*"
     ]
   }
-
 }
 
 # ------ Create a security group for the Bastion EC2 instance
