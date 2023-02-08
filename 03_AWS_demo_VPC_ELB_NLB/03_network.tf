@@ -34,6 +34,7 @@ resource aws_default_route_table demo03 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
+#        (will be used by public subnet)
 resource aws_default_network_acl demo03 {
   default_network_acl_id = aws_vpc.demo03.default_network_acl_id
   tags                   = { Name = "demo03-acl" }
@@ -50,17 +51,7 @@ resource aws_default_network_acl demo03 {
       to_port    = 22
     }
   }
-
-  # this is needed for yum
-  ingress {
-    protocol   = "tcp"
-    rule_no    = 150
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 1024
-    to_port    = 65535
-  }
-  
+ 
   dynamic ingress {
     for_each = var.authorized_ips
     content {
@@ -71,6 +62,26 @@ resource aws_default_network_acl demo03 {
       from_port  = 80
       to_port    = 80
     }
+  }
+
+  # this is needed for yum
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 300
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
+  # allow access from private subnet (needed for traffic thru NAT gateway)
+  ingress {
+    protocol   = -1
+    rule_no    = 400
+    action     = "allow"
+    cidr_block = var.cidr_subnet_private
+    from_port  = 0  
+    to_port    = 0
   }
 
   egress {
@@ -123,6 +134,55 @@ resource aws_route_table demo03_private {
   route {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.demo03.id
+  }
+}
+
+# ------ Create a new network ACL for private subnet
+resource aws_network_acl demo03_private {
+  vpc_id     = aws_vpc.demo03.id
+  tags       = { Name = "demo03-private-acl" }
+  subnet_ids = [ aws_subnet.demo03_private.id ]
+
+  # allow all traffic from public subnet
+  ingress {
+    protocol   = -1
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = var.cidr_subnet_public
+    from_port  = 0
+    to_port    = 0
+  }
+  
+  # needed
+  dynamic ingress {
+    for_each = var.authorized_ips
+    content {
+      protocol   = "tcp"
+      rule_no    = 200 + 10 * index(var.authorized_ips, ingress.value)
+      action     = "allow"
+      cidr_block = ingress.value
+      from_port  = 80
+      to_port    = 80
+    }
+  }
+
+  # this is needed for yum
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 300
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
+  egress {
+    protocol   = -1
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
   }
 }
 

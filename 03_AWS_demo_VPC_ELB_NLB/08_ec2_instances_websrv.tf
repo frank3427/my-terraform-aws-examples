@@ -38,6 +38,15 @@ resource aws_security_group demo03_sg_websrv {
     cidr_blocks = var.authorized_ips 
   }
 
+  # ingress rule: allow HTTP for LB health checks
+  ingress {
+    description = "allow HTTP access from VPC public subnet (needed for health checks)"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [ var.cidr_subnet_public ]
+  }
+  
   # ingress rule: allow SSH
   ingress {
     description = "allow SSH access from public subnet"

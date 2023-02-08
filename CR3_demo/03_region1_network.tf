@@ -161,7 +161,7 @@ resource aws_route_table cr3_private_r1 {
   }
 }
 
-# ------ Create a new route network ACL
+# ------ Create a new network ACL
 resource aws_network_acl cr3_r1_websrv {
   provider   = aws.r1
   vpc_id     = aws_vpc.cr3_r1.id

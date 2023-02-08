@@ -35,6 +35,15 @@ resource aws_lb_target_group demo03_tg1 {
   port     = 80
   protocol = "TCP"
   vpc_id   = aws_vpc.demo03.id
+
+  health_check {
+    enabled             = true
+    timeout             = 5
+    interval            = 10
+    protocol            = "TCP"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 # ------ Attach the 2 webservers EC2 instances to the target group
