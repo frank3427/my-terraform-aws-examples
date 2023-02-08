@@ -54,7 +54,7 @@ resource aws_default_network_acl demo03 {
   # this is needed for yum
   ingress {
     protocol   = "tcp"
-    rule_no    = 200
+    rule_no    = 150
     action     = "allow"
     cidr_block = "0.0.0.0/0"
     from_port  = 1024

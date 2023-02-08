@@ -19,7 +19,7 @@ resource aws_instance demo03_websrv {
   vpc_security_group_ids = [ aws_security_group.demo03_sg_websrv.id ]
   tags                   = { Name = "demo03-websrv${count.index + 1}" }
   user_data_base64       = base64encode(replace(file(var.websrv_cloud_init_script),"<HOSTNAME>","websrv${count.index + 1}"))        
-  iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  #iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
 }
 
 # ------ Create a security group
