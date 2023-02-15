@@ -1,0 +1,37 @@
+# ---- region
+aws_region         = "eu-west-1"    # Ireland
+account0_profile   = "xxx_profile0"
+account1_profile   = "xxx_profile1"
+account2_profile   = "xxx_profile2"
+
+# ---- CIDR network
+acct0_cidr_vpc       = "192.168.0.0/16"
+acct0_cidr_subnet1   = "192.168.0.0/24"
+acct1_cidr_vpc       = "10.0.0.0/16"
+acct1_cidr_subnet1   = "10.0.0.0/24"
+acct2_cidr_vpc       = "172.16.0.0/16"
+acct2_cidr_subnet1   = "172.16.0.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n" ]
+
+# ---- Instance
+az                       = "a"
+inst_type                = "t3a.small"
+acct0_inst_private_ip    = "192.168.0.11"
+acct1_inst_private_ip    = "10.0.0.11"
+acct2_inst_private_ip    = "172.16.0.11"
+public_sshkey_path       = "sshkeys_generated/ssh_key_demo91.pub"
+private_sshkey_path      = "sshkeys_generated/ssh_key_demo91"
+cloud_init_script        = "cloud_init/cloud_init.sh"
+
+# ---- Route53
+r53_domain         = "awscloud.private"
+r53_sub_domain1    = "acc1.awscloud.private"
+r53_sub_domain2    = "acc2.awscloud.private"
+r53_host1_in_acct1 = "host1.acc1.awscloud.private"
+r53_host2_in_acct2 = "host2.acc2.awscloud.private"
+r53_endp_inb_ip1   = "192.168.0.201"
+r53_endp_inb_ip2   = "192.168.0.202"
+r53_endp_outb_ip1  = "192.168.0.203"
+r53_endp_outb_ip2  = "192.168.0.204"
