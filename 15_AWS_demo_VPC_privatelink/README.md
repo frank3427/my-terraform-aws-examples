@@ -1,5 +1,4 @@
 AWS PrivateLink demo:
-AWS PrivateLink demo:
 
 - VPC (provider) with 1 private subnet and 1 public subnet
   - Network LB in public subnet (listener on port 80)
