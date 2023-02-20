@@ -1,0 +1,17 @@
+variable "aws_region" {}
+variable "cidr_vpc" {}
+variable "cidr_client_subnet" {}
+variable "cidr_rds_subnets" {}
+variable "authorized_ips" {}
+variable "public_sshkey_path" {}
+variable "private_sshkey_path" {}
+variable "db_client_az" {}
+variable "db_client_private_ip" {}
+variable "db_client_inst_type" {}
+variable "db_client_cloud_init_script" {}
+variable "aurora_subnets_azs" {}
+variable "aurora_mysql_cluster_identifier" {}
+variable "aurora_mysql_engine_version" {}
+variable "aurora_mysql_username" {}
+variable "aurora_mysql_db_name" {}
+variable "aurora_mysql_size_in_gbs" {}
