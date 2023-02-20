@@ -8,7 +8,7 @@ yum install zsh mysql nmap -y
 
 # use $$ to ignore shell variable
 echo "========== Create a script to connect to MySQL Database"
-cat << EOF > /home/ec2-user/mysql2.sh
+cat << EOF > /home/ec2-user/mysql.sh
 mysql -u ${param_user} -p$${MYSQL_PASSWD} -h ${param_hostname}
 EOF
 chown ec2-user:ec2-user /home/ec2-user/mysql.sh
