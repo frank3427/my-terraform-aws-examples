@@ -11,7 +11,6 @@ resource aws_instance demo04_websrv {
     ]
   }
   count                  = 3
-  availability_zone      = "${var.aws_region}${var.websrv_az[count.index % 2]}"
   instance_type          = var.websrv_inst_type
   ami                    = data.aws_ami.al2_arm64.id
   key_name               = aws_key_pair.demo04_websrv.id

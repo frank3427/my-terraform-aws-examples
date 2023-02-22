@@ -6,7 +6,7 @@ resource aws_eip demo04_bastion {
   tags     = { Name = "demo04-bastion" }
 }
 
-# ------ Create an EC2 instances for web servers
+# ------ Create an EC2 instance for bastion
 resource aws_instance demo04_bastion {
   # ignore change in cloud-init file after provisioning
   lifecycle {
@@ -14,7 +14,6 @@ resource aws_instance demo04_bastion {
       user_data_base64
     ]
   }
-  #availability_zone      = "${var.aws_region}${var.bastion_az}"
   instance_type          = var.bastion_inst_type
   ami                    = data.aws_ami.al2_arm64.id
   key_name               = aws_key_pair.demo04_bastion.id

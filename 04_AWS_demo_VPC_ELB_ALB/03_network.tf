@@ -211,7 +211,7 @@ resource aws_subnet demo04_private_websrv {
   availability_zone       = "${var.aws_region}${var.websrv_az[count.index]}"
   cidr_block              = var.cidr_subnets_private_websrv[count.index]
   map_public_ip_on_launch = false
-  tags                    = { Name = "demo04-private-websrv${count.index+1}" }
+  tags                    = { Name = "demo04-private-websrv-${var.websrv_az[count.index]}" }
 }
 
 # ------ Associate the route table with subnets
