@@ -1,0 +1,19 @@
+# ---- region
+#aws_region     = "eu-west-3"    # Paris
+aws_region     = "eu-west-1"    # Ireland
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- Instance
+inst1_type               = "t3a.small"   # "t4g.medium"
+arch                     = "x86_64"        # choose arm64 or x86_64
+az                       = "a"
+inst1_private_ip         = "192.168.0.11"
+public_sshkey_path       = "sshkeys_generated/ssh_key_demo17.pub"
+private_sshkey_path      = "sshkeys_generated/ssh_key_demo17"
+cloud_init_script_al2    = "cloud_init/cloud_init_al2.sh"
