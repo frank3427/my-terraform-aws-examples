@@ -35,10 +35,6 @@ locals {
   script     = (var.linux == "al2") ? var.cloud_init_script_al2 : var.cloud_init_script_ubuntu
 }
 
-output debug {
-  value = local.script
-}
-
 output Instance {
   value = <<EOF
 
