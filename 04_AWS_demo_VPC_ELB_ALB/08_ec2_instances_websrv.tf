@@ -19,7 +19,7 @@ resource aws_instance demo04_websrv {
   vpc_security_group_ids = [ aws_security_group.demo04_sg_websrv.id ]
   tags                   = { Name = "demo04-websrv${count.index + 1}" }
   user_data_base64       = base64encode(replace(file(var.websrv_cloud_init_script),"<HOSTNAME>","websrv${count.index + 1}"))        
-  iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  # iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
 }
 
 # ------ Create a security group
@@ -29,23 +29,42 @@ resource aws_security_group demo04_sg_websrv {
   vpc_id      = aws_vpc.demo04.id
   tags        = { Name = "demo04-sg-websrv" }
 
+  # Cycle error in Terraform
+  # # ingress rule: allow HTTP
+  # ingress {
+  #   description = "allow HTTP access from load balancer"
+  #   from_port   = 80
+  #   to_port     = 80
+  #   protocol    = "tcp"
+  #   security_groups = [ aws_security_group.demo04_sg_alb.id ]
+  # }
+
   # ingress rule: allow HTTP
   ingress {
-    description = "allow HTTP access from public subnet"
+    description = "allow HTTP access from VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = [ var.cidr_vpc ]
   }
 
-  # ingress rule: allow SSH
+  # ingress rule: allow SSH from bastion host
   ingress {
-    description = "allow SSH access from public subnet"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [ var.cidr_vpc ]
+    description     = "allow SSH access from bastion host"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [ aws_security_group.demo04_sg_bastion.id ]
   }
+
+  # # ingress rule: allow SSH
+  # ingress {
+  #   description = "allow SSH access from public subnet"
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   cidr_blocks = [ var.cidr_vpc ]
+  # }
 
   # egress rule: allow all traffic
   egress {

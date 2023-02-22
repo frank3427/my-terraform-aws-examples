@@ -63,12 +63,21 @@ resource aws_security_group demo04_sg_alb {
     cidr_blocks = var.authorized_ips
   }
 
-  # egress rule: allow all traffic
+  # egress rule: allow only HTTP traffic to web servers
   egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
+    description     = "allow only HTTP traffic to web servers"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"   
+    security_groups = [ aws_security_group.demo04_sg_websrv.id ]
   }
+
+  # # egress rule: allow all traffic
+  # egress {
+  #   description = "allow all traffic"
+  #   from_port   = 0
+  #   to_port     = 0
+  #   protocol    = "-1"    # all protocols
+  #   cidr_blocks = [ "0.0.0.0/0" ]
+  # }
 }
