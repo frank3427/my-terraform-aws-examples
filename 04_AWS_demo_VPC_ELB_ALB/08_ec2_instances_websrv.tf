@@ -10,16 +10,15 @@ resource aws_instance demo04_websrv {
       user_data_base64
     ]
   }
-  count                  = 2
-  availability_zone      = "${var.aws_region}${var.websrv_az[count.index]}"
+  count                  = 3
+  availability_zone      = "${var.aws_region}${var.websrv_az[count.index % 2]}"
   instance_type          = var.websrv_inst_type
   ami                    = data.aws_ami.al2_arm64.id
   key_name               = aws_key_pair.demo04_websrv.id
-  subnet_id              = aws_subnet.demo04_private_websrv[count.index].id
+  subnet_id              = aws_subnet.demo04_private_websrv[count.index % 2].id
   vpc_security_group_ids = [ aws_security_group.demo04_sg_websrv.id ]
   tags                   = { Name = "demo04-websrv${count.index + 1}" }
   user_data_base64       = base64encode(replace(file(var.websrv_cloud_init_script),"<HOSTNAME>","websrv${count.index + 1}"))        
-  # iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
 }
 
 # ------ Create a security group

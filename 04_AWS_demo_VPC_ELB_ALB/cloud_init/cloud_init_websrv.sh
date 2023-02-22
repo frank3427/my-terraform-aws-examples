@@ -16,6 +16,8 @@ This web page is served by server <?php echo gethostname(); ?>
 </body>
 </html>
 EOF
+mkdir -p /var/www/html/mypath
+cp -p /var/www/html/index.php /var/www/html/mypath
 systemctl start httpd
 systemctl enable httpd
 

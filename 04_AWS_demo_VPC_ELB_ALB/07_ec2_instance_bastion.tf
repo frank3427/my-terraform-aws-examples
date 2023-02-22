@@ -22,7 +22,6 @@ resource aws_instance demo04_bastion {
   vpc_security_group_ids = [ aws_security_group.demo04_sg_bastion.id ]
   tags                   = { Name = "demo04-bastion" }
   user_data_base64       = base64encode(file(var.bastion_cloud_init_script))         
-  #iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
 }
 
 # ------ Create a security group

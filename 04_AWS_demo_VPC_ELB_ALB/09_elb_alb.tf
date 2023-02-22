@@ -19,7 +19,7 @@ resource aws_lb demo04_alb {
 #   }
 }
 
-# ------ Create a target group (empty)
+# ------ Create a first target group (empty)
 resource aws_lb_target_group demo04_tg1 {
   name     = "demo04-tg1"
   port     = 80
@@ -27,8 +27,8 @@ resource aws_lb_target_group demo04_tg1 {
   vpc_id   = aws_vpc.demo04.id
 }
 
-# ------ Attach the 2 webservers EC2 instances to the target group
-resource aws_lb_target_group_attachment demo04_websrv {
+# ------ Attach the first 2 webservers EC2 instances to the target group #1
+resource aws_lb_target_group_attachment demo04_tg1_websrv {
   count            = 2
   target_group_arn = aws_lb_target_group.demo04_tg1.arn
   target_id        = aws_instance.demo04_websrv[count.index].id
@@ -79,5 +79,45 @@ resource aws_security_group demo04_sg_alb {
   #   to_port     = 0
   #   protocol    = "-1"    # all protocols
   #   cidr_blocks = [ "0.0.0.0/0" ]
+  # }
+}
+
+# ====== Path based routing
+
+# ------ Create a second target group (empty) for path-based routing
+resource aws_lb_target_group demo04_tg2 {
+  name     = "demo04-tg2"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.demo04.id
+}
+
+# ------ Attach the 3rd webserver EC2 instance to the target group #2
+resource aws_lb_target_group_attachment demo04_tg2_websrv {
+  target_group_arn = aws_lb_target_group.demo04_tg2.arn
+  target_id        = aws_instance.demo04_websrv[2].id
+  port             = 80
+}
+
+# ------ Add a listener rule for path based routing
+resource aws_lb_listener_rule demo04_rule1 {
+  listener_arn = aws_lb_listener.demo04_listener80.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.demo04_tg2.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/mypath/*"]
+    }
+  }
+
+  # condition {
+  #   host_header {
+  #     values = ["example.com"]
+  #   }
   # }
 }

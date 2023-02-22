@@ -18,6 +18,12 @@ Host d04-ws2
           IdentityFile ${var.websrv_private_sshkey_path}
           StrictHostKeyChecking no
           ProxyJump d04-bastion
+Host d04-ws3
+          Hostname ${aws_instance.demo04_websrv[2].private_ip}
+          User ec2-user
+          IdentityFile ${var.websrv_private_sshkey_path}
+          StrictHostKeyChecking no
+          ProxyJump d04-bastion
 EOF
 
   filename        = "sshcfg"
@@ -37,10 +43,12 @@ output CONNECTIONS {
      ssh -F sshcfg d04-bastion             to connect to bastion host
      ssh -F sshcfg d04-ws1                 to connect to Web server #1
      ssh -F sshcfg d04-ws2                 to connect to Web server #2
+     ssh -F sshcfg d04-ws3                 to connect to Web server #3
 
   2) ---- HTTP connection to public load balancer
      Open the following URL in your Web browser:
      http://${aws_lb.demo04_alb.dns_name}
+     http://${aws_lb.demo04_alb.dns_name}/mypath    for path-based routing
 EOF
 
 }
