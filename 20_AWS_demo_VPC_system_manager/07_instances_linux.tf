@@ -48,10 +48,8 @@ output Instances {
   value = <<EOF
 
 
----- You can SSH directly to the Linux instance by typing the following ssh command
-ssh -F sshcfg demo20-linux1
-ssh -F sshcfg demo20-linux2
-...
+---- You can SSH directly to the Linux instances by typing the following ssh commands:
+${join("\n",[for instance in aws_instance.demo20: "ssh -F sshcfg ${instance.tags_all.Name}"])}
 
 EOF
 }
