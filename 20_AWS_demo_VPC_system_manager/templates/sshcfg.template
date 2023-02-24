@@ -1,0 +1,7 @@
+%{ for instance in instances ~}
+Host demo20-linux${index(instances,instance)+1}
+          Hostname ${lookup(instance,"public_ip")}
+          User ${username}
+          IdentityFile ${ssh_private_key_file}
+          StrictHostKeyChecking no
+%{ endfor ~}
