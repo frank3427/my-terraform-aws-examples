@@ -44,7 +44,11 @@ resource aws_instance demo02_inst1 {
   vpc_security_group_ids = [ aws_security_group.demo02_sg1.id ] 
   tags                   = { Name = "demo02-win" }
   get_password_data      = true    
-  iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo02-inst1-boot" }
+  }
 }
 
 # ------ Display the command needed to connect to the instance

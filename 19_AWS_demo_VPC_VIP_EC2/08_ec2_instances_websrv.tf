@@ -14,7 +14,12 @@ resource aws_instance demo19_websrv {
   private_ip             = var.websrv_private_ips[count.index]
   vpc_security_group_ids = [ aws_security_group.demo19_sg_websrv.id ]
   tags                   = { Name = "demo19-websrv${count.index + 1}" }
-  user_data_base64       = base64encode(replace(file(var.websrv_cloud_init_script),"<HOSTNAME>","websrv${count.index + 1}"))        
+  user_data_base64       = base64encode(replace(file(var.websrv_cloud_init_script),"<HOSTNAME>","websrv${count.index + 1}"))       
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "demo19-websrv${count.index + 1}-boot" }
+  }  
 }
 
 # ------ Create a security group

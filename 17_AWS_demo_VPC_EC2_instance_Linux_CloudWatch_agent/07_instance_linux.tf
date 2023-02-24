@@ -24,6 +24,11 @@ resource aws_instance demo17_inst1 {
   user_data_base64       = base64encode(file(local.script)) 
   private_ip             = var.inst1_private_ip   # optional  
   iam_instance_profile   = aws_iam_instance_profile.demo17_cloudwatch.id
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo17-inst1-boot" }
+  }
 }
 
 # ------ Display the complete ssh command needed to connect to the instance

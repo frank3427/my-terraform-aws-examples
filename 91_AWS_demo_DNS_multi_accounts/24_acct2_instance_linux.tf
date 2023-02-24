@@ -25,6 +25,11 @@ resource aws_instance demo91_acct2_inst1 {
   tags                   = { Name = "demo91-acct2-inst1" }
   user_data_base64       = base64encode(file(var.cloud_init_script)) 
   private_ip             = var.acct2_inst_private_ip   
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { Name = "demo91-acct2-inst1-boot" }
+  } 
 }
 
 # ------ Display the complete ssh command needed to connect to the instance

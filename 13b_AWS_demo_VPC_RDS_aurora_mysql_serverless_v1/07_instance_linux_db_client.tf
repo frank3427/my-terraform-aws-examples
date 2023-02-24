@@ -28,7 +28,11 @@ resource aws_instance demo13b_db_client {
                               # param_hostname = trimsuffix(aws_db_instance.demo13b_mysql.endpoint,":3306"),
                               # param_user     = aws_db_instance.demo13b_mysql.username
   private_ip             = var.db_client_private_ip   # optional        
-  # iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo13b-boot" }
+  }
 }
 
 # ------ Customize the default security group for the EC2 instance

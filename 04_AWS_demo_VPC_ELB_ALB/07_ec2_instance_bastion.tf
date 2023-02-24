@@ -20,7 +20,12 @@ resource aws_instance demo04_bastion {
   subnet_id              = aws_subnet.demo04_public_bastion.id
   vpc_security_group_ids = [ aws_security_group.demo04_sg_bastion.id ]
   tags                   = { Name = "demo04-bastion" }
-  user_data_base64       = base64encode(file(var.bastion_cloud_init_script))         
+  user_data_base64       = base64encode(file(var.bastion_cloud_init_script))
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo04-bastion-boot" }
+  }           
 }
 
 # ------ Create a security group

@@ -29,6 +29,11 @@ resource aws_instance demo05_inst1 {
   tags                   = { Name = "demo05-inst1" }
   user_data_base64       = base64encode(file(var.cloud_init_script))
   iam_instance_profile   = aws_iam_instance_profile.demo05.id
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo05-inst1-boot" }
+  }
 }
 
 # ------ Display the complete ssh command needed to connect to the instance

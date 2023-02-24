@@ -24,7 +24,12 @@ resource aws_instance demo91_acct1_inst1 {
   vpc_security_group_ids = [ aws_default_security_group.demo91_acct1.id ] 
   tags                   = { Name = "demo91-acct1-inst1" }
   user_data_base64       = base64encode(file(var.cloud_init_script)) 
-  private_ip             = var.acct1_inst_private_ip   
+  private_ip             = var.acct1_inst_private_ip  
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { Name = "demo91-acct1-inst1-boot" }
+  } 
 }
 
 # ------ Display the complete ssh command needed to connect to the instance

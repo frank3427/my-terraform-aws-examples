@@ -22,7 +22,11 @@ resource aws_instance demo04b_bastion {
   vpc_security_group_ids = [ aws_security_group.demo04b_sg_bastion.id ]
   tags                   = { Name = "demo04b-bastion" }
   user_data_base64       = base64encode(file(var.bastion_cloud_init_script))         
-  iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo04b-bastion-boot" }
+  }  
 }
 
 # ------ Create a security group

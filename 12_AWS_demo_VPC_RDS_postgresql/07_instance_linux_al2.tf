@@ -27,7 +27,11 @@ resource aws_instance demo12_al2 {
                               param_user     = aws_db_instance.demo12_postgresql.username
   }))
   private_ip             = var.al2_private_ip   # optional        
-  iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo12-al2-boot" }
+  }
 }
 
 # ------ Customize the default security group for the EC2 instance

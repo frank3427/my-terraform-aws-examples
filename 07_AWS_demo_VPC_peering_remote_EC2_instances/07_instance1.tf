@@ -24,5 +24,9 @@ resource aws_instance demo07_r1 {
   vpc_security_group_ids = [ aws_security_group.demo07_sg_r1.id ] 
   tags                   = { Name = "demo07-r1" }
   user_data_base64       = base64encode(file(var.cloud_init_script))         
-  iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo07-r1-boot" }
+  }
 }

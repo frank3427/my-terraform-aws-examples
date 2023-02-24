@@ -25,7 +25,11 @@ resource aws_instance cr3_r2_dr {
   vpc_security_group_ids = [ aws_security_group.cr3_sg_r2.id ] 
   tags                   = { Name = "cr3-r2-dr" }
   user_data_base64       = base64encode(file(var.cloud_init_script_dr))         
-  #iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { Name = "cr3-r2-dr-boot" }
+  } 
 }
 
 # ------ Create a security group for the DR EC2 instance

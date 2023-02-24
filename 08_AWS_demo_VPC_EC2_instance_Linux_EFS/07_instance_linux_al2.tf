@@ -23,7 +23,11 @@ resource aws_instance demo08_al2 {
   tags                   = { Name = "demo08-al2" }
   user_data_base64       = base64encode(replace(local.cloud_init,"<DNS_NAME>",aws_efs_file_system.demo08.dns_name))
   private_ip             = var.al2_private_ip   # optional        
-  iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo08-al2-boot" }
+  }
 }
 
 # ------ Display the complete ssh command needed to connect to the instance

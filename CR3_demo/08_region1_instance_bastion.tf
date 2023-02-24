@@ -29,7 +29,11 @@ resource aws_instance cr3_r1_bastion {
                               mount_point = var.efs_mount_point,
                               dns_name    = aws_efs_file_system.cr3_r1.dns_name
                            }))        
-  #iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { Name = "cr3-r1-bastion-boot" }
+  } 
 }
 
 # ------ Post provisioning by remote-exec

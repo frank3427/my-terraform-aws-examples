@@ -26,6 +26,10 @@ resource aws_instance demo09_ubuntu {
                               mount_point = var.efs_mount_point,
                               dns_name    = aws_efs_file_system.demo09.dns_name
   }))      
-  iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo09-ubuntu-boot" }
+  }
 }
 

@@ -24,7 +24,11 @@ resource aws_instance cr3_r1_websrv {
                               dr_ssh_key    = tls_private_key.ssh-cr3[2].private_key_pem
                               dr_private_ip = var.priv_ip_ws_dr
                            }))   
-  #iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { Name = "cr3-r1-websrv${count.index+1}-boot" }
+  } 
 }
 
 # ------ Create a security group for the web servers EC2 instances
