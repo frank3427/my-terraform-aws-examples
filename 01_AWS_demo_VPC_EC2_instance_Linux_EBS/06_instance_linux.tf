@@ -23,7 +23,11 @@ resource aws_instance demo01_inst1 {
   tags                   = { Name = "demo01-inst1" }
   user_data_base64       = base64encode(file(local.script)) 
   private_ip             = var.inst1_private_ip   # optional  
-  #iam_instance_profile   = "AmazonSSMRoleForInstancesQuickSetup"  # needed for easy connection in Systems Manager      
+  root_block_device {
+    encrypted   = true      # use default KMS key aws/ebs
+    volume_type = "gp3"
+    tags        = { "Name" = "demo01-inst1-boot" }
+  }
 }
 
 # ------ Display the complete ssh command needed to connect to the instance

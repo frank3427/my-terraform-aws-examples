@@ -1,10 +1,10 @@
 # ------ Create an EBS volume
 resource aws_ebs_volume demo01_inst1_vol1 {
   availability_zone = "${var.aws_region}${var.az}"
-  size              = 40        # size in GBs
+  size              = 20        # size in GBs
+  type              = "gp3"     # can be: gp2, gp3, io1, io2, sc1, st1
+  encrypted         = true      # use default KMS key aws/ebs
   tags              = { Name = "demo01-inst1-vol1" }  
-  type              = "gp2"     # can be: gp2, gp3, io1, io2, sc1, st1
-  encrypted         = true
 }
 
 # ------ Attach the EBS volume to the EC2 instance
