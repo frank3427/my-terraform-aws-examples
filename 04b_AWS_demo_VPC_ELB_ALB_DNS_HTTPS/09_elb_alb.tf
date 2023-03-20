@@ -35,31 +35,36 @@ resource aws_lb_target_group_attachment demo04b_websrv {
   port             = 80
 }
 
-# ------ Create a HTTP listener for the ALB
+# ------ Create a HTTP listener for the ALB (redirect to HTTPS)
 resource aws_lb_listener demo04b_listener80 {
   load_balancer_arn = aws_lb.demo04b_alb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+# ------ Create a HTTPS listener for the ALB
+resource aws_lb_listener demo04b_listener443 {
+  load_balancer_arn = aws_lb.demo04b_alb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.demo04b.arn
+
+  default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.demo04b_tg1.arn
   }
 }
-
-# # ------ Create a HTTPS listener for the ALB
-# resource aws_lb_listener demo04b_listener443 {
-#   load_balancer_arn = aws_lb.demo04b_alb.arn
-#   port              = "443"
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-2016-08"
-#   certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
-
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.demo04b_tg1.arn
-#   }
-# }
 
 # ------ Create a security group for the ALB
 resource aws_security_group demo04b_sg_alb {
@@ -68,14 +73,14 @@ resource aws_security_group demo04b_sg_alb {
   vpc_id      = aws_vpc.demo04b.id
   tags        = { Name = "demo04b-sg-alb" }
 
-  # # ingress rule: allow HTTP
-  # ingress {
-  #   description = "allow HTTP access from authorized_ips"
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = var.authorized_ips
-  # }
+  # ingress rule: allow HTTP
+  ingress {
+    description = "allow HTTP access from authorized_ips"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = var.authorized_ips
+  }
 
   # ingress rule: allow HTTP
   ingress {

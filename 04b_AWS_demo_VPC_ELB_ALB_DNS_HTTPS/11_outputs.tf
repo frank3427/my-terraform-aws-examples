@@ -1,23 +1,23 @@
 # ------ Create a SSH config file
 resource local_file sshconfig {
   content = <<EOF
-Host d04-bastion
+Host d04b-bastion
           Hostname ${aws_eip.demo04b_bastion.public_ip}
           User ec2-user
           IdentityFile ${var.bastion_private_sshkey_path}
           StrictHostKeyChecking no
-Host d04-ws1
+Host d04b-ws1
           Hostname ${aws_instance.demo04b_websrv[0].private_ip}
           User ec2-user
           IdentityFile ${var.websrv_private_sshkey_path}
           StrictHostKeyChecking no
-          ProxyJump d04-bastion
-Host d04-ws2
+          ProxyJump d04b-bastion
+Host d04b-ws2
           Hostname ${aws_instance.demo04b_websrv[1].private_ip}
           User ec2-user
           IdentityFile ${var.websrv_private_sshkey_path}
           StrictHostKeyChecking no
-          ProxyJump d04-bastion
+          ProxyJump d04b-bastion
 EOF
 
   filename        = "sshcfg"
@@ -34,9 +34,9 @@ output CONNECTIONS {
   1) ---- SSH connection to compute instances
      Run one of following commands on your Linux/MacOS desktop/laptop
 
-     ssh -F sshcfg d04-bastion             to connect to bastion host
-     ssh -F sshcfg d04-ws1                 to connect to Web server #1
-     ssh -F sshcfg d04-ws2                 to connect to Web server #2
+     ssh -F sshcfg d04b-bastion             to connect to bastion host
+     ssh -F sshcfg d04b-ws1                 to connect to Web server #1
+     ssh -F sshcfg d04b-ws2                 to connect to Web server #2
 
   2) ---- HTTPS connection to public load balancer
      Open the following URL in your Web browser:

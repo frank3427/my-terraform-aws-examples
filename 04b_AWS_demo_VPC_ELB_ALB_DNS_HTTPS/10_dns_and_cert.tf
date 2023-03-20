@@ -7,9 +7,9 @@ resource aws_route53_record demo04b_elb {
 }
 
 resource aws_acm_certificate demo04b {
-  domain_name       = var.dns_domain
+  domain_name       = var.dns_name
   validation_method = "DNS"
-  tags              = { Name = "demo04-cert" }
+  tags              = { Name = "demo04b-cert" }
 
   lifecycle {
     create_before_destroy = true

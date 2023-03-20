@@ -47,7 +47,7 @@ resource aws_default_route_table demo04b {
 resource aws_default_network_acl demo04b {
   default_network_acl_id = aws_vpc.demo04b.default_network_acl_id
   tags                   = { Name = "demo04b-acl" }
-  subnet_ids             = [ aws_subnet.demo04b_public.id ]
+  subnet_ids             = [ aws_subnet.demo04b_public_bastion.id, aws_subnet.demo04b_public_lb[0].id, aws_subnet.demo04b_public_lb[1].id ]
 
   dynamic ingress {
     for_each = var.authorized_ips
@@ -61,16 +61,6 @@ resource aws_default_network_acl demo04b {
     }
   }
 
-  # this is needed for yum
-  ingress {
-    protocol   = "tcp"
-    rule_no    = 200
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 1024
-    to_port    = 65535
-  }
-  
   dynamic ingress {
     for_each = var.authorized_ips
     content {
@@ -80,6 +70,41 @@ resource aws_default_network_acl demo04b {
       cidr_block = ingress.value
       from_port  = 443
       to_port    = 443
+    }
+  }
+
+  dynamic ingress {
+    for_each = var.authorized_ips
+    content {
+      protocol   = "tcp"
+      rule_no    = 205 + 10 * index(var.authorized_ips, ingress.value)
+      action     = "allow"
+      cidr_block = ingress.value
+      from_port  = 80
+      to_port    = 80
+    }
+  }
+
+  # this is needed for yum
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 300
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
+  # allow access from private subnets (needed for traffic thru NAT gateway)
+  dynamic ingress {
+    for_each = var.cidr_subnets_private_websrv
+    content {
+      protocol   = -1
+      rule_no    = 400 + 10 * index(var.cidr_subnets_private_websrv, ingress.value)
+      action     = "allow"
+      cidr_block = ingress.value
+      from_port  = 0
+      to_port    = 0
     }
   }
 
@@ -139,6 +164,55 @@ resource aws_route_table demo04b_private {
   route {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.demo04b.id
+  }
+}
+
+# ------ Create a new network ACL for private subnets
+resource aws_network_acl demo04b_private {
+  vpc_id     = aws_vpc.demo04b.id
+  tags       = { Name = "demo04b-private-acl" }
+  subnet_ids = [ for subnet in aws_subnet.demo04b_private_websrv: subnet.id ]
+
+  # allow all traffic from vpc
+  ingress {
+    protocol   = -1
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = var.cidr_vpc
+    from_port  = 0
+    to_port    = 0
+  }
+  
+  # # needed
+  # dynamic ingress {
+  #   for_each = var.authorized_ips
+  #   content {
+  #     protocol   = "tcp"
+  #     rule_no    = 200 + 10 * index(var.authorized_ips, ingress.value)
+  #     action     = "allow"
+  #     cidr_block = ingress.value
+  #     from_port  = 80
+  #     to_port    = 80
+  #   }
+  # }
+
+  # this is needed for yum
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 300
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
+  egress {
+    protocol   = -1
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
   }
 }
 

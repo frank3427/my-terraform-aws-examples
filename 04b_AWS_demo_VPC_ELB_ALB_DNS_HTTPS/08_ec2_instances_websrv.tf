@@ -35,20 +35,20 @@ resource aws_security_group demo04b_sg_websrv {
 
   # ingress rule: allow HTTP
   ingress {
-    description = "allow HTTP access from public subnet"
+    description = "allow HTTP access from VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = [ var.cidr_vpc ]
   }
 
-  # ingress rule: allow SSH
+  # ingress rule: allow SSH from bastion host
   ingress {
-    description = "allow SSH access from public subnet"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [ var.cidr_vpc ]
+    description     = "allow SSH access from bastion host"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [ aws_security_group.demo04b_sg_bastion.id ]
   }
 
   # egress rule: allow all traffic
