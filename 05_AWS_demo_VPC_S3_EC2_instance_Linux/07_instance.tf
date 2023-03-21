@@ -62,5 +62,8 @@ aws s3 ls s3://demo05-bucket
 aws s3 rm s3://demo05-bucket/test-file.txt
 aws s3 ls s3://demo05-bucket
 
+Note: you can use the following command to create a 2 GB te tfile
+dd if=/dev/random of=big-test-file bs=1024k count=2048
+
 EOF
 }
