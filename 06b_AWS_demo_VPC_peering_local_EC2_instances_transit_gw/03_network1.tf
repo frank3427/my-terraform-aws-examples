@@ -60,6 +60,24 @@ resource aws_default_network_acl demo06b_1 {
     to_port    = 65535
   }
   
+  ingress {
+    protocol   = -1 # all
+    rule_no    = 302
+    action     = "allow"
+    cidr_block = var.cidr_vpc2
+    from_port  = 0
+    to_port    = 0
+  }
+
+  ingress {
+    protocol   = -1 # all
+    rule_no    = 303
+    action     = "allow"
+    cidr_block = var.cidr_vpc3
+    from_port  = 0
+    to_port    = 0
+  }
+
   egress {
     protocol   = -1
     rule_no    = 100
