@@ -1,4 +1,4 @@
-# ------ Create a VPC for AWS private link CONSUME (csm=consumer)
+# ------ Create a VPC for AWS private link CONSUMER (csm=consumer)
 resource aws_vpc demo15_csm {
   cidr_block           = var.csm_cidr_vpc
   enable_dns_hostnames = true
