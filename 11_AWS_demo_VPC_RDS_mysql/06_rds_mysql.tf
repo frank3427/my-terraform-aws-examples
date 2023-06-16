@@ -26,6 +26,7 @@ resource aws_db_subnet_group demo11 {
 resource aws_db_instance demo11_mysql {
   #availability_zone      = "${var.aws_region}${var.az}"    # not valid for multi-AZ
   allocated_storage      = var.mysql_size_in_gbs
+  storage_type           = var.mysql_storage_type
   max_allocated_storage  = var.mysql_max_size_in_gbs
   db_name                = var.mysql_db_name
   engine                 = "mysql"
@@ -38,7 +39,6 @@ resource aws_db_instance demo11_mysql {
   vpc_security_group_ids = [ aws_security_group.demo11_rds.id ]
   tags                   = { Name = "demo11-rds" }
   identifier             = var.mysql_identifier
-  storage_type           = var.mysql_storage_type
   multi_az               = var.mysql_multi_az
   publicly_accessible    = false
   skip_final_snapshot    = true
