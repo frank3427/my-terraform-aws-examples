@@ -2,7 +2,7 @@
 # ------           to have a public IP address for bastion persistent across stop/start
 resource aws_eip demo18_bastion {
   instance = aws_instance.demo18_bastion.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo18-bastion" }
 }
 

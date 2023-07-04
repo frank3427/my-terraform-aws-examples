@@ -2,7 +2,7 @@
 # ------           to have a public IP address for EC2 instance persistent across stop/start
 resource aws_eip demo16_inst1 {
   instance = aws_instance.demo16_inst1.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo16-inst1" }
 }
 

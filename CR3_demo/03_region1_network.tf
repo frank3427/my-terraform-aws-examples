@@ -137,7 +137,7 @@ resource aws_subnet cr3_r1_alb {
 # ------ Create an elastic IP address for the NAT gateway
 resource aws_eip cr3_natgw_r1 {
   provider = aws.r1
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "cr3-r1-natgw" }
 }
 

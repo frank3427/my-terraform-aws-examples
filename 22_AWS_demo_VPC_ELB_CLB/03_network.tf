@@ -133,7 +133,7 @@ resource aws_default_network_acl demo22 {
 
 # ------ Create an elastic IP address for the NAT gateway
 resource aws_eip demo22_natgw {
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo22-natgw" }
 }
 

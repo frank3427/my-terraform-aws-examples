@@ -2,7 +2,7 @@
 # ------           to have a public IP address for EC2 instance persistent across stop/start
 resource aws_eip demo12_al2 {
   instance = aws_instance.demo12_al2.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo12-postgresql-client" }
 }
 
