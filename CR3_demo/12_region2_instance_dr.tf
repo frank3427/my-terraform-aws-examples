@@ -3,7 +3,7 @@
 resource aws_eip cr3_r2_dr {
   provider = aws.r2
   instance = aws_instance.cr3_r2_dr.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "cr3-r2-dr" }
 }
 

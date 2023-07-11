@@ -3,7 +3,7 @@
 resource aws_eip cr3_r1_bastion {
   provider = aws.r1
   instance = aws_instance.cr3_r1_bastion.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "cr3-r1-bastion" }
 }
 
