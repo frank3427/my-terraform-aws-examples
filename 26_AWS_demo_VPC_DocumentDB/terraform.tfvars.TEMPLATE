@@ -1,0 +1,34 @@
+# ---- region
+aws_region     = "eu-west-3"    # Paris
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+cidr_subnet2   = "192.168.1.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- generated SSH key pair
+public_sshkey_path   = "sshkeys_generated/ssh_key_demo26.pub"
+private_sshkey_path  = "sshkeys_generated/ssh_key_demo26"
+
+# ---- Availability Zone 
+az1                      = "a"
+az2                      = "b"
+
+# ---- Instance Amazon Linux 2
+al2_private_ip         = "192.168.0.11"
+al2_inst_type          = "t3a.large"
+al2_cloud_init_script  = "cloud_init/cloud_init_al2_TEMPLATE.sh"
+
+# ---- DocumentDB
+docdb_identifier         = "demo26-docdb-cluster"
+docdb_user               = "user1"                # cannot use "admin"
+docdb_backup_retention   = 5                         # days
+docdb_backup_window      = "07:00-09:00"             # UTC
+docdb_maintenance_window = "wed:04:00-wed:04:30"     # UTC
+docdb_port               = "27017"                   # default port is 27017
+docdb_instance_type      = "db.r6g.large"
+docdb_nb_of_instances    = 2
+docdb_apply_immediately  = true                      # default is false (applied in next maintenance window)
