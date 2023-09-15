@@ -52,7 +52,7 @@ resource aws_security_group demo26_docdb {
 }
 
 # ------ Create a new subnet group (at least 2 AZs)
-resource aws_db_subnet_group demo26 {
+resource aws_docdb_subnet_group demo26 {
   name       = "demo26"
   subnet_ids = [ aws_subnet.demo26_public1.id, aws_subnet.demo26_public2.id ]
 
@@ -68,14 +68,16 @@ resource aws_docdb_cluster demo26 {
   port                         = var.docdb_port
   master_username              = var.docdb_user
   master_password              = local.docdb_pwd
-  db_subnet_group_name         = aws_db_subnet_group.demo26.name
+  db_subnet_group_name         = aws_docdb_subnet_group.demo26.name
   vpc_security_group_ids       = [ aws_security_group.demo26_docdb.id ]
   backup_retention_period      = var.docdb_backup_retention
   preferred_backup_window      = var.docdb_backup_window
   preferred_maintenance_window = var.docdb_maintenance_window
   skip_final_snapshot          = true
-  apply_immediately            = var.docdb_apply_immediately 
+  storage_encrypted            = true 
+  apply_immediately            = var.docdb_apply_immediately
 }
+#aws_docdb_cluster.demo26: Creation complete after 51s [id=demo26-docdb-cluster]
 
 # ------ Add DocumentDB instances (at least 1) to DocumentDB cluster
 resource aws_docdb_cluster_instance demo26 {
@@ -87,5 +89,5 @@ resource aws_docdb_cluster_instance demo26 {
   #preferred_maintenance_window = var.docdb_maintenance_window
 }
 
-#aws_docdb_cluster_instance.demo26[1]: Destruction complete after 7m37s
 #aws_docdb_cluster_instance.demo26[0]: Creation complete after 3m45s [id=demo26-docdb-cluster-1]
+#aws_docdb_cluster_instance.demo26[1]: Destruction complete after 7m37s
