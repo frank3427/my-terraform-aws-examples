@@ -41,6 +41,12 @@ resource aws_db_instance demo12_postgresql {
   multi_az               = false
   publicly_accessible    = false
   skip_final_snapshot    = true
+  monitoring_interval    = 0    # Enhanced monitoring disabled
+  performance_insights_enabled          = true
+  performance_insights_retention_period = 7
+  backup_retention_period               = 7
+  backup_window                         = "15:00-16:00" # UTC, daily
+  delete_automated_backups              = true
 }
 
 # ------ Create a new security group for the RDS instance
