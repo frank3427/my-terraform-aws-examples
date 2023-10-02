@@ -2,7 +2,7 @@
 # ------           to have a public IP address for EC2 instance persistent across stop/start
 resource aws_eip demo17_inst1 {
   instance = aws_instance.demo17_inst1.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo17-inst1" }
 }
 
@@ -24,6 +24,7 @@ resource aws_instance demo17_inst1 {
   user_data_base64       = base64encode(file(local.script)) 
   private_ip             = var.inst1_private_ip   # optional  
   iam_instance_profile   = aws_iam_instance_profile.demo17_cloudwatch.id
+  monitoring             = true     # enable detailed monitoring (1 minute vs 5 minutes for CloudWatch)
   root_block_device {
     encrypted   = true      # use default KMS key aws/ebs
     volume_type = "gp3"

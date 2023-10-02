@@ -2,7 +2,7 @@
 # ------           to have a public IP address for EC2 instance persistent across stop/start
 resource aws_eip demo12_al2 {
   instance = aws_instance.demo12_al2.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo12-postgresql-client" }
 }
 
@@ -24,13 +24,27 @@ resource aws_instance demo12_al2 {
   user_data_base64       = base64encode(templatefile(var.al2_cloud_init_script, {
                               param_hostname = trimsuffix(aws_db_instance.demo12_postgresql.endpoint,":5432"),
                               param_db_name  = var.postgresql_db_name
-                              param_user     = aws_db_instance.demo12_postgresql.username
+                              param_user     = aws_db_instance.demo12_postgresql.username,
+                              param_password = random_string.demo12-db-passwd.result
   }))
   private_ip             = var.al2_private_ip   # optional        
   root_block_device {
     encrypted   = true      # use default KMS key aws/ebs
     volume_type = "gp3"
     tags        = { "Name" = "demo12-al2-boot" }
+  }
+}
+
+# ------ Copy local SQL scripts to EC2 instance
+resource null_resource copy_sql {
+  provisioner "file" {
+    connection {
+      host        = aws_eip.demo12_al2.public_ip
+      user        = local.username
+      private_key = file(var.private_sshkey_path)
+    }
+    source        = "sql_scripts/"
+    destination   = "/home/ec2-user"
   }
 }
 

@@ -24,9 +24,9 @@ al2_cloud_init_script  = "cloud_init/cloud_init_al2_TEMPLATE.sh"
 
 # ---- RDS postgresql
 postgresql_identifier      = "demo12-rds-postgresql"
-postgresql_instance_class  = "db.r6g.xlarge"
+postgresql_instance_class  = "db.r6g.large"
 postgresql_size_in_gbs     = "40"
 postgresql_max_size_in_gbs = "100"
 postgresql_db_name         = "demo12"
-postgresql_version         = "14.5"
-postgresql_storage_type    = "gp2"       # problem with gp3: accepted but gp2 used !
+postgresql_version         = "15.4"
+postgresql_storage_type    = "gp3"

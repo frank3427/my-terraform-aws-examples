@@ -69,11 +69,12 @@ resource aws_subnet demo05_public {
   tags                    = { Name = "demo05-public" }
 }
 
-# ------ Create and use a VPC endpoint for S3 to keep traffic between instance and S3 internal
+# ------ Create and use a VPC gateway endpoint for S3 to keep traffic between instance and S3 internal (Internet not used)
 resource aws_vpc_endpoint demo05_s3 {
-  vpc_id       = aws_vpc.demo05.id
-  service_name = "com.amazonaws.${var.aws_region}.s3"
-  tags         = { Name = "demo05-s3-endpt" }
+  vpc_id            = aws_vpc.demo05.id
+  service_name      = "com.amazonaws.${var.aws_region}.s3"
+  vpc_endpoint_type = "Gateway"
+  tags              = { Name = "demo05-s3-endpt" }
 }
 
 resource aws_vpc_endpoint_route_table_association demo05_s3 {

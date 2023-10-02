@@ -113,7 +113,7 @@ resource aws_default_network_acl demo15_pvd {
 
 # ------ Create an elastic IP address for the NAT gateway
 resource aws_eip demo15_pvd_natgw {
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo15-pvd-natgw" }
 }
 

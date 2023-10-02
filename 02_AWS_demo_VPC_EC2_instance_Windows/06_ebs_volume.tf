@@ -12,10 +12,4 @@ resource aws_volume_attachment demo02_inst1_vol1 {
   volume_id   = aws_ebs_volume.demo02_inst1_vol1.id
   instance_id = aws_instance.demo02_inst1.id
   device_name = "/dev/sdf"          # recommended for EBS volumes: /dev/sd[f-p]
-
-#    mkfs -t xfs -L vol1 /dev/nvme1n1
-#    mkdir /mnt/vol1
-#    echo "LABEL=vol1      /mnt/vol1      xfs      defaults    0 0" >> /etc/fstab
-#    mount /mnt/vol1
-
 }

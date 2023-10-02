@@ -11,7 +11,7 @@ resource aws_network_interface demo19_vip {
 
 resource aws_eip demo19_vip {
   network_interface = aws_network_interface.demo19_vip.id
-  vpc               = true
+  domain            = "vpc"
   tags              = { Name = "demo19-bastion" }
 }
 
