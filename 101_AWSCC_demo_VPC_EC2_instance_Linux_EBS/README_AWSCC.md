@@ -1,4 +1,4 @@
-## MISSING resources IN awscc
+## Missing resources in awscc provider
 
 - ec2 instance
 - internet gateway attachment
@@ -7,12 +7,12 @@
 - ec2 security group
 - cannot add route rule(s) to route table
 
-## MISSING data sources IN awscc
+## Missing data sources in awscc provider
 
 - AMI
 
-## DIFFERENCES
+## Differences awscc vs aws
 
 - different format to tags
-  aws : tags = { Name = "demo101-rt" }
-  awscc : tags = [{ key = "Name", value = "demo101-rt" }]
+  - aws : tags = { Name = "demo101-rt" }
+  - awscc : tags = [{ key = "Name", value = "demo101-rt" }]
