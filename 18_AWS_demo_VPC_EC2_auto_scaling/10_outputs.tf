@@ -1,28 +1,28 @@
-# # ------ Create a SSH config file
-# resource local_file sshconfig {
-#   content = <<EOF
-# Host d18-bastion
-#           Hostname ${aws_eip.demo18_bastion.public_ip}
-#           User ec2-user
-#           IdentityFile ${var.bastion_private_sshkey_path}
-#           StrictHostKeyChecking no
-# Host d18-ws1
-#           Hostname ${aws_instance.demo18_websrv[0].private_ip}
-#           User ec2-user
-#           IdentityFile ${var.websrv_private_sshkey_path}
-#           StrictHostKeyChecking no
-#           ProxyJump d18-bastion
-# Host d18-ws2
-#           Hostname ${aws_instance.demo18_websrv[1].private_ip}
-#           User ec2-user
-#           IdentityFile ${var.websrv_private_sshkey_path}
-#           StrictHostKeyChecking no
-#           ProxyJump d18-bastion
-# EOF
+# ------ Create a SSH config file
+resource local_file sshconfig {
+  content = <<EOF
+Host d18-bastion
+          Hostname ${aws_eip.demo18_bastion.public_ip}
+          User ec2-user
+          IdentityFile ${var.bastion_private_sshkey_path}
+          StrictHostKeyChecking no
+Host d18-ws1
+          Hostname {aws_instance.demo18_websrv[0].private_ip}
+          User ec2-user
+          IdentityFile ${var.websrv_private_sshkey_path}
+          StrictHostKeyChecking no
+          ProxyJump d18-bastion
+Host d18-ws2
+          Hostname {aws_instance.demo18_websrv[1].private_ip}
+          User ec2-user
+          IdentityFile ${var.websrv_private_sshkey_path}
+          StrictHostKeyChecking no
+          ProxyJump d18-bastion
+EOF
 
-#   filename        = "sshcfg"
-#   file_permission = "0600"
-# }
+  filename        = "sshcfg"
+  file_permission = "0600"
+}
 
 # ------ Display the complete ssh commands needed to connect to the compute instances
 output CONNECTIONS {

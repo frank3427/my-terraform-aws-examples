@@ -31,7 +31,7 @@ resource aws_default_route_table demo06_1 {
 resource aws_default_network_acl demo06_1 {
   default_network_acl_id = aws_vpc.demo06_1.default_network_acl_id
   tags                   = { Name = "demo06_1-acl" }
-  subnet_ids             = [ aws_subnet.demo06_1_public.id ]
+  subnet_ids             = [ aws_subnet.demo06_public1.id ]
 
   dynamic ingress {
     for_each = var.authorized_ips
@@ -43,6 +43,16 @@ resource aws_default_network_acl demo06_1 {
       from_port  = 22
       to_port    = 22
     }
+  }
+
+  # allow all traffic from peered VPC
+  ingress {
+    protocol   = -1
+    rule_no    = 150
+    action     = "allow"
+    cidr_block = var.cidr_vpc2
+    from_port  = 0
+    to_port    = 0
   }
 
   # this is needed for yum

@@ -70,7 +70,7 @@ resource aws_subnet demo05_public {
 }
 
 # ------ Create and use a VPC gateway endpoint for S3 to keep traffic between instance and S3 internal (Internet not used)
-resource aws_vpc_endpoint demo05_s3 {
+resource aws_vpc_endpoint demo05_s3_gateway {
   vpc_id            = aws_vpc.demo05.id
   service_name      = "com.amazonaws.${var.aws_region}.s3"
   vpc_endpoint_type = "Gateway"
@@ -79,7 +79,7 @@ resource aws_vpc_endpoint demo05_s3 {
 
 resource aws_vpc_endpoint_route_table_association demo05_s3 {
   route_table_id  = aws_default_route_table.demo05.id
-  vpc_endpoint_id = aws_vpc_endpoint.demo05_s3.id
+  vpc_endpoint_id = aws_vpc_endpoint.demo05_s3_gateway.id
 }
 
 # ------ Create a security group for the EC2 instance

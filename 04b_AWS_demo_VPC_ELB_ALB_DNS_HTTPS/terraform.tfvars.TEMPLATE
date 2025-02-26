@@ -26,5 +26,6 @@ bastion_cloud_init_script   = "cloud_init/cloud_init_bastion.sh"
 
 # ---- DNS (route 53) -- PROVIDE YOUR EXISTING ROUTE 53 DNS ZONE HERE
 dns_name    = "demo04b.example.com"
+dns_name2   = "demo04b2.example.com"
 dns_domain  = "example.com"
 dns_zone_id = "xxxxxxxxxxxx"

@@ -1,0 +1,29 @@
+# ---- region
+#aws_region     = "eu-west-3"    # Paris
+aws_region     = "eu-west-1"    # Ireland
+
+# ---- network CIDRs
+cidr_vpc         = "192.168.0.0/16"
+cidr_subnet_pub  = "192.168.0.0/24"
+cidr_subnet_priv = "192.168.1.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- EC2 Instance
+inst1_type               = "t3.large"      # "t4g.medium"
+arch                     = "x86_64"        # choose arm64 or x86_64
+linux_os_version         = "al2023"        # choose al2023, al2, ubuntu22, rhel9, sles15
+az                       = "a"
+inst1_private_ip         = "192.168.0.11"
+public_sshkey_path       = "sshkeys_generated/ssh_key_demo44.pub"
+private_sshkey_path      = "sshkeys_generated/ssh_key_demo44"
+cloud_init_script_al     = "cloud_init/cloud_init_al.sh"
+cloud_init_script_ubuntu = "cloud_init/cloud_init_ubuntu.sh"
+cloud_init_script_sles   = "cloud_init/cloud_init_sles.sh"
+cloud_init_script_rhel   = "cloud_init/cloud_init_rhel.sh"
+
+# ---- Elasticache Memcached cluster
+memcached_version        = "1.6.22"
+elasticache_nb_nodes     = 2
+elasticache_node_type    = "cache.t3.medium"

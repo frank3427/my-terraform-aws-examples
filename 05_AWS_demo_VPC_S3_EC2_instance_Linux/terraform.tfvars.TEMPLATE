@@ -8,6 +8,9 @@ cidr_subnet1   = "192.168.0.0/24"
 # ---- Authorized public IPs ingress
 authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
 
+# ---- S3
+s3_bucket_name = "demo05-bucket-cpa"
+
 # ---- Instance
 az                  = "a"
 inst1_type          = "t3.medium"       # x86_64 arch

@@ -1,0 +1,9 @@
+# ---- region
+#aws_region     = "eu-west-3"    # Paris
+aws_region     = "eu-west-1"    # Ireland
+
+# ---- API gateway
+apigw_path1      = "path1"
+
+# ---- Cognito
+cognito_user_name = "chris"

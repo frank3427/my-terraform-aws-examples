@@ -1,15 +1,11 @@
 # ------ Display the complete ssh command needed to connect to the instance
-locals {
-  username   = "ec2-user"
-}
-
 output Instructions {
   value = <<EOF
 
 ---- PostgreSQL details
 Endpoint: ${aws_db_instance.demo12_postgresql.endpoint}
 User    : ${aws_db_instance.demo12_postgresql.username}
-Password: ${random_string.demo12-db-passwd.result}
+Password: ${local.password}
 
 ---- You can SSH directly to the Linux instance with PostgreSQL Client by typing the following ssh command:
 ssh -i ${var.private_sshkey_path} ${local.username}@${aws_eip.demo12_al2.public_ip}
@@ -39,7 +35,7 @@ Notes:
       VALUES (1, 'Christophe','Pauliat','2022-10-03');
 
       INSERT INTO tblEmployee (employee_id, employee_first_name, employee_last_name, employee_joining_date)
-      VALUES (2, 'Jean','Bon','2021-10-03');, 
+      VALUES (2, 'Jean','Bon','2021-10-03'); 
 
       INSERT INTO tblEmployee (employee_id, employee_first_name, employee_last_name, employee_joining_date)
       VALUES (3, 'Pierre','Martin','2020-12-30');

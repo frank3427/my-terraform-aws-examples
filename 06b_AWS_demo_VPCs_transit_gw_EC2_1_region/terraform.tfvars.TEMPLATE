@@ -1,0 +1,17 @@
+# ---- region
+aws_region     = "eu-west-3"    # Paris
+
+# ---- CIDR network
+cidrs_vpc        = [ "192.168.0.0/16", "10.0.0.0/16", "172.16.0.0/16" ]
+cidrs_subnet_tgw = [ "192.168.9.0/28", "10.0.9.0/28", "172.16.9.0/28" ]
+cidrs_subnet_ec2 = [ "192.168.0.0/24", "10.0.0.0/24", "172.16.0.0/24" ]
+
+# ---- Authorized public IPs ingress
+authorized_ips   = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- Instance
+az                  = "a"
+inst_type           = "m6g.medium"
+public_sshkey_path  = "sshkeys_generated/ssh_key_demo06b.pub"
+private_sshkey_path = "sshkeys_generated/ssh_key_demo06b"
+cloud_init_script   = "cloud_init/cloud_init_al2023.sh"

@@ -1,0 +1,18 @@
+# ---- region
+aws_region     = "eu-north-1"    # Stockholm
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- Instance
+inst1_type               = "g4dn.xlarge"   
+az                       = "a"
+inst1_private_ip         = "192.168.0.11"
+public_sshkey_path       = "sshkeys_generated/ssh_key_demo34.pub"
+private_sshkey_path      = "sshkeys_generated/ssh_key_demo34"
+cloud_init_script_al2    = "cloud_init/cloud_init_al2.sh"
+cloud_init_script_ubuntu = "cloud_init/cloud_init_ubuntu.sh"

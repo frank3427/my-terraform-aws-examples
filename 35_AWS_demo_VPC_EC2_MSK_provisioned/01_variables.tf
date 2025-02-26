@@ -1,0 +1,14 @@
+variable "aws_region" {}
+variable "cidr_vpc" {}
+variable "cidr_subnets" {}
+variable "az_subnets" {}
+variable "authorized_ips" {}
+variable "inst1_type" {}
+variable "inst1_arch" {}
+variable "inst1_private_ip" {}
+variable "public_sshkey_path" {}
+variable "private_sshkey_path" {}
+variable "cloud_init_script" {}
+variable "msk_kafka_version" {}
+variable "msk_node_type" {}
+variable "msk_ebs_size_gb" {}

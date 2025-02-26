@@ -1,0 +1,8 @@
+# ---- region
+aws_region   = "eu-west-1"    # Ireland
+
+# ---- DynamoDB table for Terraform Backend
+dynamodb_tab = "demo31_tf_state"
+
+# ---- S3 bucket for Terraform Backend
+s3_bucket    = "demo31_tf_state_cpauliat""

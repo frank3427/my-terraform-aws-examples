@@ -45,7 +45,7 @@ resource aws_rds_cluster demo13 {
 resource aws_rds_cluster_instance demo13 {
   count                  = 3
   identifier             = "${var.aurora_mysql_db_identifier}${count.index+1}"
-  cluster_identifier     = var.aurora_mysql_cluster_identifier
+  cluster_identifier     = aws_rds_cluster.demo13.id
   engine                  = "aurora-mysql"
   instance_class         = var.aurora_mysql_instance_class
   publicly_accessible    = false

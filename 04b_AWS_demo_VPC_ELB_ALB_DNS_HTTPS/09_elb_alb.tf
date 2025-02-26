@@ -66,6 +66,12 @@ resource aws_lb_listener demo04b_listener443 {
   }
 }
 
+# ------ Add a second certificate for ALB listener
+resource aws_lb_listener_certificate demo04b2 {
+  listener_arn    = aws_lb_listener.demo04b_listener443.arn
+  certificate_arn   = aws_acm_certificate.demo04b2.arn
+}
+
 # ------ Create a security group for the ALB
 resource aws_security_group demo04b_sg_alb {
   name        = "demo04b-sg-alb"

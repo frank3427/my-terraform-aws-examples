@@ -1,0 +1,24 @@
+# ---- region
+#aws_region     = "eu-west-3"    # Paris
+aws_region     = "eu-west-1"    # Ireland
+
+# ---- network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnets   = [ "192.168.0.0/24", "192.168.1.0/24", "192.168.2.0/24" ]
+az_subnets     = [ "a", "b", "c" ]
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- Instance
+inst1_type               = "t3.small"    # "t4g.medium"
+inst1_arch               = "x86_64"       # choose arm64 or x86_64
+inst1_private_ip         = "192.168.0.11"
+public_sshkey_path       = "sshkeys_generated/ssh_key_demo35.pub"
+private_sshkey_path      = "sshkeys_generated/ssh_key_demo35"
+cloud_init_script        = "cloud_init/cloud_init_TEMPLATE.sh"
+
+# ---- MSK
+msk_kafka_version        = "3.5.1"          # In July 2024, recommended = 3.5.1
+msk_node_type            = "kafka.t3.small" # kafka.m5.large"
+msk_ebs_size_gb          = "100"

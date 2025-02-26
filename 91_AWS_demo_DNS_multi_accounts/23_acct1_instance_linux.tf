@@ -3,7 +3,7 @@
 resource aws_eip demo91_acct1_inst1 {
   provider = aws.acct1
   instance = aws_instance.demo91_acct1_inst1.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo91-acct1-inst1" }
 }
 
