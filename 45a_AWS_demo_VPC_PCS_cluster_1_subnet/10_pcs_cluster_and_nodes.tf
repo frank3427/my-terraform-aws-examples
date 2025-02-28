@@ -13,32 +13,26 @@ resource awscc_pcs_cluster demo45a {
     }
 }
 
-# ---- Create a PCS compute node group for compute nodes
+# ---- create CloudfFormation stack to create PCS compute node group and PCS queue
+# awscc 1.31 does not support PCS compute node group
+resource aws_cloudformation_stack demo45a_nodes_queue {
+  name          = "demo45a-pcs-nodes-queue"
+  capabilities  = ["CAPABILITY_IAM"]
+  template_body = templatefile("templates/cfn_template.tpl", {
+    compute_node_group_name = "demo45a-nodes-group1",
+    pcs_cluster_id          = awscc_pcs_cluster.demo45a.cluster_id,
+    instance_type           = var.cpt_nodes_inst_type,
+    launch_template_version = aws_launch_template.demo45a_cpt_nodes.latest_version,
+    launch_template_id      = aws_launch_template.demo45a_cpt_nodes.id,
+    subnet_id               = aws_subnet.demo45a_public.id,
+    instance_profile_arn    = aws_iam_instance_profile.demo45a.arn,
+    queue_name              = var.slurm_queue,
+    nodes_count             = var.cpt_nodes_count
+  })
+}
 
-# resource awscc_pcs_compute_node_group # Not available in awscc 1.26.0
-# https://github.com/hashicorp/terraform-provider-awscc/issues/2157
-
-# create AWS CLI script to create pcs compute node group
-resource local_file create_pcs_cpt_nodes_group {
-    filename = "tmp1_create_cpt_nodes_group.sh"
-    content = <<EOF
-aws pcs create-compute-node-group \
-    --region "${var.aws_region}" \
-    --cluster-identifier "${awscc_pcs_cluster.demo45a.cluster_id}" \
-    --compute-node-group-name "demo45a-cpt-nodes-group" \
-    --subnet-ids '["${aws_subnet.demo45a_public.id}"]' \
-    --custom-launch-template '{
-        "id": "${aws_launch_template.demo45a_cpt_nodes.id}",
-        "version": "${aws_launch_template.demo45a_cpt_nodes.latest_version}"
-        }' \
-    --iam-instance-profile-arn "${aws_iam_instance_profile.demo45a.arn}" \
-    --scaling-configuration '{
-        "minInstanceCount": ${var.cpt_nodes_count},
-        "maxInstanceCount": ${var.cpt_nodes_count}
-        }' \
-    --instance-configs instanceType=${var.cpt_nodes_inst_type}
-
-EOF
+locals {
+    pcs_compute_nodes_group_id = aws_cloudformation_stack.demo45a_nodes_queue.outputs.ComputeNodeGroupID
 }
 
 # ---- Create a PCS queue
@@ -51,30 +45,3 @@ EOF
 #         compute_node_group_id = "pcs_ub9sk06mye"
 #     }]
 # }
-
-# CPT_NODE_GRP_ID=`aws pcs list-compute-node-groups --cluster-identifier "${awscc_pcs_cluster.demo45a.cluster_id}" --region "${var.aws_region}" --query 'computeNodeGroups[0].id' | jq -r`
-
-# create AWS CLI script to create pcs queue
-resource local_file create_pcs_queue {
-    filename = "tmp2_create_queue.sh"
-    content = <<EOF
-aws pcs list-compute-node-groups \
-    --region "${var.aws_region}" \
-    --cluster-identifier "${awscc_pcs_cluster.demo45a.cluster_id}" \
-    --query 'computeNodeGroups[].[name,id]' \
-    --output text > ${local.nodegrp_ids_file}
-
-CPT_NODE_GRP_ID=`grep demo45a-cpt-nodes-group ${local.nodegrp_ids_file} | cut -f2`
-
-aws pcs create-queue \
-    --region "${var.aws_region}" \
-    --cluster-identifier "${awscc_pcs_cluster.demo45a.cluster_id}" \
-    --queue-name "${var.slurm_queue}" \
-    --compute-node-group-configurations computeNodeGroupId=$CPT_NODE_GRP_ID
-
-EOF
-}
-
-locals {
-    nodegrp_ids_file = "tmp_node_group_ids.txt"
-}
