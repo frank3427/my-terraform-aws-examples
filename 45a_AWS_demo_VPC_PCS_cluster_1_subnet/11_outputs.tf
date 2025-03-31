@@ -1,6 +1,6 @@
 # ------ Get the public IP addresses of the compute nodes using tags
 resource null_resource wait_for_nodes {
-  depends_on = [ aws_cloudformation_stack.demo45a_nodes_queue ]
+  depends_on = [ awscc_pcs_compute_node_group.demo45a_ng1 ]
   provisioner "local-exec" {
     command = "sleep 60"
   }
@@ -10,12 +10,18 @@ data aws_instances cpt_nodes {
   depends_on = [ null_resource.wait_for_nodes ]
   filter {
     name   = "tag:aws:pcs:compute-node-group-id"
-    values = [ local.pcs_compute_nodes_group_id ]
+    values = [ awscc_pcs_compute_node_group.demo45a_ng1.compute_node_group_id ]
   }
 }
 
 output cpt_nodes_public_ips {
   value = local.compute_nodes_public_ips
+}
+
+locals {
+    username                 = "ec2-user"   
+    sshcfg_file              = "sshcfg" 
+    compute_nodes_public_ips = data.aws_instances.cpt_nodes.public_ips
 }
 
 # ------ Create a SSH config file
@@ -41,8 +47,4 @@ output Instructions {
   })
 }
 
-locals {
-    username                 = "ec2-user"   
-    sshcfg_file              = "sshcfg" 
-    compute_nodes_public_ips = data.aws_instances.cpt_nodes.public_ips
-}
+
