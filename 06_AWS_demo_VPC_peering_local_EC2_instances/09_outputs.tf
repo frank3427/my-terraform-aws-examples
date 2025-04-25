@@ -13,9 +13,13 @@ instance in VPC #2: ssh -i ${var.private_sshkey_path} ${local.username}@${aws_ei
 
 ---- Once connected to instance in VPC #1, you can ping instance in VPC #2
 $ ping ${aws_instance.demo06_inst2.private_ip}
+or
+$ ping ${aws_instance.demo06_inst2.private_dns}
 
 ---- OR once connected to instance in VPC #2, you can ping instance in VPC #1
 $ ping ${aws_instance.demo06_inst1.private_ip}
+or
+$ ping ${aws_instance.demo06_inst1.private_dns}
 
 
 EOF

@@ -40,11 +40,14 @@ output CONNECTIONS {
   1) ---- SSH connection to compute instances
      Run one of following commands on your Linux/MacOS desktop/laptop
 
-     ssh -F sshcfg d04-bastion             to connect to bastion host
-     ssh -F sshcfg d04-ws1                 to connect to Web server #1
-     ssh -F sshcfg d04-ws2                 to connect to Web server #2
-     ssh -F sshcfg d04-ws3                 to connect to Web server #3
+     ssh -F sshcfg d04-bastion             # to connect to bastion host
+     ssh -F sshcfg d04-ws1                 # to connect to Web server #1
+     ssh -F sshcfg d04-ws2                 # to connect to Web server #2
+     ssh -F sshcfg d04-ws3                 # to connect to Web server #3
 
+     Note: you can see access logs on a webserver with following command:
+     sudo tail -f /var/log/httpd/access_log
+     
   2) ---- HTTP connection to public load balancer
      Open the following URL in your Web browser:
      http://${aws_lb.demo04_alb.dns_name}

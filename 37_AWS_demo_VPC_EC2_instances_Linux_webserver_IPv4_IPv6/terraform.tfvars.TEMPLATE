@@ -1,0 +1,23 @@
+# ---- region
+aws_region     = "eu-west-3"    # Paris
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+cidr_subnet2   = "192.168.1.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips    = [ "x.x.x.x/n", "y.y.y.y/m" ]
+authorized_ips_v6 = [ "hhhh:hhhh:hhhh:hhhh:hhhh:hhhh:hhhh:hhhh" ]
+
+# ---- EC2 Instances
+inst1_type               = "t3.small"      # "t4g.medium"
+inst2_type               = "t3.small"      # "t4g.medium"
+arch                     = "x86_64"        # choose arm64 or x86_64
+az1                      = "a"
+az2                      = "b"
+inst1_private_ip         = "192.168.0.11"
+inst2_private_ip         = "192.168.1.11"
+public_sshkey_path       = "sshkeys_generated/ssh_key_demo37.pub"
+private_sshkey_path      = "sshkeys_generated/ssh_key_demo37"
+cloud_init_script_al     = "cloud_init/cloud_init_al.sh"

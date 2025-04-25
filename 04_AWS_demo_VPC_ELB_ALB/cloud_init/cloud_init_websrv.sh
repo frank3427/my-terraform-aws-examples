@@ -18,8 +18,12 @@ This web page is served by server <?php echo gethostname(); ?>
 EOF
 mkdir -p /var/www/html/mypath
 cp -p /var/www/html/index.php /var/www/html/mypath
+
+echo "========== Change log format to include source IP address (stored in header x-forwarded-for)"
+sed -i.bak 's#LogFormat \(.*\)" combined#LogFormat \1 \\\"%{X-Forwarded-For}i\\\"" combined#' /etc/httpd/conf/httpd.conf
 systemctl start httpd
 systemctl enable httpd
+
 
 # NOT NEEDED AS IPTABLES NOT ENABLED BY DEFAULT
 # echo "========== Open port 80/tcp in Linux Firewall"

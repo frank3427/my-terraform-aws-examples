@@ -1,4 +1,4 @@
-# ------ Generate a random password for the database
+# ------ Generate a random password for the database if password not managed in Secrets Manager
 resource random_string demo12-db-passwd {
   # must contains at least 2 upper case letters, 2 lower case letters, 2 numbers and 2 special characters
   length      = 12
@@ -13,6 +13,11 @@ resource random_string demo12-db-passwd {
   override_special = "#-_"   # use only special characters in this list
 }
 
+locals {
+  username   = "ec2-user"
+  password   = random_string.demo12-db-passwd.result
+}
+
 resource aws_db_subnet_group demo12 {
   name       = "demo12"
   subnet_ids = [ aws_subnet.demo12_public.id, aws_subnet.demo12_public2.id ]
@@ -24,24 +29,25 @@ resource aws_db_subnet_group demo12 {
 
 # aws_db_instance.demo12_postgresql: Creation complete after 3m24s [id=demo12-rds-postgresql]
 resource aws_db_instance demo12_postgresql {
-  availability_zone      = "${var.aws_region}${var.az}"
-  allocated_storage      = var.postgresql_size_in_gbs
-  max_allocated_storage  = var.postgresql_max_size_in_gbs
-  db_name                = var.postgresql_db_name
-  engine                 = "postgres"
-  engine_version         = var.postgresql_version
-  instance_class         = var.postgresql_instance_class
-  username               = "adm"
-  password               = random_string.demo12-db-passwd.result
-  db_subnet_group_name   = aws_db_subnet_group.demo12.name
-  vpc_security_group_ids = [ aws_security_group.demo12_rds.id ]
-  tags                   = { Name = "demo12-rds" }
-  identifier             = var.postgresql_identifier
-  storage_type           = var.postgresql_storage_type
-  multi_az               = false
-  publicly_accessible    = false
-  skip_final_snapshot    = true
-  monitoring_interval    = 0    # Enhanced monitoring disabled
+  multi_az                    = true
+  #availability_zone           = "${var.aws_region}${var.az}"   # comment this line if multi_az = true
+  allocated_storage           = var.postgresql_size_in_gbs
+  max_allocated_storage       = var.postgresql_max_size_in_gbs
+  db_name                     = var.postgresql_db_name
+  engine                      = "postgres"
+  engine_version              = var.postgresql_version
+  instance_class              = var.postgresql_instance_class
+  username                    = "adm"
+  #manage_master_user_password = false
+  password                    = local.password
+  db_subnet_group_name        = aws_db_subnet_group.demo12.name
+  vpc_security_group_ids      = [ aws_security_group.demo12_rds.id ]
+  tags                        = { Name = "demo12-rds" }
+  identifier                  = var.postgresql_identifier
+  storage_type                = var.postgresql_storage_type
+  publicly_accessible         = false
+  skip_final_snapshot         = true
+  monitoring_interval         = 0    # Enhanced monitoring disabled
   performance_insights_enabled          = true
   performance_insights_retention_period = 7
   backup_retention_period               = 7

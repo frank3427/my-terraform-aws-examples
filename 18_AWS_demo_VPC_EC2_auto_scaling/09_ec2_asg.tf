@@ -59,6 +59,9 @@ resource aws_autoscaling_group demo18 {
     value               = "demo18-from-asg"
     propagate_at_launch = true
   }
+  instance_refresh {
+    strategy = "Rolling"
+  }
 }
 
 # ------ Create a security group

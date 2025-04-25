@@ -34,6 +34,7 @@ resource aws_db_instance demo11_mysql {
   instance_class         = var.mysql_instance_class
   username               = "admin"
   password               = random_string.demo11-db-passwd.result
+  #manage_master_user_password = true       # use this to have password created, stored and managed by Secrets Manager
   #port                   = "3306"
   db_subnet_group_name   = aws_db_subnet_group.demo11.name
   vpc_security_group_ids = [ aws_security_group.demo11_rds.id ]

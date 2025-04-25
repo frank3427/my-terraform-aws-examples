@@ -40,10 +40,23 @@ resource aws_default_network_acl demo01 {
     }
   }
 
+  # for EC2 instance connect
+  dynamic ingress {
+    for_each = local.ec2_instance_connect_cidrs
+    content {
+      protocol   = "tcp"
+      rule_no    = 200 + 10 * index(local.ec2_instance_connect_cidrs, ingress.value)
+      action     = "allow"
+      cidr_block = ingress.value
+      from_port  = 22
+      to_port    = 22
+    }
+  }
+
   # this is needed for yum
   ingress {
     protocol   = "tcp"
-    rule_no    = 200
+    rule_no    = 300
     action     = "allow"
     cidr_block = "0.0.0.0/0"
     from_port  = 1024
@@ -69,6 +82,15 @@ resource aws_subnet demo01_public {
   tags                    = { Name = "demo01-public" }
 }
 
+# ------ get prefix list and cidrs for EC2 instance connect in this region
+data aws_ec2_managed_prefix_list ec2_instance_connect {
+  name = "com.amazonaws.${var.aws_region}.ec2-instance-connect"
+}
+
+locals {
+  ec2_instance_connect_cidrs = tolist(data.aws_ec2_managed_prefix_list.ec2_instance_connect.entries)[*].cidr
+}
+
 # ------ Customize the security group for the EC2 instance
 resource aws_default_security_group demo01 {
   vpc_id      = aws_vpc.demo01.id
@@ -83,6 +105,15 @@ resource aws_default_security_group demo01 {
     cidr_blocks = var.authorized_ips
   }
 
+  # ingress rule: allow SSH from EC2 Instance Connect
+  ingress {
+    description        = "allow SSH access from EC2 Instance Connect"
+    from_port         = 22
+    to_port           = 22
+    protocol          = "tcp"
+    prefix_list_ids   = [data.aws_ec2_managed_prefix_list.ec2_instance_connect.id]
+  }
+
   # egress rule: allow all traffic
   egress {
     description = "allow all traffic"
@@ -91,4 +122,8 @@ resource aws_default_security_group demo01 {
     protocol    = "-1"    # all protocols
     cidr_blocks = [ "0.0.0.0/0" ]
   }
+}
+
+output ec2_instance_connect_cidrs {
+  value = local.ec2_instance_connect_cidrs
 }

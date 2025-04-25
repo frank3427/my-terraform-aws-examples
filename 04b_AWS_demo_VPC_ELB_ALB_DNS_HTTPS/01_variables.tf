@@ -15,5 +15,6 @@ variable "bastion_public_sshkey_path" {}
 variable "bastion_private_sshkey_path" {}
 variable "bastion_cloud_init_script" {}
 variable "dns_name" {}
+variable "dns_name2" {}
 variable "dns_domain" {}
 variable "dns_zone_id" {}

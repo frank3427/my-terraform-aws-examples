@@ -2,6 +2,7 @@ variable "aws_region" {}
 variable "cidr_vpc" {}
 variable "cidr_subnet1" {}
 variable "authorized_ips" {}
+variable "s3_bucket_name" {}
 variable "az" {}
 variable "inst1_type" {}
 variable "public_sshkey_path" {}

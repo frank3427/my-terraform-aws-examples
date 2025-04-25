@@ -14,7 +14,6 @@ resource aws_instance demo01_inst1 {
       user_data_base64
     ]
   }
-  availability_zone      = "${var.aws_region}${var.az}"
   instance_type          = var.inst1_type
   ami                    = local.ami
   key_name               = aws_key_pair.demo01.id
@@ -30,15 +29,19 @@ resource aws_instance demo01_inst1 {
   }
 }
 
-# ------ Display the complete ssh command needed to connect to the instance
 locals {
-  username   = (var.linux == "al2") ? "ec2-user" : "ubuntu"
-  ami_arm64  = (var.linux == "al2") ? data.aws_ami.al2_arm64.id  : data.aws_ami.ubuntu_2204_arm64.id
-  ami_x86_64 = (var.linux == "al2") ? data.aws_ami.al2_x86_64.id : data.aws_ami.ubuntu_2204_x86_64.id
-  ami        = (var.arch == "arm64") ? local.ami_arm64 : local.ami_x86_64
-  script     = (var.linux == "al2") ? var.cloud_init_script_al2 : var.cloud_init_script_ubuntu
+  username = startswith(var.linux_os_version, "ubuntu") ? "ubuntu" : "ec2-user"
+  scripts  = {
+    "al2": var.cloud_init_script_al,
+    "al2023": var.cloud_init_script_al,
+    "ubuntu22": var.cloud_init_script_ubuntu,
+    "sles15": var.cloud_init_script_sles,
+    "rhel9": var.cloud_init_script_rhel,
+  }
+  script = local.scripts[var.linux_os_version]
 }
 
+# ------ Display the complete ssh command needed to connect to the instance
 output Instance {
   value = <<EOF
 

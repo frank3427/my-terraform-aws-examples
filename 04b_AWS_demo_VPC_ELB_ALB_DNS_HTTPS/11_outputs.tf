@@ -41,7 +41,13 @@ output CONNECTIONS {
   2) ---- HTTPS connection to public load balancer
      Open the following URL in your Web browser:
      https://${var.dns_name}
+     or 
+     http://${var.dns_name} (should be redirected to https)
 
+     You can see access logs of Web servers in /var/log/httpd/access_log files
+     source IP address = private IPs of ALB (1 private IP per subnet/AZ)
+
+     
 EOF
 
 }

@@ -1,0 +1,32 @@
+# ---- region
+aws_region     = "eu-west-1"    # Paris
+
+# ---- CIDR network
+cidr_vpc       = "192.168.0.0/16"
+cidr_subnet1   = "192.168.0.0/24"
+cidr_subnet2   = "192.168.1.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- generated SSH key pair
+public_sshkey_path   = "sshkeys_generated/ssh_key_demo12b.pub"
+private_sshkey_path  = "sshkeys_generated/ssh_key_demo12b"
+
+# ---- Availability Zone 
+az                       = "b"
+az2                      = "a"
+
+# ---- Instance Amazon Linux 2
+al2_private_ip         = "192.168.0.11"
+al2_inst_type          = "t3a.large"
+al2_cloud_init_script  = "cloud_init/cloud_init_al2_TEMPLATE.sh"
+
+# ---- RDS postgresql
+postgresql_identifier      = "demo12b-rds-postgresql"
+postgresql_instance_class  = "db.r6g.large"
+postgresql_size_in_gbs     = "40"
+postgresql_max_size_in_gbs = "100"
+postgresql_db_name         = "demo12b"
+postgresql_version         = "15.4"
+postgresql_storage_type    = "gp3"

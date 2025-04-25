@@ -1,0 +1,31 @@
+# ---- region
+aws_region         = "eu-west-3"    # Paris
+
+# ---- CIDR network
+cidr_vpc           = "192.168.0.0/16"
+cidr_client_subnet = "192.168.0.0/24"
+cidr_rds_subnets   = [ "192.168.1.0/24", "192.168.2.0/24", "192.168.3.0/24" ]
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- generated SSH key pair
+public_sshkey_path   = "sshkeys_generated/ssh_key_demo13d.pub"
+private_sshkey_path  = "sshkeys_generated/ssh_key_demo13d"
+
+# ---- Instance Amazon Linux 2 (database client)
+db_client_az                = "b"
+db_client_private_ip        = "192.168.0.11"
+db_client_inst_type         = "t3a.large"
+db_client_cloud_init_script = "cloud_init/cloud_init_al_TEMPLATE.sh"
+
+# ---- RDS aurora_postgresql serverless v2
+aurora_subnets_azs                 = [ "a", "b", "c" ]
+aurora_postgresql_db_identifier         = "demo13d-aurora-inst"
+aurora_postgresql_cluster_identifier    = "demo13d-aurora-postgresql-cluster"
+aurora_postgresql_engine_version        = "14.6"
+aurora_postgresql_username              = "admin2"      # admin is reserved
+aurora_postgresql_db_name               = "db1"
+aurora_postgresql_size_in_gbs           = "40"
+aurora_postgresql_serverless_v2_min_acu = "0.5"
+aurora_postgresql_serverless_v2_max_acu = "2"

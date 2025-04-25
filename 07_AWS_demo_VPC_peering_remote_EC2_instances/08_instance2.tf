@@ -1,9 +1,9 @@
 # ------ optional: Create an Elastic IP address
 # ------           to have a public IP address for EC2 instance persistent across stop/start
 resource aws_eip demo07_r2 {
-  provider       = aws.r2
+  provider = aws.r2
   instance = aws_instance.demo07_r2.id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo07-r2" }
 }
 

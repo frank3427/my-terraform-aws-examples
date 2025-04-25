@@ -149,7 +149,7 @@ resource aws_eip demo04b_natgw {
   tags     = { Name = "demo04b-natgw" }
 }
 
-# ------ Create a NAT gatewat
+# ------ Create a NAT gateway
 resource aws_nat_gateway demo04b {
   connectivity_type = "public"
   allocation_id     = aws_eip.demo04b_natgw.id

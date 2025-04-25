@@ -1,0 +1,13 @@
+{
+    "TableName": "TerraformLock",
+    "KeySchema": [
+      { "AttributeName": "LockID", "KeyType": "HASH" }
+    ],
+    "AttributeDefinitions": [
+      { "AttributeName": "LockID", "AttributeType": "S" }
+    ],
+    "ProvisionedThroughput": {
+      "ReadCapacityUnits": 5,
+      "WriteCapacityUnits": 5
+    }
+}

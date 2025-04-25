@@ -1,0 +1,111 @@
+{
+    "DBInstances": [
+        {
+            "DBInstanceIdentifier": "demo11-rds-mysql",
+            "DBInstanceClass": "db.r6g.large",
+            "Engine": "mysql",
+            "DBInstanceStatus": "available",
+            "MasterUsername": "admin",
+            "DBName": "demo11",
+            "Endpoint": {
+                "Address": "demo11-rds-mysql.cnbdvonjndlk.eu-west-3.rds.amazonaws.com",
+                "Port": 3306,
+                "HostedZoneId": "ZMESEXB7ZGGQ3"
+            },
+            "AllocatedStorage": 20,
+            "InstanceCreateTime": "2024-09-23T10:35:44.220000+00:00",
+            "PreferredBackupWindow": "10:34-11:04",
+            "BackupRetentionPeriod": 3,
+            "DBSecurityGroups": [],
+            "VpcSecurityGroups": [
+                {
+                    "VpcSecurityGroupId": "sg-0a9afabc3ed4be78d",
+                    "Status": "active"
+                }
+            ],
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "default.mysql8.0",
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ],
+            "AvailabilityZone": "eu-west-3a",
+            "DBSubnetGroup": {
+                "DBSubnetGroupName": "demo11",
+                "DBSubnetGroupDescription": "Managed by Terraform",
+                "VpcId": "vpc-0f5ebb58fe4bb838b",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-02e2262ede2340397",
+                        "SubnetAvailabilityZone": {
+                            "Name": "eu-west-3b"
+                        },
+                        "SubnetOutpost": {},
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-0b717364df723789e",
+                        "SubnetAvailabilityZone": {
+                            "Name": "eu-west-3a"
+                        },
+                        "SubnetOutpost": {},
+                        "SubnetStatus": "Active"
+                    }
+                ]
+            },
+            "PreferredMaintenanceWindow": "tue:06:57-tue:07:27",
+            "PendingModifiedValues": {},
+            "LatestRestorableTime": "2024-09-23T12:10:00+00:00",
+            "MultiAZ": true,
+            "EngineVersion": "8.0.35",
+            "AutoMinorVersionUpgrade": true,
+            "ReadReplicaDBInstanceIdentifiers": [],
+            "LicenseModel": "general-public-license",
+            "Iops": 3000,
+            "OptionGroupMemberships": [
+                {
+                    "OptionGroupName": "default:mysql-8-0",
+                    "Status": "in-sync"
+                }
+            ],
+            "SecondaryAvailabilityZone": "eu-west-3b",
+            "PubliclyAccessible": false,
+            "StorageType": "gp3",
+            "DbInstancePort": 0,
+            "StorageEncrypted": false,
+            "DbiResourceId": "db-PHL6EXVIF6CV3UEROPKRADQN2U",
+            "CACertificateIdentifier": "rds-ca-rsa2048-g1",
+            "DomainMemberships": [],
+            "CopyTagsToSnapshot": false,
+            "MonitoringInterval": 0,
+            "DBInstanceArn": "arn:aws:rds:eu-west-3:147785346668:db:demo11-rds-mysql",
+            "IAMDatabaseAuthenticationEnabled": false,
+            "PerformanceInsightsEnabled": false,
+            "DeletionProtection": false,
+            "AssociatedRoles": [],
+            "MaxAllocatedStorage": 60,
+            "TagList": [
+                {
+                    "Key": "map-migrated",
+                    "Value": "migTEST"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "demo11-rds"
+                }
+            ],
+            "CustomerOwnedIpEnabled": false,
+            "ActivityStreamStatus": "stopped",
+            "BackupTarget": "region",
+            "NetworkType": "IPV4",
+            "StorageThroughput": 125,
+            "CertificateDetails": {
+                "CAIdentifier": "rds-ca-rsa2048-g1",
+                "ValidTill": "2025-09-23T10:34:55+00:00"
+            },
+            "DedicatedLogVolume": false,
+            "IsStorageConfigUpgradeAvailable": false
+        }
+    ]
+}

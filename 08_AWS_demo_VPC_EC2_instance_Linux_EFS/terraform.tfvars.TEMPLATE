@@ -13,12 +13,12 @@ public_sshkey_path   = "sshkeys_generated/ssh_key_demo08.pub"
 private_sshkey_path  = "sshkeys_generated/ssh_key_demo08"
 
 # ---- Availability Zone 
-az                       = "b"
+az                   = "b"
 
-# ---- Instance Amazon Linux 2
-al2_private_ip           = "192.168.0.11"
-al2_inst_type            = "m6g.medium"
-al2_cloud_init_script    = "cloud_init/cloud_init_al2.sh"
+# ---- EC2 Instance 
+private_ip           = "192.168.0.11"
+inst_type            = "m6g.medium"
+cloud_init_script    = "cloud_init/cloud_init_al_TEMPLATE.sh"
 
 # ---- EFS filesystem
-efs_mount_point          = "/mnt/efs1"
+efs_mount_point      = "/mnt/efs1"

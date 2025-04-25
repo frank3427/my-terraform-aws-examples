@@ -33,6 +33,32 @@ resource aws_instance demo11_al2 {
   }
 }
 
+# ------ Copy scripts to EC2 instance
+resource null_resource demo11 {
+
+  connection {
+      agent       = false
+      timeout     = "10m"
+      host        = aws_eip.demo11_al2.public_ip
+      user        = "ec2-user"
+      private_key = file(var.private_sshkey_path)
+  }
+
+  provisioner file {
+    source      = "scripts/latency.py"
+    destination = "/home/ec2-user/latency.py"
+  }
+
+  provisioner file {
+    source      = "scripts/nmap.sh"
+    destination = "/home/ec2-user/nmap.sh"
+  }
+
+  provisioner remote-exec {
+    inline = [ "chmod +x nmap.sh latency.py"]
+  }
+}
+
 # ------ Customize the default security group for the EC2 instance
 resource aws_default_security_group demo11_ec2 {
   vpc_id      = aws_vpc.demo11.id

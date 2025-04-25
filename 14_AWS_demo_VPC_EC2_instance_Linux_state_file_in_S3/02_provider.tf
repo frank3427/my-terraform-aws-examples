@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket = "cpabucket"
-    key    = "terraform/demo14.tfstate"
-    region = "eu-west-3"
+    region         = "eu-west-3"
+    bucket         = "cpa7777"
+    key            = "terraform/demo14.tfstate"
   }
 }
 
