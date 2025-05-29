@@ -1,8 +1,7 @@
 # ------ SSH key pair for opc user
 resource tls_private_key ssh-cr3 {
   count     = "3"
-  algorithm = "RSA"
-  rsa_bits  = 2048
+  algorithm = "ED25519"
 }
 
 resource local_file ssh-cr3-public {
