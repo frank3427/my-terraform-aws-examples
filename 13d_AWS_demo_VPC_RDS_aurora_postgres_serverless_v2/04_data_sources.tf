@@ -3,7 +3,7 @@
 
 #   filter {
 #     name   = "name"
-#     values = ["amzn2-ami-kernel-5.10-hvm-2.0.202*x86_64-gp2"]
+#     values = ["amzn2-ami-kernel-5.10-hvm-*x86_64-gp2"]
 #   }
 #    owners = ["amazon"]
 # }
@@ -14,7 +14,7 @@ data aws_ami al2023_x64 {
 
   filter {
     name   = "name"
-    values = ["al2023-ami-2023*x86_64"]
+    values = ["al2023-ami-*x86_64"]
   }
    owners = ["amazon"]
 }

@@ -5,7 +5,7 @@ data aws_ami al2_x86_64_acct1 {
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-5.10-hvm-2.0.202*x86_64-gp2"]
+    values = ["amzn2-ami-kernel-5.10-hvm-*x86_64-gp2"]
   }
    owners = ["amazon"]
 }
@@ -17,7 +17,7 @@ data aws_ami al2_x86_64_acct2 {
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-5.10-hvm-2.0.202*x86_64-gp2"]
+    values = ["amzn2-ami-kernel-5.10-hvm-*x86_64-gp2"]
   }
    owners = ["amazon"]
 }

@@ -23,18 +23,18 @@ data aws_ami arm64 {
 # ---- Get the right AMI
 locals {
   os_to_filter_x64 = {
-    "al2023": "al2023-ami-2023*x86_64",
-    "al2": "amzn2-ami-kernel-5.10-hvm-2.0.202*x86_64-gp2",
-    "ubuntu22": "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-202*",
-    "sles15": "suse-sles-15-sp6-v202*hvm-ssd-x86_64",
-    "rhel9": "RHEL-9*_HVM-202*x86_64*"
+    "al2023": "al2023-ami-*x86_64",
+    "al2": "amzn2-ami-kernel-5.10-hvm-*x86_64-gp2",
+    "ubuntu22": "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*",
+    "sles15": "suse-sles-15-*-v*hvm-ssd-x86_64",
+    "rhel9": "RHEL-9*_HVM-*x86_64*"
   }
   os_to_filter_arm64 = {
-    "al2023": "al2023-ami-2023*arm64",
-    "al2": "amzn2-ami-kernel-5.10-hvm-2.0.202*arm64-gp2",
-    "ubuntu22": "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-202*",
-    "sles15": "suse-sles-15-sp6-v202*hvm-ssd-x86_64",
-    "rhel9": "RHEL-9*_HVM-202*arm64*"
+    "al2023": "al2023-ami-*-arm64",
+    "al2": "amzn2-ami-kernel-5.10-hvm-*-arm64-gp2",
+    "ubuntu22": "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-*",
+    "sles15": "suse-sles-15-*-v*hvm-ssd-arm64",
+    "rhel9": "RHEL-9*_HVM-*arm64*"
   }
   ami = (var.arch  == "arm64")  ? data.aws_ami.arm64.id : data.aws_ami.x64.id
 }

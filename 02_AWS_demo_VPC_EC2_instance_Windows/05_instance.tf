@@ -8,8 +8,7 @@ resource aws_eip demo02_inst1 {
 
 # ------ Create a RSA key pair (to encrypt/decrypt Windows password) 
 resource tls_private_key demo02 {
-  algorithm = "RSA"
-  rsa_bits  = 4096
+  algorithm = "ED25519"
 }
 
 resource local_file demo02-public {

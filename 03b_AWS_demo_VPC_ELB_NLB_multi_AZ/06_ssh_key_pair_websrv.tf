@@ -1,7 +1,6 @@
 # ------ SSH key pair for websrv
 resource tls_private_key ssh_demo03b_websrv {
-  algorithm = "RSA"
-  rsa_bits  = 2048
+  algorithm = "ED25519"
 }
 
 resource local_file ssh_demo03b_websrv_public {

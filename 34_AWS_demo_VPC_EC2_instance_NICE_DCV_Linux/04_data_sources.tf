@@ -4,7 +4,7 @@ data aws_ami al2_x86_64 {
 
   filter {
     name   = "name"
-    values = ["DCV-AmazonLinux2-x86_64-2023.*"]
+    values = ["DCV-AmazonLinux2-x86_64-*"]
   }
   owners = ["amazon"]
 }

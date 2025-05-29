@@ -3,7 +3,7 @@ data aws_ami win2022 {
 
   filter {
     name   = "name"
-    values = ["Windows_Server-2022-English-Full-Base-202*"]
+    values = ["Windows_Server-*-English-Full-Base-*"]
   }
 
    owners = ["amazon"]

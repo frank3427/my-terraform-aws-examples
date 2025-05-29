@@ -4,7 +4,7 @@ data aws_ami acct1_al2023_arm64 {
 
   filter {
     name   = "name"
-    values = ["al2023-ami-2023*arm64"]
+    values = ["al2023-ami-*arm64"]
   }
    owners = ["amazon"]
 }
@@ -15,7 +15,7 @@ data aws_ami acct2_al2023_arm64 {
 
   filter {
     name   = "name"
-    values = ["al2023-ami-2023*arm64"]
+    values = ["al2023-ami-*arm64"]
   }
    owners = ["amazon"]
 }

@@ -1,7 +1,6 @@
 # ------ SSH key pair 
 resource tls_private_key ssh_demo11 {
-  algorithm = "RSA"
-  rsa_bits  = 2048
+  algorithm = "ED25519"
 }
 
 resource local_file ssh_demo11_public {

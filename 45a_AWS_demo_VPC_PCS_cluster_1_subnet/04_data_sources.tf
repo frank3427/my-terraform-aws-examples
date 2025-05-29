@@ -3,7 +3,7 @@ data aws_ami pcs_slurm_x64 {
 
   filter {
     name   = "name"
-    values = [ "aws-pcs-sample_ami-amzn2-x86_64-slurm-24.05*" ]
+    values = [ "aws-pcs-sample_ami-amzn2-x86_64-slurm-*" ]
   }
    owners = ["amazon"]
 }
@@ -13,7 +13,7 @@ data aws_ami pcs_slurm_arm64 {
 
   filter {
     name   = "name"
-    values = [ "aws-pcs-sample_ami-amzn2-arm64-slurm-24.05*" ]
+    values = [ "aws-pcs-sample_ami-amzn2-arm64-slurm-*" ]
   }
    owners = ["amazon"]
 }

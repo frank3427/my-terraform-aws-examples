@@ -1,7 +1,6 @@
 # ------ SSH key pair for opc user
 resource tls_private_key ssh-demo06 {
-  algorithm = "RSA"
-  rsa_bits  = 2048
+  algorithm = "ED25519"
 }
 
 resource local_file ssh-demo06-public {
