@@ -36,6 +36,14 @@ do
     mount ${mount_point}
     if [ $? -eq 0 ]; then 
       echo "EFS mounted successfully at ${mount_point}."
+      # Create Apache config directories on EFS immediately after successful mount
+      echo "========== Create Apache vhost config directories on EFS =========="
+      mkdir -p "${mount_point}/apache_configs/sites-available"
+      chown root:root "${mount_point}/apache_configs"
+      chown root:root "${mount_point}/apache_configs/sites-available"
+      chmod 755 "${mount_point}/apache_configs"
+      chmod 755 "${mount_point}/apache_configs/sites-available"
+      echo "Apache vhost config directories created successfully on EFS."
       break; 
     fi
     RETRY_COUNT=$((RETRY_COUNT+1))
@@ -47,6 +55,13 @@ do
     echo "WARNING: Failed to mount EFS, will try again in 10 seconds (attempt $RETRY_COUNT)..."
     sleep 10
 done
+
+# Ownership of the EFS mount point itself.
+# This should be done after creating root-owned subdirectories if we want to keep them root-owned.
+# The current placement of chown for ${mount_point} to ec2-user might be too broad if we want root to own subdirectories.
+# However, root can still create/own directories inside even if the top-level is ec2-user owned.
+# For simplicity and to match the original script's intent for the mount point, we'll leave this chown.
+# The directories /apache_configs/* will remain root:root as set above.
 chown ec2-user:ec2-user ${mount_point}
 
 echo "========== Store web pages on EFS filesystem"

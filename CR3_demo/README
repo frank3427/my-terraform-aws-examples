@@ -19,17 +19,28 @@ This document outlines the architecture of the CR3 demo environment, spanning tw
   - 3 EC2 instances in private subnets (intended to be replaced by an Auto Scaling group in future enhancements).
   - Apache web server installed and configured on each instance.
   - **Vhost Support**: Apache is configured to support name-based virtual hosts (vhosts).
-    - Vhost configurations are managed via `/etc/httpd/sites-available/` and enabled via symlinks in `/etc/httpd/sites-enabled/`.
-    - The default vhost serves content from `${efs_mount_point}/var_www_html` (see EFS section).
-  - **Vhost Content**: Web content for additional vhosts is served from EFS under the `${efs_mount_point}/var_www_vhosts/` directory structure.
-  - **Provisioning a New Vhost (Manual Steps per Server)**:
-    1.  Create the content directory on EFS (e.g., `${efs_mount_point}/var_www_vhosts/newsite.example.com/html`).
-    2.  Add website files (HTML, PHP, images, etc.) to this new EFS directory.
-    3.  On **each web server**, create an Apache vhost configuration file (e.g., `/etc/httpd/sites-available/newsite.example.com.conf`). This file should define the `DocumentRoot` to point to the EFS content directory (e.g., `${efs_mount_point}/var_www_vhosts/newsite.example.com/html`) and set up appropriate logs.
-    4.  Enable the site on **each web server**: `sudo ln -s /etc/httpd/sites-available/newsite.example.com.conf /etc/httpd/sites-enabled/`
-    5.  Reload Apache on **each web server** to apply changes: `sudo systemctl reload httpd`.
+    - **Vhost Configuration (EFS Based)**: Apache vhost configuration files (`.conf`) are managed centrally on the EFS filesystem in the `${mount_point}/apache_configs/sites-available/` directory. This directory is created by the bastion host's cloud-init script.
+    - This allows for centralized management of all vhost definitions.
+  - **Vhost Content**: Web content for vhosts is served from EFS under the `${efs_mount_point}/var_www_vhosts/` directory structure.
+  - **Provisioning and Managing Vhosts (Centralized via EFS)**:
+    1.  **Content Creation**:
+        *   Create the website's document root directory on EFS: e.g., `${mount_point}/var_www_vhosts/newsite.example.com/html`.
+        *   Place your website files (HTML, PHP, images, etc.) into this directory. Ensure appropriate file permissions for the `apache` user.
+    2.  **Vhost Configuration File (`.conf`)**:
+        *   On the **bastion host** (or any system with write access to the EFS `${mount_point}/apache_configs/sites-available/` directory as root), create or edit the Apache vhost configuration file.
+        *   Example path on bastion: `/mnt/efs/apache_configs/sites-available/newsite.example.com.conf` (assuming `${mount_point}` is `/mnt/efs`).
+        *   This file should define the `DocumentRoot` to point to the EFS content directory (e.g., `${mount_point}/var_www_vhosts/newsite.example.com/html`), set up logs, and include any other necessary Apache directives.
+        *   Ensure the file is owned by `root:root` with permissions `644`.
+    3.  **Activation on Web Servers**:
+        *   The `cloud_init_websrv_TEMPLATE.sh` script on each web server is configured to automatically manage vhost activation.
+        *   On **boot**, each web server:
+            *   Clears its local `/etc/httpd/sites-enabled/` directory of any existing symlinks.
+            *   Scans the `${mount_point}/apache_configs/sites-available/` directory on EFS for all `*.conf` files.
+            *   Creates symbolic links in its local `/etc/httpd/sites-enabled/` pointing to these configuration files on EFS.
+        *   **Important**: Changes to vhost configuration files on EFS (adding, removing, or modifying `.conf` files in `${mount_point}/apache_configs/sites-available/`) will be picked up by web servers **upon their next reboot**. There is no automatic live-reload mechanism across the cluster for these EFS config changes; a reboot of the web servers is required for them to re-process the symlinks and for Apache to load the new/updated configurations.
+        *   Apache is restarted at the end of the cloud-init process, applying the linked configurations.
   - Web servers mount the shared EFS filesystem.
-  - Bootstrapped using `cloud_init_websrv_TEMPLATE.sh`.
+  - Bootstrapped using `cloud_init_websrv_TEMPLATE.sh`, which now handles the EFS-based vhost symlinking.
 
 - **MariaDB Servers**:
   - 2 MariaDB EC2 instances in private subnets, configured for master-master replication.
@@ -43,8 +54,9 @@ This document outlines the architecture of the CR3 demo environment, spanning tw
   - 1 EFS filesystem created.
   - Mounted on all Bastion, Web, and DR (in Region 2 via VPC peering and mount targets) instances at `${efs_mount_point}` (e.g., `/mnt/efs`).
   - Used for:
-    - Default web server document root: `${efs_mount_point}/var_www_html/`.
+    - Default web server document root: `${efs_mount_point}/var_www_html/` (if a default vhost is configured from EFS).
     - Vhost document roots: `${efs_mount_point}/var_www_vhosts/`.
+    - **Centralized Apache vhost configurations**: `${mount_point}/apache_configs/sites-available/`. This directory is created by the bastion host's cloud-init script and populated from the bastion.
     - Potentially other shared storage needs.
 
 ### Load Balancing & DNS
@@ -73,11 +85,34 @@ This document outlines the architecture of the CR3 demo environment, spanning tw
 - **VPC Peering**: A VPC peering connection is established between the Region 1 VPC and the Region 2 VPC to allow private communication (e.g., for EFS access from DR instance, potential database replication if extended).
 
 ## Cloud-Init Scripts
-- `cloud_init_bastion_TEMPLATE.sh`: For bastion host setup.
-- `cloud_init_websrv_TEMPLATE.sh`: For web server setup in Region 1.
+- `cloud_init_bastion_TEMPLATE.sh`: For bastion host setup, including creating the `${mount_point}/apache_configs/sites-available/` directory on EFS.
+- `cloud_init_websrv_TEMPLATE.sh`: For web server setup in Region 1, including symlinking vhost configs from EFS.
 - `cloud_init_mariadb_TEMPLATE.sh`: For MariaDB server setup in Region 1.
 - `cloud_init_dr.sh`: For DR web server setup in Region 2.
 These scripts automate package installation, configuration, and service setup on instance launch.
 They use variables passed from Terraform (e.g., EFS mount point, DNS names, IP addresses).
 Refer to the scripts in the `cloud_init/` directory for detailed bootstrapping steps.
+
+## Security Considerations
+
+- **EFS Access Control**:
+  - Currently, EFS access is controlled via security groups allowing NFS (port 2049) traffic from within the VPC.
+  - For enhanced security, EFS security group rules could be narrowed to allow access only from specific subnets (e.g., private subnets where web servers reside and the public subnet for the bastion host).
+  - Future enhancements could include using IAM roles for EFS access policies, providing more granular control (though this is not currently implemented).
+
+- **File Permissions on EFS for Apache Configurations**:
+  - The vhost configuration directory on EFS (`${mount_point}/apache_configs/` and its subdirectory `${mount_point}/apache_configs/sites-available/`) are created by the bastion's cloud-init and owned by `root:root`.
+  - Directory permissions are `755` (rwxr-xr-x). Configuration files (`.conf`) stored here should be owned by `root:root` with permissions `644` (rw-r--r--).
+  - This setup ensures that:
+    - Only `root` (typically via the bastion host) can manage (create, edit, delete) vhost configuration files in `${mount_point}/apache_configs/sites-available/`.
+    - Apache processes running on the web servers (usually as user `apache`) can read these configuration files from EFS.
+
+- **Bastion Host Security**:
+  - Access to the bastion host should be strictly controlled (e.g., via SSH key pairs, limited source IPs in its security group).
+  - Since the bastion host is the primary management point for EFS-stored vhost configurations and potentially other sensitive shared data, its security is paramount.
+
+- **SELinux on Web Servers**:
+  - If Apache on the web servers fails to read vhost configuration files from EFS (leading to vhosts not loading or Apache failing to start/restart properly), SELinux might be enforcing policies that prevent this.
+  - The command `sudo setsebool -P httpd_use_nfs 1` may be required on each web server to allow Apache to read files from NFS mounts like EFS. This setting is persistent across reboots.
+  - This was noted as a commented-out option in `cloud_init_websrv_TEMPLATE.sh` and should be considered during troubleshooting if Apache has issues accessing EFS-based configuration files.
 

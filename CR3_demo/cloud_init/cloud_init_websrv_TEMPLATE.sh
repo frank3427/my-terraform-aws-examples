@@ -73,30 +73,42 @@ echo "Creating vhost directories..."
 mkdir -p /etc/httpd/sites-available
 mkdir -p /etc/httpd/sites-enabled
 
-# Create EFS directory structure for vhosts
+# Create EFS directory structure for vhost *content* (DocumentRoots)
 echo "Creating EFS directory for vhosts: ${mount_point}/var_www_vhosts"
 mkdir -p "${mount_point}/var_www_vhosts"
 chown "${APACHE_USER}:${APACHE_GROUP}" "${mount_point}/var_www_vhosts"
 echo "EFS vhost directory created and permissions set."
 
-# Create a default vhost configuration (pointing to existing EFS webroot)
-DEFAULT_VHOST_CONF="/etc/httpd/sites-available/000-default.conf"
-echo "Creating default vhost configuration: ${DEFAULT_VHOST_CONF}"
-cat << EOF > "${DEFAULT_VHOST_CONF}"
-<VirtualHost *:80>
-    ServerAdmin webmaster@localhost
-    DocumentRoot ${mount_point}/var_www_html 
-    ErrorLog ${APACHE_LOG_DIR}/default-error.log
-    CustomLog ${APACHE_LOG_DIR}/default-access.log combined
-</VirtualHost>
-EOF
+# Remove local default vhost configuration - all vhosts will be sourced from EFS
+echo "Local default vhost configuration is now managed via EFS."
+# The local /etc/httpd/sites-available/000-default.conf is no longer created by this script.
+# Any default configuration should be placed in ${mount_point}/apache_configs/sites-available/ on EFS.
 
-# Enable the default site
-echo "Enabling default vhost..."
-if [ ! -L "/etc/httpd/sites-enabled/000-default.conf" ]; then
-  ln -s "${DEFAULT_VHOST_CONF}" "/etc/httpd/sites-enabled/000-default.conf"
+# Symlink vhost configurations from EFS
+echo "Cleaning existing symlinks in /etc/httpd/sites-enabled/..."
+find /etc/httpd/sites-enabled/ -type l -delete
+
+EFS_VHOST_CONFIG_DIR="${mount_point}/apache_configs/sites-available"
+echo "Looking for vhost configurations in ${EFS_VHOST_CONFIG_DIR}..."
+if [ -d "${EFS_VHOST_CONFIG_DIR}" ]; then
+    # Check if SELinux is enforcing and consider httpd_use_nfs if needed
+    # if sestatus | grep "SELinux status" | grep -q "enabled"; then
+    #   if sestatus | grep "Current mode" | grep -q "enforcing"; then
+    #     echo "SELinux is enforcing, ensuring httpd_use_nfs is set..."
+    #     # Check current state of httpd_use_nfs
+    #     # getsebool httpd_use_nfs
+    #     # setsebool -P httpd_use_nfs 1 # Uncomment if needed after testing
+    #     # echo "If Apache fails to read EFS configs, 'sudo setsebool -P httpd_use_nfs 1' might be required."
+    #   fi
+    # fi
+
+    for conf_file in $(find "${EFS_VHOST_CONFIG_DIR}" -maxdepth 1 -type f -name "*.conf"); do
+        filename=$(basename "$conf_file")
+        echo "Creating symlink for $filename in /etc/httpd/sites-enabled/..."
+        ln -s "$conf_file" "/etc/httpd/sites-enabled/$filename"
+    done
 else
-  echo "Default vhost already enabled."
+    echo "WARNING: EFS vhost config directory ${EFS_VHOST_CONFIG_DIR} not found. No vhosts will be enabled from EFS."
 fi
 
 # Original setup for /var/www/html (symlink to EFS)
