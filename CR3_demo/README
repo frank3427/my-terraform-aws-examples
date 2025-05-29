@@ -1,16 +1,83 @@
-region 1:
-- 1 VPC with 1 public subnet and 3 private subnets (3 AZs)
-- 1 bastion EC2 instance in public subnet
-- 3 websrv EC2 instancs in private subnets (to be replaced by auto-scaling group)
-- 1 ALB in public subnet in front of 3 websrv
-- 1 EFS for /var/www/html, mounted on 3 instances
-- 1 DNS hostname for ALB (in existing hosted zone) with DNS failover from region1 to region2
-- 1 DNS hostname for DR instance in region2
-- 1 TLS certificate for ALB ?
+# CR3 Demo Environment Overview
 
-region2:
-- 1 VPC with 1 public subnet
-- 1 websrv instance in public subnet (DR)
+This document outlines the architecture of the CR3 demo environment, spanning two AWS regions.
 
-peering between the 2 VPCs
+## Region 1: Primary Site (e.g., us-east-1)
+
+### Networking
+- **VPC**: 1 VPC with 1 public subnet and 3 private subnets distributed across 3 Availability Zones (AZs).
+  - Public Subnet: For ALB and Bastion Host.
+  - Private Subnets: For Web Servers and MariaDB Servers.
+
+### Compute & Storage
+- **Bastion Host**:
+  - 1 EC2 instance in the public subnet for secure access to internal resources.
+  - Includes MariaDB client tools (`mariadb` package) for database management via SSH tunneling or direct connection from the bastion.
+  - Mounts the shared EFS filesystem.
+
+- **Web Servers**:
+  - 3 EC2 instances in private subnets (intended to be replaced by an Auto Scaling group in future enhancements).
+  - Apache web server installed and configured on each instance.
+  - **Vhost Support**: Apache is configured to support name-based virtual hosts (vhosts).
+    - Vhost configurations are managed via `/etc/httpd/sites-available/` and enabled via symlinks in `/etc/httpd/sites-enabled/`.
+    - The default vhost serves content from `${efs_mount_point}/var_www_html` (see EFS section).
+  - **Vhost Content**: Web content for additional vhosts is served from EFS under the `${efs_mount_point}/var_www_vhosts/` directory structure.
+  - **Provisioning a New Vhost (Manual Steps per Server)**:
+    1.  Create the content directory on EFS (e.g., `${efs_mount_point}/var_www_vhosts/newsite.example.com/html`).
+    2.  Add website files (HTML, PHP, images, etc.) to this new EFS directory.
+    3.  On **each web server**, create an Apache vhost configuration file (e.g., `/etc/httpd/sites-available/newsite.example.com.conf`). This file should define the `DocumentRoot` to point to the EFS content directory (e.g., `${efs_mount_point}/var_www_vhosts/newsite.example.com/html`) and set up appropriate logs.
+    4.  Enable the site on **each web server**: `sudo ln -s /etc/httpd/sites-available/newsite.example.com.conf /etc/httpd/sites-enabled/`
+    5.  Reload Apache on **each web server** to apply changes: `sudo systemctl reload httpd`.
+  - Web servers mount the shared EFS filesystem.
+  - Bootstrapped using `cloud_init_websrv_TEMPLATE.sh`.
+
+- **MariaDB Servers**:
+  - 2 MariaDB EC2 instances in private subnets, configured for master-master replication.
+  - Data is stored on dedicated, encrypted EBS volumes (default: 20GB gp3, device: /dev/sdf), configured for deletion on instance termination.
+  - Instance type and EBS volume details are configurable via Terraform variables (`var.inst_type_db`, `var.db_ebs_device_name`, `var.db_ebs_volume_size`).
+  - MariaDB instances are bootstrapped using `cloud_init_mariadb_TEMPLATE.sh`.
+    - This script handles installation, EBS volume formatting/mounting to `/var/lib/mysql`, basic replication configuration (server_id, binlog, etc.), and security hardening.
+    - **IMPORTANT SECURITY NOTE:** The `cloud_init_mariadb_TEMPLATE.sh` script uses placeholder passwords for initial MariaDB setup (root: 'StrongPassword123!', replication user 'repl': 'ReplicationPassword123!'). These **must be changed immediately** after deployment for any production or sensitive environment.
+
+- **Elastic File System (EFS)**:
+  - 1 EFS filesystem created.
+  - Mounted on all Bastion, Web, and DR (in Region 2 via VPC peering and mount targets) instances at `${efs_mount_point}` (e.g., `/mnt/efs`).
+  - Used for:
+    - Default web server document root: `${efs_mount_point}/var_www_html/`.
+    - Vhost document roots: `${efs_mount_point}/var_www_vhosts/`.
+    - Potentially other shared storage needs.
+
+### Load Balancing & DNS
+- **Application Load Balancer (ALB)**:
+  - 1 ALB in the public subnet, distributing traffic across the 3 web server instances.
+  - Configured with HTTP and HTTPS listeners.
+- **DNS**:
+  - 1 DNS hostname for the ALB (e.g., `primary.example.com`) managed in an existing Route 53 hosted zone.
+  - Configured with DNS failover (Route 53 weighted or failover routing policy) from Region 1 ALB to the Region 2 DR instance.
+  - 1 DNS hostname for the DR instance in Region 2 (e.g., `dr.example.com`).
+- **TLS Certificate**:
+  - An AWS Certificate Manager (ACM) TLS certificate is associated with the ALB for HTTPS. (Assumed, based on typical setup with `var.dns_name_primary`).
+
+## Region 2: Disaster Recovery (DR) Site (e.g., us-west-2)
+
+### Networking
+- **VPC**: 1 VPC with 1 public subnet.
+
+### Compute & Storage
+- **Web Server (DR)**:
+  - 1 EC2 instance in the public subnet serving as a DR web server.
+  - Mounts the EFS filesystem from Region 1 (requires appropriate EFS mount targets in Region 2 and VPC peering).
+  - Bootstrapped using `cloud_init_dr.sh`.
+
+## Inter-Region Connectivity
+- **VPC Peering**: A VPC peering connection is established between the Region 1 VPC and the Region 2 VPC to allow private communication (e.g., for EFS access from DR instance, potential database replication if extended).
+
+## Cloud-Init Scripts
+- `cloud_init_bastion_TEMPLATE.sh`: For bastion host setup.
+- `cloud_init_websrv_TEMPLATE.sh`: For web server setup in Region 1.
+- `cloud_init_mariadb_TEMPLATE.sh`: For MariaDB server setup in Region 1.
+- `cloud_init_dr.sh`: For DR web server setup in Region 2.
+These scripts automate package installation, configuration, and service setup on instance launch.
+They use variables passed from Terraform (e.g., EFS mount point, DNS names, IP addresses).
+Refer to the scripts in the `cloud_init/` directory for detailed bootstrapping steps.
 

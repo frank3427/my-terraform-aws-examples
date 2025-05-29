@@ -24,3 +24,21 @@ variable "dns_name_primary" {}
 variable "dns_name_secondary" {}
 variable "dns_domain" {}
 variable "dns_zone_id" {}
+
+variable "inst_type_db" {
+  description = "Instance type for MariaDB servers"
+  type        = string
+  default     = "t3.micro" 
+}
+
+variable "db_ebs_device_name" {
+  description = "EBS device name for MariaDB data volume"
+  type        = string
+  default     = "/dev/sdf"
+}
+
+variable "db_ebs_volume_size" {
+  description = "Size of the EBS volume for MariaDB data (in GB)"
+  type        = number
+  default     = 20
+}

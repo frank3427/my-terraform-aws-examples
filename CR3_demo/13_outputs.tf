@@ -60,3 +60,13 @@ output CONNECTIONS {
 EOF
 
 }
+
+output "mariadb_private_ips" {
+  description = "Private IPs of the MariaDB servers"
+  value       = aws_instance.cr3_r1_mariadb[*].private_ip
+}
+
+output "mariadb_instance_ids" {
+  description = "Instance IDs of the MariaDB servers"
+  value       = aws_instance.cr3_r1_mariadb[*].id
+}
