@@ -54,7 +54,7 @@ The Terraform configuration in the parent directory, specifically in files like 
         resource "aws_instance" "inst1_in_vpc1" {
           // ... other configurations ...
           # Assuming var.ami_id implies an Amazon Linux 2 instance
-          user_data = file("${path.module}/cloud_init/cloud_init_al2.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_al2.sh")
         }
         ```
     *   And in `08_instance2.tf`:
@@ -62,7 +62,7 @@ The Terraform configuration in the parent directory, specifically in files like 
         resource "aws_instance" "inst2_in_vpc2" {
           // ... other configurations ...
           # Assuming var.ami_id_vpc2 implies an Amazon Linux 2 instance for VPC2
-          user_data = file("${path.module}/cloud_init/cloud_init_al2.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_al2.sh")
         }
         ```
         (If different OS types were used for `inst1` and `inst2`, the script path would change accordingly).

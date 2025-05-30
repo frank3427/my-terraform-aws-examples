@@ -90,7 +90,7 @@ After successful deployment, you can invoke and verify the Lambda function in se
     aws lambda invoke \
         --function-name demo29_lambda \
         --payload '{}' \
-        output.json 
+        output.json
     ```
     *   `--payload '{}'` sends an empty JSON object as the event.
     *   `output.json` is the file where the Lambda function's response will be saved.

@@ -117,7 +117,7 @@ After successful deployment:
         ```bash
         SECRET_VALUE="<your_header_secret_value>" # From var.header_secret_value
         GLOBAL_ACCELERATOR_IP="<one_of_the_ga_static_ips>"
-        
+
         curl -v -H "X-Origin-Verify: $SECRET_VALUE" http://$GLOBAL_ACCELERATOR_IP/
         ```
         You should receive a 200 OK response with the content from your web servers.

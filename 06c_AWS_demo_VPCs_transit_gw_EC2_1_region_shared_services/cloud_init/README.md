@@ -48,13 +48,13 @@ The Terraform configuration in the parent directory, particularly in the file re
         // Instance in Shared Services VPC
         resource "aws_instance" "instance_in_shared_services_vpc" {
           // ... other configurations ...
-          user_data = file("${path.module}/cloud_init/cloud_init_al2023.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_al2023.sh")
         }
 
         // Instance in a Spoke VPC
         resource "aws_instance" "instance_in_spoke_vpc_a" {
           // ... other configurations ...
-          user_data = file("${path.module}/cloud_init/cloud_init_al2023.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_al2023.sh")
         }
         // And so on for instances in other spoke VPCs
         ```

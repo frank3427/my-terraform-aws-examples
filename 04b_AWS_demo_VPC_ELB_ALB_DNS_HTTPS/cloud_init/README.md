@@ -46,7 +46,7 @@ The Terraform configurations in the parent directory reference these scripts to 
         }
 
         // For web servers (or within a launch template)
-        resource "aws_instance" "websrv" { 
+        resource "aws_instance" "websrv" {
           // ... other configurations ...
           user_data = file("${path.module}/cloud_init/cloud_init_websrv.sh")
         }

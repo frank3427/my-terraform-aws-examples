@@ -59,7 +59,7 @@ After Terraform successfully provisions the EC2 instance, you **must perform the
     ```bash
     # Example commands from Terraform output for creating sessions:
     sudo dcv create-session ec2-user-session --user ec2-user --type CONSOLE
-    sudo dcv create-session chris-session --user chris --type VIRTUAL 
+    sudo dcv create-session chris-session --user chris --type VIRTUAL
     # (CONSOLE for physical display, VIRTUAL for virtual X display)
     ```
     *   `CONSOLE` session: Attaches to the main X server display (display :0). Only one console session can run at a time per server.

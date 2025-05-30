@@ -43,7 +43,7 @@ The Terraform configuration in the parent directory (e.g., in `07_instance_linux
           vars = {
             efs_dns_name    = aws_efs_file_system.efs.dns_name // Or aws_efs_file_system.efs.id
             efs_mount_point = var.efs_mount_point
-            aws_region      = var.aws_region 
+            aws_region      = var.aws_region
             // Any other variables the template might expect
           }
         }

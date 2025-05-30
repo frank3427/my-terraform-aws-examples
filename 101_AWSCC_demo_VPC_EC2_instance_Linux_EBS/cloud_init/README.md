@@ -63,8 +63,8 @@ The Terraform configuration in the parent directory, particularly in the file th
         resource "aws_instance" "linux_instance" {
           // ... other configurations ...
           # The user_data might be selected based on a variable
-          user_data = file(var.linux_os_version == "al2" ? 
-                           "${path.module}/cloud_init/cloud_init_al2.sh" : 
+          user_data = file(var.linux_os_version == "al2" ?
+                           "${path.module}/cloud_init/cloud_init_al2.sh" :
                            "${path.module}/cloud_init/cloud_init_ubuntu.sh")
           # Or more simply if only one type is primarily supported by the example:
           # user_data = file("${path.module}/cloud_init/cloud_init_al2.sh")

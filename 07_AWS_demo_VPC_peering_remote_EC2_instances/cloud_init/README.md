@@ -54,7 +54,7 @@ The Terraform configuration in the parent directory, particularly in files that 
           provider = aws.r1 // Specifies this instance is in Region 1
           // ... other configurations for instance in Region 1 ...
           # Assuming var.ami_id_region1 implies an Amazon Linux 2 instance
-          user_data = file("${path.module}/cloud_init/cloud_init_al2.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_al2.sh")
         }
         ```
     *   And for an instance in Region 2 (defined using the `aws.r2` provider alias):
@@ -64,7 +64,7 @@ The Terraform configuration in the parent directory, particularly in files that 
           provider = aws.r2 // Specifies this instance is in Region 2
           // ... other configurations for instance in Region 2 ...
           # Assuming var.ami_id_region2 implies an Ubuntu instance
-          user_data = file("${path.module}/cloud_init/cloud_init_ubuntu.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_ubuntu.sh")
         }
         ```
 

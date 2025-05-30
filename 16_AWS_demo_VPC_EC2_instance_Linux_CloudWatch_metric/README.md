@@ -98,7 +98,7 @@ After successful deployment (allow a few minutes for the cron job to run and sen
         ```
     *   Run `stress-ng` to consume memory. For example, to stress memory with 2 workers using 512MB each (adjust based on your instance type):
         ```bash
-        stress-ng --vm 2 --vm-bytes 512M --timeout 300s 
+        stress-ng --vm 2 --vm-bytes 512M --timeout 300s
         ```
         (This will run for 300 seconds / 5 minutes).
     *   Observe the `memory-usage` metric in CloudWatch. You should see an increase in the reported memory usage as `stress-ng` consumes memory.

@@ -101,7 +101,7 @@ After successful deployment and the ElastiCache cluster status is "available":
 1.  **SSH into the EC2 Client Instance:**
     Use the Elastic IP (EIP) provided in the Terraform output and your SSH key.
     ```bash
-    ssh -i /path/to/your/ssh-key.pem <user>@<EIP_EC2_Instance> 
+    ssh -i /path/to/your/ssh-key.pem <user>@<EIP_EC2_Instance>
     # Default user for Amazon Linux 2 is ec2-user
     ```
 

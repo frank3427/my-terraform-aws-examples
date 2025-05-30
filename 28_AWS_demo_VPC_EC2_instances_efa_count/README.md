@@ -99,7 +99,7 @@ After successful deployment and the cloud-init script has completed on all insta
     Use the generated `sshcfg` file or the instance's EIP.
     ```bash
     # Using generated sshcfg
-    ssh demo28-1 
+    ssh demo28-1
     # Or directly
     # ssh -i /path/to/your/ssh-key.pem <user>@<EIP_Instance1>
     ```
@@ -118,13 +118,13 @@ After successful deployment and the cloud-init script has completed on all insta
         ```bash
         # On node 1 (e.g., demo28-1)
         # Ensure your hostfile (e.g., myhosts) contains the private EFA IP of demo28-1 and demo28-2
-        # e.g., 
+        # e.g.,
         # 10.x.x.x # EFA IP of demo28-1
         # 10.x.x.y # EFA IP of demo28-2
 
         mpirun -np 2 --hostfile myhosts /path/to/osu_latency
         # Or for bandwidth:
-        # mpirun -np 2 --hostfile myhosts /path/to/osu_bibw 
+        # mpirun -np 2 --hostfile myhosts /path/to/osu_bibw
         ```
     *   Low latency values (a few microseconds for `osu_latency`) indicate EFA is working correctly.
 

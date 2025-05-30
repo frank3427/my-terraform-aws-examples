@@ -38,7 +38,7 @@ The Terraform configuration in the parent directory, specifically within the `07
         ```terraform
         resource "aws_instance" "demo5_inst1" {
           // ... other configurations ...
-          user_data = file("${path.module}/cloud_init/cloud_init_al2.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_al2.sh")
           // Or potentially templatefile() if variables were injected
         }
         ```

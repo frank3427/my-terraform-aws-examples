@@ -24,9 +24,9 @@ terraform {
     region = "eu-west-3"  # Example: AWS Region of the S3 bucket & DynamoDB table
     bucket = "cpa7777"     # Example: Name of the S3 bucket
     key    = "terraform/demo14b.tfstate" # Example: Path/name of the state file
-    
+
     # DynamoDB Table for State Locking
-    dynamodb_table = "TerraformLock" 
+    dynamodb_table = "TerraformLock"
     # encrypt        = true # Optional: server-side encryption for S3 state file
   }
 }

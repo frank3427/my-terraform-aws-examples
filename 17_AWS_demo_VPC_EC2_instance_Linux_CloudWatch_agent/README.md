@@ -100,9 +100,9 @@ After successful deployment (allow a few minutes for the agent to start and send
     *   Run `stress-ng` to generate CPU or memory load:
         ```bash
         # Example: Stress CPU
-        stress-ng --cpu 1 --cpu-load 80 --timeout 300s 
+        stress-ng --cpu 1 --cpu-load 80 --timeout 300s
         # Example: Stress memory
-        stress-ng --vm 1 --vm-bytes 512M --timeout 300s 
+        stress-ng --vm 1 --vm-bytes 512M --timeout 300s
         ```
     *   Observe the corresponding metrics (e.g., `cpu_usage_idle`, `mem_used_percent`) in CloudWatch. You should see changes reflecting the load.
 

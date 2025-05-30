@@ -113,7 +113,7 @@ After successful deployment:
     Once logged into `host1` in Account 1:
     *   **Resolve own hostname (local PHZ):**
         ```bash
-        nslookup host1.<var.r53_sub_domain1_leaf>.<var.r53_domain> 
+        nslookup host1.<var.r53_sub_domain1_leaf>.<var.r53_domain>
         # e.g., nslookup host1.acct1.awscloud.private
         ```
         This should resolve to the private IP of `host1`.

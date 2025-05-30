@@ -115,7 +115,7 @@ This is the root directory of the project and contains the main Terraform config
 
 1.  Navigate to the main project directory (root of `31_AWS_demo_s3_backend/`):
     ```bash
-    cd .. 
+    cd ..
     # Or navigate directly to 31_AWS_demo_s3_backend/ from your clone root
     ```
 2.  Initialize Terraform. It will detect the `backend "s3"` block and configure itself to use the (hardcoded) S3 bucket and DynamoDB table.

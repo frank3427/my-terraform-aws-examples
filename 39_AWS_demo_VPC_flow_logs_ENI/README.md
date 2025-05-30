@@ -115,7 +115,7 @@ After successful deployment and SNS subscription confirmation:
 2.  **Simulate Failed SSH Attempts:**
     *   From a machine **not authorized** by the bastion's security group (i.e., an IP not in `var.authorized_ips`), attempt to SSH to the bastion host's public IP multiple times (e.g., 4-5 times within a few minutes).
         ```bash
-        ssh -i /path/to/some/key.pem ec2-user@<Bastion_Host_Public_IP> 
+        ssh -i /path/to/some/key.pem ec2-user@<Bastion_Host_Public_IP>
         # This should be blocked by the security group, resulting in REJECTED traffic.
         ```
     *   These attempts should be rejected by the bastion's security group, and these rejections will be captured by the VPC Flow Logs.

@@ -48,13 +48,13 @@ The Terraform configuration in the parent directory, particularly in the file re
         resource "aws_instance" "instances_in_vpc_a" {
           count = var.nb_instances_vpc_a // Example if multiple instances
           // ... other configurations for instances in VPC A ...
-          user_data = file("${path.module}/cloud_init/cloud_init_al2023.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_al2023.sh")
         }
 
         resource "aws_instance" "instances_in_vpc_b" {
           count = var.nb_instances_vpc_b // Example if multiple instances
           // ... other configurations for instances in VPC B ...
-          user_data = file("${path.module}/cloud_init/cloud_init_al2023.sh") 
+          user_data = file("${path.module}/cloud_init/cloud_init_al2023.sh")
         }
         // And so on for other VPCs
         ```
