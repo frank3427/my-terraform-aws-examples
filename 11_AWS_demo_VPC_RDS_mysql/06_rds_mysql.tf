@@ -22,6 +22,7 @@ resource aws_db_subnet_group demo11 {
   }
 }
 
+# ------ Create a new MySQL RDS database
 # multi-AZ=true: aws_db_instance.demo11_mysql: Creation complete after 9m55s [id=demo11-rds-mysql]
 resource aws_db_instance demo11_mysql {
   #availability_zone      = "${var.aws_region}${var.az}"    # not valid for multi-AZ

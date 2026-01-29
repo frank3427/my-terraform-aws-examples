@@ -18,9 +18,9 @@ az                       = "b"
 az2                      = "a"
 
 # ---- Instance Amazon Linux 2
-al2_private_ip         = "192.168.0.11"
-al2_inst_type          = "t3a.large"
-al2_cloud_init_script  = "cloud_init/cloud_init_al2_TEMPLATE.sh"
+al2023_private_ip         = "192.168.0.11"
+al2023_inst_type          = "t3a.large"
+al2023_cloud_init_script  = "cloud_init/cloud_init_al2023_TEMPLATE.sh"
 
 # ---- RDS mysql
 mysql_identifier             = "demo11-rds-mysql"

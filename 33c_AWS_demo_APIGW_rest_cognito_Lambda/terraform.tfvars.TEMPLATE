@@ -2,8 +2,17 @@
 #aws_region     = "eu-west-3"    # Paris
 aws_region     = "eu-west-1"    # Ireland
 
+# ---- Misc
+project_prefix    = "demo33c"
+
 # ---- API gateway
-apigw_path1      = "path1"
+apigw_path1       = "path1"
+
+# ---- Lambda
+lambda_runtime    = "python3.13"
+
+# ---- CloudWatch Logs
+cwlogs_retention_in_days = 7
 
 # ---- Cognito
 cognito_user_name = "chris"

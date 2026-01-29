@@ -12,9 +12,10 @@ User    : ${aws_db_instance.demo11_mysql.username}
 Password: ${random_string.demo11-db-passwd.result}
 
 ---- You can SSH directly to the Linux instance with Oracle Instance Client by typing the following ssh command
-ssh -i ${var.private_sshkey_path} ${local.username}@${aws_eip.demo11_al2.public_ip}
+ssh -i ${var.private_sshkey_path} ${local.username}@${aws_eip.demo11_al2023.public_ip}
 
 ---- Once connected, you can connect to the MySQL database using the following command
+export MYSQL_PWD="${random_string.demo11-db-passwd.result}"
 ./mysql.sh
 
 Notes: 
@@ -45,6 +46,24 @@ Notes:
 - you can list rows inside the table with the following command:
       select * from tblEmployee;
 
+- you can run an infinite loop with select command with the following command:
+
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS infinite_select//
+
+CREATE PROCEDURE infinite_select()
+BEGIN
+    WHILE 1 DO
+        SELECT CURRENT_TIME, tblEmployee.* FROM tblEmployee;
+        DO SLEEP(1);
+    END WHILE;
+END //
+
+DELIMITER ;
+
+CALL infinite_select();
 
 EOF
 }

@@ -1,9 +1,12 @@
 variable "aws_region" {}
+variable "test_region" {}
 variable "az" {}
 variable "cidr_vpc" {}
 variable "cidr_subnet_public" {}
 variable "cidr_subnets_private_lb" {}
 variable "cidr_subnets_private_websrv" {}
+variable "test_cidr_vpc" {}
+variable "test_cidr_subnet_public" {}
 variable "authorized_ips" {}
 variable "websrv_nb_instances" {}
 variable "websrv_inst_type" {}
@@ -14,3 +17,7 @@ variable "bastion_inst_type" {}
 variable "bastion_public_sshkey_path" {}
 variable "bastion_private_sshkey_path" {}
 variable "bastion_cloud_init_script" {}
+variable "test_inst_type" {}
+variable "test_public_sshkey_path" {}
+variable "test_private_sshkey_path" {}
+variable "test_cloud_init_script" {}

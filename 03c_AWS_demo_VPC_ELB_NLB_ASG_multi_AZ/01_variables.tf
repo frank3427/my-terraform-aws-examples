@@ -1,0 +1,9 @@
+variable "aws_region" {}
+variable "cidr_vpc" {}
+variable "cidr_subnet_public" {}
+variable "cidr_subnet_private" {}
+variable "authorized_ips" {}
+variable "nb_az" {}
+variable "az" {}
+variable "websrv_inst_type" {}
+variable "websrv_cloud_init_script" {}

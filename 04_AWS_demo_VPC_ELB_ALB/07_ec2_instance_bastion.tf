@@ -15,7 +15,7 @@ resource aws_instance demo04_bastion {
     ]
   }
   instance_type          = var.bastion_inst_type
-  ami                    = data.aws_ami.al2_arm64.id
+  ami                    = data.aws_ami.al2023_arm64.id
   key_name               = aws_key_pair.demo04_bastion.id
   subnet_id              = aws_subnet.demo04_public_bastion.id
   vpc_security_group_ids = [ aws_security_group.demo04_sg_bastion.id ]

@@ -16,7 +16,7 @@ resource aws_instance demo13_db_client {
   }
   availability_zone      = "${var.aws_region}${var.db_client_az}"
   instance_type          = var.db_client_inst_type
-  ami                    = data.aws_ami.al2_x64.id
+  ami                    = data.aws_ami.al2023_x64.id
   key_name               = aws_key_pair.demo13.id
   subnet_id              = aws_subnet.demo13_db_client.id
   vpc_security_group_ids = [ aws_default_security_group.demo13_ec2.id ] 

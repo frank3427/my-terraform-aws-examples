@@ -13,7 +13,7 @@ resource aws_instance demo04b_websrv {
   count                  = 2
   availability_zone      = "${var.aws_region}${var.websrv_az[count.index]}"
   instance_type          = var.websrv_inst_type
-  ami                    = data.aws_ami.al2_arm64.id
+  ami                    = data.aws_ami.al2023_arm64.id
   key_name               = aws_key_pair.demo04b_websrv.id
   subnet_id              = aws_subnet.demo04b_private_websrv[count.index].id
   vpc_security_group_ids = [ aws_security_group.demo04b_sg_websrv.id ]

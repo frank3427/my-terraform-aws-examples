@@ -28,19 +28,7 @@ resource aws_default_route_table demo20b {
 resource aws_default_network_acl demo20b {
   default_network_acl_id = aws_vpc.demo20b.default_network_acl_id
   tags                   = { Name = "demo20b-public-acl" }
-  subnet_ids             = [ aws_subnet.demo20b_public.id ]
-
-  dynamic ingress {
-    for_each = var.authorized_ips
-    content {
-      protocol   = "tcp"
-      rule_no    = 100 + 10 * index(var.authorized_ips, ingress.value)
-      action     = "allow"
-      cidr_block = ingress.value
-      from_port  = 22
-      to_port    = 22
-    }
-  }
+  subnet_ids             = tolist(aws_subnet.demo20b_public[*].id)
 
   # this is needed for yum
   ingress {
@@ -71,28 +59,20 @@ resource aws_default_network_acl demo20b {
   }
 }
 
-# ------ Create a subnet (use the default route table and default network ACL)
+# ------ Create public subnets (use the default route table and default network ACL)
 resource aws_subnet demo20b_public {
+  count                   = 2
   vpc_id                  = aws_vpc.demo20b.id
-  availability_zone       = "${var.aws_region}${var.az}"
-  cidr_block              = var.cidr_subnet1
+  availability_zone       = "${var.aws_region}${var.azs[count.index]}"
+  cidr_block              = var.cidr_subnets_public[count.index]
   map_public_ip_on_launch = true
-  tags                    = { Name = "demo20b-public" }
+  tags                    = { Name = "demo20b-public-${count.index+1}" }
 }
 
 # ------ Customize the security group for the EC2 instance
 resource aws_default_security_group demo20b {
   vpc_id      = aws_vpc.demo20b.id
   tags        = { Name = "demo20b-sg1" }
-
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow SSH access from authorized public IP addresses and VPC"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = concat(var.authorized_ips, [ var.cidr_vpc ])
-  }
 
   # ingress rule: allow HTTPS for Systems Manager
   ingress {
@@ -102,14 +82,6 @@ resource aws_default_security_group demo20b {
     protocol    = "tcp"
     cidr_blocks = [ var.cidr_vpc ]
   }
-
-  # ingress {
-  #   description = "allow all"
-  #   from_port   = 0
-  #   to_port     = 0
-  #   protocol    = -1
-  #   cidr_blocks = [ "0.0.0.0/0" ]
-  # }
 
   # egress rule: allow all traffic
   egress {
@@ -121,29 +93,32 @@ resource aws_default_security_group demo20b {
   }
 }
 
-# ========== Private subnets for web servers
+# ========== Private subnets in HA mode (NAT gateway and VPC endpoints in 2 AZs)
 
-# ------ Create an elastic IP address for the NAT gateway
+# ------ Create elastic IP addresses for the NAT gateways
 resource aws_eip demo20b_natgw {
-  domain   = "vpc"
-  tags     = { Name = "demo20b-natgw" }
+  count  = 2
+  domain = "vpc"
+  tags   = { Name = "demo20b-natgw-${count.index+1}" }
 }
 
-# ------ Create a NAT gateway
+# ------ Create NAT gateways
 resource aws_nat_gateway demo20b {
+  count             = 2
   connectivity_type = "public"
-  allocation_id     = aws_eip.demo20b_natgw.id
-  subnet_id         = aws_subnet.demo20b_public.id
-  tags              = { Name = "demo20b-natgw" }
+  allocation_id     = aws_eip.demo20b_natgw[count.index].id
+  subnet_id         = aws_subnet.demo20b_public[count.index].id
+  tags              = { Name = "demo20b-natgw-${count.index+1}" }
 }
 
-# ------ Create a new route table
+# ------ Create 2 new route tables
 resource aws_route_table demo20b_private {
+  count  = 2
   vpc_id = aws_vpc.demo20b.id
   tags   = { Name = "demo20b-private-rt" }
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.demo20b.id
+    nat_gateway_id = aws_nat_gateway.demo20b[count.index].id
   }
 }
 
@@ -151,7 +126,7 @@ resource aws_route_table demo20b_private {
 resource aws_network_acl demo20b_private {
   vpc_id     = aws_vpc.demo20b.id
   tags       = { Name = "demo20b-private-acl" }
-  subnet_ids = [ aws_subnet.demo20b_private.id ]
+  subnet_ids = tolist(aws_subnet.demo20b_private[*].id)
 
   # allow all traffic from vpc
   ingress {
@@ -161,19 +136,6 @@ resource aws_network_acl demo20b_private {
     cidr_block = var.cidr_vpc
     from_port  = 22
     to_port    = 22
-  }
-
-  # needed
-  dynamic ingress {
-    for_each = var.authorized_ips
-    content {
-      protocol   = "tcp"
-      rule_no    = 200 + 10 * index(var.authorized_ips, ingress.value)
-      action     = "allow"
-      cidr_block = ingress.value
-      from_port  = 22
-      to_port    = 22
-    }
   }
 
   # this is needed for yum
@@ -206,22 +168,24 @@ resource aws_network_acl demo20b_private {
   }
 }
 
-# ------ Create 1 private subnet
+# ------ Create 2 private subnets
 resource aws_subnet demo20b_private {
+  count                   = 2
   vpc_id                  = aws_vpc.demo20b.id
-  availability_zone       = "${var.aws_region}${var.az}"
-  cidr_block              = var.cidr_subnets_private
+  availability_zone       = "${var.aws_region}${var.azs[count.index]}"
+  cidr_block              = var.cidr_subnets_private[count.index]
   map_public_ip_on_launch = false
-  tags                    = { Name = "demo20b-private" }
+  tags                    = { Name = "demo20b-private-${count.index+1}" }
 }
 
-# ------ Associate the route table with subnet
+# ------ Associate the route tables with subnets
 resource aws_route_table_association demo20b_private {
-  subnet_id      = aws_subnet.demo20b_private.id
-  route_table_id = aws_route_table.demo20b_private.id
+  count          = 2
+  subnet_id      = aws_subnet.demo20b_private[count.index].id
+  route_table_id = aws_route_table.demo20b_private[count.index].id
 }
 
-# ------ Create endpoints for System Manager
+# ------ Create VPC endpoints for System Manager attached to both AZ (in private subnets)
 locals {
   ssm_endp = [ "ssm", "ec2messages", "ssmmessages"]
 }
@@ -233,6 +197,6 @@ resource aws_vpc_endpoint demo20b_ssm {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   tags                = { Name = "demo20b-${local.ssm_endp[count.index]}" }
-  subnet_ids          = [ aws_subnet.demo20b_private.id ]
+  subnet_ids          = aws_subnet.demo20b_private[*].id
   security_group_ids  = [ aws_default_security_group.demo20b.id ]
 }

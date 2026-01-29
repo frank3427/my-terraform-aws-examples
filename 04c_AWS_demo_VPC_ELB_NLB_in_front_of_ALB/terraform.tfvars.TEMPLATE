@@ -1,0 +1,17 @@
+aws_region                    = "eu-west-3"
+cidr_vpc                      = "10.0.0.0/16"
+cidr_subnet_public_bastion    = "10.0.0.0/24"
+cidr_subnets_public_nlb       = ["10.0.1.0/24", "10.0.2.0/24"]
+cidr_subnets_private_alb      = ["10.0.10.0/24", "10.0.20.0/24"]
+cidr_subnets_private_websrv   = ["10.0.11.0/24", "10.0.21.0/24"]
+authorized_ips                = ["0.0.0.0/0"]
+websrv_az                     = ["a", "b"]
+websrv_inst_type              = "t4g.micro"
+websrv_public_sshkey_path     = "./sshkeys_generated/ssh_key_demo04c_websrv.pub"
+websrv_private_sshkey_path    = "./sshkeys_generated/ssh_key_demo04c_websrv"
+websrv_cloud_init_script      = "./cloud_init/cloud_init_websrv.sh"
+bastion_az                    = "a"
+bastion_inst_type             = "t4g.micro"
+bastion_public_sshkey_path    = "./sshkeys_generated/ssh_key_demo04c_bastion.pub"
+bastion_private_sshkey_path   = "./sshkeys_generated/ssh_key_demo04c_bastion"
+bastion_cloud_init_script     = "./cloud_init/cloud_init_bastion.sh"

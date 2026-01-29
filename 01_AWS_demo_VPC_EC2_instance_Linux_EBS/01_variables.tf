@@ -15,8 +15,8 @@ variable "linux_os_version" {
     type        = string
     description = "Linux OS version"
     validation {
-    condition     = contains(["al2", "al2023", "ubuntu22", "sles15", "rhel9"], var.linux_os_version)
-    error_message = "Valid values for linux_os_version are al2, al2023, ubuntu22, sles15, rhel9"
+    condition     = contains(["al2", "al2023", "ubuntu22", "ubuntu24", "sles15", "rhel9"], var.linux_os_version)
+    error_message = "Valid values for linux_os_version are al2, al2023, ubuntu22, ubuntu24, sles15, rhel9"
   }    
 }
 variable "az" {

@@ -69,6 +69,37 @@ resource aws_subnet demo17_public {
   tags                    = { Name = "demo17-public" }
 }
 
+# ------ Create VPC endpoint for CloudWatch
+resource aws_vpc_endpoint demo17_cloudwatch {
+  vpc_id              = aws_vpc.demo17.id
+  service_name        = "com.amazonaws.${var.aws_region}.monitoring"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.demo17_public.id]
+  security_group_ids  = [aws_security_group.demo17_vpce.id]
+  tags                = { Name = "demo17-cloudwatch-vpce" }
+}
+
+# ------ Security group for VPC endpoint
+resource aws_security_group demo17_vpce {
+  name_prefix = "demo17-vpce-"
+  vpc_id      = aws_vpc.demo17.id
+  tags        = { Name = "demo17-vpce-sg" }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.cidr_vpc]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 # ------ Customize the security group for the EC2 instance
 resource aws_default_security_group demo17 {
   vpc_id      = aws_vpc.demo17.id

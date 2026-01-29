@@ -13,17 +13,17 @@ authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
 public_sshkey_path   = "sshkeys_generated/ssh_key_demo13.pub"
 private_sshkey_path  = "sshkeys_generated/ssh_key_demo13"
 
-# ---- Instance Amazon Linux 2 (database client)
+# ---- Instance Amazon Linux 2023 (database client)
 db_client_az                = "b"
 db_client_private_ip        = "192.168.0.11"
 db_client_inst_type         = "t3a.large"
-db_client_cloud_init_script = "cloud_init/cloud_init_al2_TEMPLATE.sh"
+db_client_cloud_init_script = "cloud_init/cloud_init_al2023_TEMPLATE.sh"
 
 # ---- RDS aurora_mysql
 aurora_subnets_azs              = [ "a", "b", "c" ]
 aurora_mysql_db_identifier      = "demo13-aurora-inst"
 aurora_mysql_cluster_identifier = "demo13-aurora-mysql-cluster"
-aurora_mysql_engine_version     = "8.0.mysql_aurora.3.05.2"
+aurora_mysql_engine_version     = "8.0.mysql_aurora.3.08.2"
 aurora_mysql_username           = "admin"
 aurora_mysql_instance_class     = "db.r6g.large"
 aurora_mysql_db_name            = "db1"

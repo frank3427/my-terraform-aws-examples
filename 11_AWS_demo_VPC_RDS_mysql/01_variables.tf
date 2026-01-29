@@ -7,9 +7,9 @@ variable "public_sshkey_path" {}
 variable "private_sshkey_path" {}
 variable "az" {}
 variable "az2" {}
-variable "al2_private_ip" {}
-variable "al2_inst_type" {}
-variable "al2_cloud_init_script" {}
+variable "al2023_private_ip" {}
+variable "al2023_inst_type" {}
+variable "al2023_cloud_init_script" {}
 variable "mysql_identifier" {}
 variable "mysql_instance_class" {}
 variable "mysql_size_in_gbs" {}

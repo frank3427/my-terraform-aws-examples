@@ -23,3 +23,6 @@ bastion_inst_type           = "m6g.medium"
 bastion_public_sshkey_path  = "sshkeys_generated/ssh_key_demo04_bastion.pub"
 bastion_private_sshkey_path = "sshkeys_generated/ssh_key_demo04_bastion"
 bastion_cloud_init_script   = "cloud_init/cloud_init_bastion.sh"
+
+# ---- ALB
+alb_use_waf                 = "true"

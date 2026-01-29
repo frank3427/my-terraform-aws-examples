@@ -12,7 +12,7 @@ resource aws_instance demo04_websrv {
   }
   count                  = 3
   instance_type          = var.websrv_inst_type
-  ami                    = data.aws_ami.al2_arm64.id
+  ami                    = data.aws_ami.al2023_arm64.id
   key_name               = aws_key_pair.demo04_websrv.id
   subnet_id              = aws_subnet.demo04_private_websrv[count.index % 2].id
   vpc_security_group_ids = [ aws_security_group.demo04_sg_websrv.id ]
