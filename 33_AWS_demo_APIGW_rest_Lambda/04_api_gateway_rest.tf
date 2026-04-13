@@ -17,9 +17,13 @@ data aws_iam_policy demo33_apigw {
 }
 
 resource aws_iam_role demo33_apigw {
-  name                = "demo33_iam_for_apigw"
-  assume_role_policy  = data.aws_iam_policy_document.demo33_apigw.json
-  managed_policy_arns = [ data.aws_iam_policy.demo33_apigw.arn ]
+  name               = "demo33_iam_for_apigw"
+  assume_role_policy = data.aws_iam_policy_document.demo33_apigw.json
+}
+
+resource aws_iam_role_policy_attachment demo33_apigw {
+  role       = aws_iam_role.demo33_apigw.name
+  policy_arn = data.aws_iam_policy.demo33_apigw.arn
 }
 
 # -- CloudWatch Logs for API gateway
@@ -85,7 +89,21 @@ resource aws_api_gateway_deployment demo33_stage1 {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.demo33.id
-  stage_name = "demo33-stage1"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource aws_api_gateway_stage demo33_stage1 {
+  rest_api_id   = aws_api_gateway_rest_api.demo33.id
+  deployment_id = aws_api_gateway_deployment.demo33_stage1.id
+  stage_name    = "demo33-stage1"
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.demo33_apigw.arn
+    format          = "$context.requestId $context.status $context.httpMethod $context.resourcePath $context.responseLength"
+  }
 }
 
 resource aws_lambda_permission demo33 {
@@ -102,9 +120,9 @@ output test_curl {
   value = <<EOF
 You can test access to API with following command:
 
-curl -i ${aws_api_gateway_deployment.demo33_stage1.invoke_url}${aws_api_gateway_resource.demo33_path1.path}
+curl -i ${aws_api_gateway_stage.demo33_stage1.invoke_url}${aws_api_gateway_resource.demo33_path1.path}
 
-curl -i ${aws_api_gateway_deployment.demo33_stage1.invoke_url}${aws_api_gateway_resource.demo33_path1.path}?name=christophe
+curl -i ${aws_api_gateway_stage.demo33_stage1.invoke_url}${aws_api_gateway_resource.demo33_path1.path}?name=christophe
 
 EOF
 }
