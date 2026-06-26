@@ -115,10 +115,11 @@ resource "aws_vpc_security_group_ingress_rule" "demo45a_ingress_ssh_0" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "demo45a_ingress_port0_1" {
-  security_group_id = aws_security_group.demo45a.id
-  description       = "self"
-  ip_protocol       = "-1"
-  tags              = { Name = "demo45a-sgr-ingress-port0-1" }
+  security_group_id            = aws_security_group.demo45a.id
+  description                  = "self"
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_security_group.demo45a.id
+  tags                         = { Name = "demo45a-sgr-ingress-port0-1" }
 }
 
 resource "aws_vpc_security_group_egress_rule" "demo45a_egress_all_2" {
@@ -130,8 +131,9 @@ resource "aws_vpc_security_group_egress_rule" "demo45a_egress_all_2" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "demo45a_egress_port0_3" {
-  security_group_id = aws_security_group.demo45a.id
-  description       = "self"
-  ip_protocol       = "-1"
-  tags              = { Name = "demo45a-sgr-egress-port0-3" }
+  security_group_id            = aws_security_group.demo45a.id
+  description                  = "self"
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_security_group.demo45a.id
+  tags                         = { Name = "demo45a-sgr-egress-port0-3" }
 }

@@ -154,7 +154,7 @@ resource "aws_vpc_security_group_ingress_rule" "demo38_ingress_all_2" {
   security_group_id = aws_default_security_group.demo38.id
   description       = "allow all IPv6 traffic from the VPC"
   ip_protocol       = "-1"
-  cidr_ipv6         = [aws_vpc.demo38.ipv6_cidr_block]
+  cidr_ipv6         = aws_vpc.demo38.ipv6_cidr_block
   tags              = { Name = "demo38-sgr-ingress-all-2" }
 }
 

@@ -194,29 +194,30 @@ resource "aws_security_group" "demo06b_sg_ec2" {
 
 
 resource "aws_vpc_security_group_ingress_rule" "demo06b_sg_ec2_ingress_ssh_0" {
-  count             = length(var.authorized_ips)
-  security_group_id = aws_security_group.demo06b_sg_ec2.id
+  count             = local.nb_vpcs * length(var.authorized_ips)
+  security_group_id = aws_security_group.demo06b_sg_ec2[floor(count.index / length(var.authorized_ips))].id
   description       = "allow SSH access from authorized public IP addresses"
   from_port         = 22
   to_port           = 22
   ip_protocol       = "tcp"
-  cidr_ipv4         = var.authorized_ips[count.index]
-  tags              = { Name = "demo06b_sg_ec2-sgr-ingress-ssh-0" }
+  cidr_ipv4         = var.authorized_ips[count.index % length(var.authorized_ips)]
+  tags              = { Name = "demo06b-vpc${floor(count.index / length(var.authorized_ips)) + 1}-sgr-ingress-ssh-${count.index % length(var.authorized_ips)}" }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "demo06b_sg_ec2_ingress_all_1" {
-  count             = length(var.cidrs_vpc)
-  security_group_id = aws_security_group.demo06b_sg_ec2.id
+  count             = local.nb_vpcs * length(var.cidrs_vpc)
+  security_group_id = aws_security_group.demo06b_sg_ec2[floor(count.index / length(var.cidrs_vpc))].id
   description       = "allow all traffic from the VPCs"
   ip_protocol       = "-1"
-  cidr_ipv4         = var.cidrs_vpc[count.index]
-  tags              = { Name = "demo06b_sg_ec2-sgr-ingress-all-1" }
+  cidr_ipv4         = var.cidrs_vpc[count.index % length(var.cidrs_vpc)]
+  tags              = { Name = "demo06b-vpc${floor(count.index / length(var.cidrs_vpc)) + 1}-sgr-ingress-all-${count.index % length(var.cidrs_vpc)}" }
 }
 
 resource "aws_vpc_security_group_egress_rule" "demo06b_sg_ec2_egress_all_2" {
-  security_group_id = aws_security_group.demo06b_sg_ec2.id
+  count             = local.nb_vpcs
+  security_group_id = aws_security_group.demo06b_sg_ec2[count.index].id
   description       = "allow all traffic"
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
-  tags              = { Name = "demo06b_sg_ec2-sgr-egress-all-2" }
+  tags              = { Name = "demo06b-vpc${count.index + 1}-sgr-egress-all" }
 }

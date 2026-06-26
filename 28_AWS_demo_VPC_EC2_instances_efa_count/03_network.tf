@@ -117,12 +117,11 @@ resource "aws_vpc_security_group_egress_rule" "demo28_egress_all_1" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "demo28_efa_ingress_all_0" {
-  security_group_id = aws_security_group.demo28_efa.id
-  description       = "allow all ingress traffic from this security group"
-  from_port         = 0
-  to_port           = 0
-  ip_protocol       = "-1"
-  tags              = { Name = "demo28_efa-sgr-ingress-all-0" }
+  security_group_id            = aws_security_group.demo28_efa.id
+  description                  = "allow all ingress traffic from this security group"
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_security_group.demo28_efa.id
+  tags                         = { Name = "demo28_efa-sgr-ingress-all-0" }
 }
 
 resource "aws_vpc_security_group_egress_rule" "demo28_efa_egress_all_1" {

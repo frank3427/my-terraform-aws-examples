@@ -3,7 +3,7 @@
 resource "aws_eip" "demo20" {
   count    = var.nb_instances_linux
   instance = aws_instance.demo20[count.index].id
-  vpc      = true
+  domain   = "vpc"
   tags     = { Name = "demo20-linux${count.index + 1}" }
 }
 
