@@ -1,10 +1,10 @@
-data archive_file demo29_lambda {
+data "archive_file" "demo29_lambda" {
   type        = "zip"
   source_file = "lambda.py"
   output_path = "lambda_function_payload.zip"
 }
 
-resource aws_lambda_function demo29 {
+resource "aws_lambda_function" "demo29" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
   filename      = "lambda_function_payload.zip"

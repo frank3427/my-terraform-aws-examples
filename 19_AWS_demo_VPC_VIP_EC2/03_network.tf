@@ -1,5 +1,5 @@
 # ------ Create a VPC 
-resource aws_vpc demo19 {
+resource "aws_vpc" "demo19" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo19-vpc" }
@@ -8,24 +8,24 @@ resource aws_vpc demo19 {
 # ========== Public subnets 
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo19-ig {
+resource "aws_internet_gateway" "demo19-ig" {
   vpc_id = aws_vpc.demo19.id
   tags   = { Name = "demo19-igw" }
 }
 
 # ------ Create a subnet for bastion
-resource aws_subnet demo19_public {
+resource "aws_subnet" "demo19_public" {
   vpc_id                  = aws_vpc.demo19.id
-  availability_zone      = "${var.aws_region}${var.az}"
+  availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet_public
   map_public_ip_on_launch = true
   tags                    = { Name = "demo19-public-bastion" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo19 {
+resource "aws_default_route_table" "demo19" {
   default_route_table_id = aws_vpc.demo19.default_route_table_id
-  tags   = { Name = "demo19-public-rt" }
+  tags                   = { Name = "demo19-public-rt" }
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -34,12 +34,12 @@ resource aws_default_route_table demo19 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo19 {
+resource "aws_default_network_acl" "demo19" {
   default_network_acl_id = aws_vpc.demo19.default_network_acl_id
   tags                   = { Name = "demo19-acl" }
-  subnet_ids             = [ aws_subnet.demo19_public.id ]
+  subnet_ids             = [aws_subnet.demo19_public.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -51,7 +51,7 @@ resource aws_default_network_acl demo19 {
     }
   }
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -87,7 +87,7 @@ resource aws_default_network_acl demo19 {
 # resource aws_route_table demo19_public {
 #   vpc_id = aws_vpc.demo19.id
 #   tags   = { Name = "demo19-public-rt" }
-  
+
 #   route {
 #     cidr_block = "0.0.0.0/0"
 #     gateway_id = aws_internet_gateway.demo19-ig.id

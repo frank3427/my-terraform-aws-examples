@@ -1,7 +1,7 @@
 provider "aws" {
-  region     = var.aws_region
+  region = var.aws_region
 
- # default tags are optional
+  # default tags are optional
   default_tags {
     tags = {
       Management = "Terraform",

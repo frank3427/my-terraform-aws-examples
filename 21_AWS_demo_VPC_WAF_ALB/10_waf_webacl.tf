@@ -1,5 +1,5 @@
 # -------- Create a WebACL in WAF
-resource aws_wafv2_web_acl demo21 {
+resource "aws_wafv2_web_acl" "demo21" {
   name        = "demo21_webacl"
   description = "demo21: WebACL created by Terraform"
   scope       = "REGIONAL"
@@ -39,7 +39,7 @@ resource aws_wafv2_web_acl demo21 {
 }
 
 # -------- Associate the WAF WebACL with Application Load Balancer
-resource aws_wafv2_web_acl_association demo21 {
+resource "aws_wafv2_web_acl_association" "demo21" {
   resource_arn = aws_lb.demo21_alb.arn
   web_acl_arn  = aws_wafv2_web_acl.demo21.arn
 }

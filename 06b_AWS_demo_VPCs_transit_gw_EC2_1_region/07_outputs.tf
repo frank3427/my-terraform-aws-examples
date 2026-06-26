@@ -3,7 +3,7 @@ locals {
   username = "ec2-user"
 }
 
-output Instances {
+output "Instances" {
   value = <<EOF
 
 

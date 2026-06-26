@@ -1,5 +1,5 @@
 # ------ Create a VPC 
-resource aws_vpc cr3_r2 {
+resource "aws_vpc" "cr3_r2" {
   provider             = aws.r2
   cidr_block           = var.cidr_vpc_r2
   enable_dns_hostnames = true
@@ -7,14 +7,14 @@ resource aws_vpc cr3_r2 {
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway cr3_r2 {
+resource "aws_internet_gateway" "cr3_r2" {
   provider = aws.r2
   vpc_id   = aws_vpc.cr3_r2.id
   tags     = { Name = "cr3-r2-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table cr3_r2 {
+resource "aws_default_route_table" "cr3_r2" {
   provider               = aws.r2
   default_route_table_id = aws_vpc.cr3_r2.default_route_table_id
   tags                   = { Name = "cr3-r2-public-rt" }
@@ -23,7 +23,7 @@ resource aws_default_route_table cr3_r2 {
     cidr_block = var.cidr_vpc_r1
     gateway_id = aws_vpc_peering_connection.cr3_r1.id
   }
-  
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.cr3_r2.id
@@ -31,13 +31,13 @@ resource aws_default_route_table cr3_r2 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl cr3_r2 {
+resource "aws_default_network_acl" "cr3_r2" {
   provider               = aws.r2
   default_network_acl_id = aws_vpc.cr3_r2.default_network_acl_id
   tags                   = { Name = "cr3-r2-acl" }
-  subnet_ids             = [ aws_subnet.cr3_public_r2.id ]
+  subnet_ids             = [aws_subnet.cr3_public_r2.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -49,7 +49,7 @@ resource aws_default_network_acl cr3_r2 {
     }
   }
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -102,7 +102,7 @@ resource aws_default_network_acl cr3_r2 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet cr3_public_r2 {
+resource "aws_subnet" "cr3_public_r2" {
   provider                = aws.r2
   vpc_id                  = aws_vpc.cr3_r2.id
   availability_zone       = "${var.aws_region2}${var.az_dr}"
@@ -112,7 +112,7 @@ resource aws_subnet cr3_public_r2 {
 }
 
 # ======== Peering connection to other VPC: ACCEPTER
-resource aws_vpc_peering_connection_accepter cr3_r2 {
+resource "aws_vpc_peering_connection_accepter" "cr3_r2" {
   provider                  = aws.r2
   vpc_peering_connection_id = aws_vpc_peering_connection.cr3_r1.id
   auto_accept               = true

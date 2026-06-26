@@ -1,5 +1,5 @@
 # ------ Display connection instructions
-output CONNECTIONS {
+output "CONNECTIONS" {
   value = <<EOF
 
   Wait a few minutes so that post-provisioning scripts can run on the compute instances

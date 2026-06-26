@@ -1,18 +1,18 @@
 # ------ Create a VPC 
-resource aws_vpc demo26 {
+resource "aws_vpc" "demo26" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo26-vpc" }
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo26 {
+resource "aws_internet_gateway" "demo26" {
   vpc_id = aws_vpc.demo26.id
   tags   = { Name = "demo26-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo26 {
+resource "aws_default_route_table" "demo26" {
   default_route_table_id = aws_vpc.demo26.default_route_table_id
   tags                   = { Name = "demo26-rt" }
 
@@ -23,12 +23,12 @@ resource aws_default_route_table demo26 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo26 {
+resource "aws_default_network_acl" "demo26" {
   default_network_acl_id = aws_vpc.demo26.default_network_acl_id
   tags                   = { Name = "demo26-acl" }
-  subnet_ids             = [ aws_subnet.demo26_public1.id, aws_subnet.demo26_public2.id ]
+  subnet_ids             = [aws_subnet.demo26_public1.id, aws_subnet.demo26_public2.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -49,7 +49,7 @@ resource aws_default_network_acl demo26 {
     from_port  = 1024
     to_port    = 65535
   }
-  
+
   egress {
     protocol   = -1
     rule_no    = 100
@@ -61,7 +61,7 @@ resource aws_default_network_acl demo26 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo26_public1 {
+resource "aws_subnet" "demo26_public1" {
   vpc_id                  = aws_vpc.demo26.id
   availability_zone       = "${var.aws_region}${var.az1}"
   cidr_block              = var.cidr_subnet1
@@ -70,7 +70,7 @@ resource aws_subnet demo26_public1 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo26_public2 {
+resource "aws_subnet" "demo26_public2" {
   vpc_id                  = aws_vpc.demo26.id
   availability_zone       = "${var.aws_region}${var.az2}"
   cidr_block              = var.cidr_subnet2

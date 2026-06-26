@@ -1,9 +1,9 @@
 # ------ Display the complete ssh command needed to connect to the instance
 locals {
-  username   = "ec2-user"
+  username = "ec2-user"
 }
 
-output Instructions {
+output "Instructions" {
   value = <<EOF
 
 
@@ -46,7 +46,7 @@ Notes:
 EOF
 }
 
-      # use ${var.mysql_db_name};
+# use ${var.mysql_db_name};
 
 # ---- MySQL details
 # Endpoint: ${aws_db_instance.demo13b_mysql.endpoint}

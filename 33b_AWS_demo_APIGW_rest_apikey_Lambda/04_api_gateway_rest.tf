@@ -1,5 +1,5 @@
 # -- IAM Role to allow API Gateway to send logs to CloudWatch logs
-data aws_iam_policy_document demo33b_apigw {
+data "aws_iam_policy_document" "demo33b_apigw" {
   statement {
     effect = "Allow"
 
@@ -12,24 +12,24 @@ data aws_iam_policy_document demo33b_apigw {
   }
 }
 
-data aws_iam_policy demo33b_apigw {
+data "aws_iam_policy" "demo33b_apigw" {
   name = "AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
-resource aws_iam_role demo33b_apigw {
+resource "aws_iam_role" "demo33b_apigw" {
   name                = "demo33b_iam_for_apigw"
   assume_role_policy  = data.aws_iam_policy_document.demo33b_apigw.json
-  managed_policy_arns = [ data.aws_iam_policy.demo33b_apigw.arn ]
+  managed_policy_arns = [data.aws_iam_policy.demo33b_apigw.arn]
 }
 
 # -- CloudWatch Logs for API gateway
-resource aws_cloudwatch_log_group demo33b_apigw {
+resource "aws_cloudwatch_log_group" "demo33b_apigw" {
   name              = "/aws/apigateway/demo33b"
   retention_in_days = 14
 }
 
 # -- REST API
-resource aws_api_gateway_rest_api demo33b {
+resource "aws_api_gateway_rest_api" "demo33b" {
   description = "demo33b API Gateway"
   name        = "demo33b"
   endpoint_configuration {
@@ -38,13 +38,13 @@ resource aws_api_gateway_rest_api demo33b {
 }
 
 # -- resource path1
-resource aws_api_gateway_resource demo33b_path1 {
+resource "aws_api_gateway_resource" "demo33b_path1" {
   rest_api_id = aws_api_gateway_rest_api.demo33b.id
   parent_id   = aws_api_gateway_rest_api.demo33b.root_resource_id
   path_part   = var.apigw_path1
 }
 
-resource aws_api_gateway_method proxy {
+resource "aws_api_gateway_method" "proxy" {
   rest_api_id      = aws_api_gateway_rest_api.demo33b.id
   resource_id      = aws_api_gateway_resource.demo33b_path1.id
   http_method      = "GET"
@@ -52,7 +52,7 @@ resource aws_api_gateway_method proxy {
   api_key_required = true
 }
 
-resource aws_api_gateway_integration lambda_integration {
+resource "aws_api_gateway_integration" "lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.demo33b.id
   resource_id             = aws_api_gateway_resource.demo33b_path1.id
   http_method             = aws_api_gateway_method.proxy.http_method
@@ -61,14 +61,14 @@ resource aws_api_gateway_integration lambda_integration {
   uri                     = aws_lambda_function.demo33b.invoke_arn
 }
 
-resource aws_api_gateway_method_response proxy {
+resource "aws_api_gateway_method_response" "proxy" {
   rest_api_id = aws_api_gateway_rest_api.demo33b.id
   resource_id = aws_api_gateway_resource.demo33b_path1.id
   http_method = aws_api_gateway_method.proxy.http_method
   status_code = "200"
 }
 
-resource aws_api_gateway_integration_response proxy {
+resource "aws_api_gateway_integration_response" "proxy" {
   rest_api_id = aws_api_gateway_rest_api.demo33b.id
   resource_id = aws_api_gateway_resource.demo33b_path1.id
   http_method = aws_api_gateway_method.proxy.http_method
@@ -80,7 +80,7 @@ resource aws_api_gateway_integration_response proxy {
   ]
 }
 
-resource aws_api_gateway_deployment demo33b {
+resource "aws_api_gateway_deployment" "demo33b" {
   depends_on = [
     aws_api_gateway_integration.lambda_integration,
   ]
@@ -88,13 +88,13 @@ resource aws_api_gateway_deployment demo33b {
   # stage_name = "demo33b-stage1"
 }
 
-resource aws_api_gateway_stage demo33b_stage1 {
+resource "aws_api_gateway_stage" "demo33b_stage1" {
   deployment_id = aws_api_gateway_deployment.demo33b.id
   rest_api_id   = aws_api_gateway_rest_api.demo33b.id
   stage_name    = "demo33b-stage1"
 }
 
-resource aws_lambda_permission demo33b {
+resource "aws_lambda_permission" "demo33b" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.demo33b.function_name
@@ -104,13 +104,13 @@ resource aws_lambda_permission demo33b {
   source_arn = "${aws_api_gateway_rest_api.demo33b.execution_arn}/*/*${aws_api_gateway_resource.demo33b_path1.path}"
 }
 
-resource aws_api_gateway_api_key demo33b_apikey1 {
+resource "aws_api_gateway_api_key" "demo33b_apikey1" {
   name = "demo33b_apikey1"
 }
 
-resource aws_api_gateway_usage_plan demo33b {
-  name         = "demo33b_apikey"
-  description  = "usage plan for API key"
+resource "aws_api_gateway_usage_plan" "demo33b" {
+  name        = "demo33b_apikey"
+  description = "usage plan for API key"
 
   api_stages {
     api_id = aws_api_gateway_rest_api.demo33b.id
@@ -129,13 +129,13 @@ resource aws_api_gateway_usage_plan demo33b {
   # }
 }
 
-resource aws_api_gateway_usage_plan_key demo33b {
+resource "aws_api_gateway_usage_plan_key" "demo33b" {
   key_id        = aws_api_gateway_api_key.demo33b_apikey1.id
   key_type      = "API_KEY"
   usage_plan_id = aws_api_gateway_usage_plan.demo33b.id
 }
 
-output test_curl {
+output "test_curl" {
   value = <<EOF
 You can test access to API with following command:
 

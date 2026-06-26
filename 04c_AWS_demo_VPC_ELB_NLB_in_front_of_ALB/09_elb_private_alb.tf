@@ -5,13 +5,6 @@ resource "aws_security_group" "demo04c_sg_alb" {
   vpc_id      = aws_vpc.demo04c.id
   tags        = { Name = "demo04c-sg-alb" }
 
-  ingress {
-    description = "allow HTTP from VPC and authorized IPs"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # concat([var.cidr_vpc], var.authorized_ips)
-  }
 }
 
 # ------ Create separate egress rule for ALB to websrv
@@ -74,4 +67,15 @@ resource "aws_lb_listener" "demo04c_alb_listener80" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.demo04c_alb_tg.arn
   }
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "demo04c_sg_alb_ingress_http_0" {
+  security_group_id = aws_security_group.demo04c_sg_alb.id
+  description       = "allow HTTP from VPC and authorized IPs"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo04c_sg_alb-sgr-ingress-http-0" }
 }
