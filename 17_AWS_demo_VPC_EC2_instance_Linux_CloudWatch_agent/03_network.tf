@@ -1,18 +1,18 @@
 # ------ Create a VPC 
-resource aws_vpc demo17 {
+resource "aws_vpc" "demo17" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo17-vpc" }
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo17 {
+resource "aws_internet_gateway" "demo17" {
   vpc_id = aws_vpc.demo17.id
   tags   = { Name = "demo17-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo17 {
+resource "aws_default_route_table" "demo17" {
   default_route_table_id = aws_vpc.demo17.default_route_table_id
   tags                   = { Name = "demo17-rt" }
 
@@ -23,12 +23,12 @@ resource aws_default_route_table demo17 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo17 {
+resource "aws_default_network_acl" "demo17" {
   default_network_acl_id = aws_vpc.demo17.default_network_acl_id
   tags                   = { Name = "demo17-acl" }
-  subnet_ids             = [ aws_subnet.demo17_public.id ]
+  subnet_ids             = [aws_subnet.demo17_public.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -61,7 +61,7 @@ resource aws_default_network_acl demo17 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo17_public {
+resource "aws_subnet" "demo17_public" {
   vpc_id                  = aws_vpc.demo17.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet1
@@ -70,56 +70,66 @@ resource aws_subnet demo17_public {
 }
 
 # ------ Create VPC endpoint for CloudWatch
-resource aws_vpc_endpoint demo17_cloudwatch {
-  vpc_id              = aws_vpc.demo17.id
-  service_name        = "com.amazonaws.${var.aws_region}.monitoring"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.demo17_public.id]
-  security_group_ids  = [aws_security_group.demo17_vpce.id]
-  tags                = { Name = "demo17-cloudwatch-vpce" }
+resource "aws_vpc_endpoint" "demo17_cloudwatch" {
+  vpc_id             = aws_vpc.demo17.id
+  service_name       = "com.amazonaws.${var.aws_region}.monitoring"
+  vpc_endpoint_type  = "Interface"
+  subnet_ids         = [aws_subnet.demo17_public.id]
+  security_group_ids = [aws_security_group.demo17_vpce.id]
+  tags               = { Name = "demo17-cloudwatch-vpce" }
 }
 
 # ------ Security group for VPC endpoint
-resource aws_security_group demo17_vpce {
+resource "aws_security_group" "demo17_vpce" {
   name_prefix = "demo17-vpce-"
   vpc_id      = aws_vpc.demo17.id
   tags        = { Name = "demo17-vpce-sg" }
 
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [var.cidr_vpc]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 # ------ Customize the security group for the EC2 instance
-resource aws_default_security_group demo17 {
-  vpc_id      = aws_vpc.demo17.id
-  tags        = { Name = "demo17-sg1" }
+resource "aws_default_security_group" "demo17" {
+  vpc_id = aws_vpc.demo17.id
+  tags   = { Name = "demo17-sg1" }
 
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow SSH access from authorized public IP addresses"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.authorized_ips
-  }
+}
 
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
+
+resource "aws_vpc_security_group_ingress_rule" "demo17_vpce_ingress_port443_0" {
+  security_group_id = aws_security_group.demo17_vpce.id
+  description       = ""
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.cidr_vpc
+  tags              = { Name = "demo17_vpce-sgr-ingress-port443-0" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo17_vpce_egress_all_1" {
+  security_group_id = aws_security_group.demo17_vpce.id
+  description       = ""
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo17_vpce-sgr-egress-all-1" }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "demo17_ingress_ssh_0" {
+  count             = length(var.authorized_ips)
+  security_group_id = aws_default_security_group.demo17.id
+  description       = "allow SSH access from authorized public IP addresses"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.authorized_ips[count.index]
+  tags              = { Name = "demo17-sgr-ingress-ssh-0" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo17_egress_all_1" {
+  security_group_id = aws_default_security_group.demo17.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo17-sgr-egress-all-1" }
 }

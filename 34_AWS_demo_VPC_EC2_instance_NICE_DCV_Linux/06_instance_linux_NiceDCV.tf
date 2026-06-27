@@ -1,13 +1,13 @@
 # ------ optional: Create an Elastic IP address
 # ------           to have a public IP address for EC2 instance persistent across stop/start
-resource aws_eip demo34_inst1 {
+resource "aws_eip" "demo34_inst1" {
   instance = aws_instance.demo34_inst1.id
   domain   = "vpc"
   tags     = { Name = "demo34-inst1" }
 }
 
 # ------ Create an EC2 instance
-resource aws_instance demo34_inst1 {
+resource "aws_instance" "demo34_inst1" {
   # ignore change in cloud-init file after provisioning
   lifecycle {
     ignore_changes = [
@@ -19,57 +19,57 @@ resource aws_instance demo34_inst1 {
   ami                    = local.ami
   key_name               = aws_key_pair.demo34.id
   subnet_id              = aws_subnet.demo34_public.id
-  vpc_security_group_ids = [ aws_default_security_group.demo34.id ] 
+  vpc_security_group_ids = [aws_default_security_group.demo34.id]
   tags                   = { Name = "demo34-inst1" }
-  user_data_base64       = base64encode(file(local.script)) 
-  private_ip             = var.inst1_private_ip   # optional  
+  user_data_base64       = base64encode(file(local.script))
+  private_ip             = var.inst1_private_ip # optional  
   root_block_device {
-    encrypted   = true      # use default KMS key aws/ebs
+    encrypted   = true # use default KMS key aws/ebs
     volume_type = "gp3"
     tags        = { "Name" = "demo34-inst1-boot" }
   }
 }
 
 # -- genereate a random password for default user and new user
-resource random_string demo34_user1_password {
+resource "random_string" "demo34_user1_password" {
   # must contains at least 2 upper case letters, 2 lower case letters, 2 numbers and 2 special characters
-  length      = 12
-  upper       = true
-  min_upper   = 2
-  lower       = true
-  min_lower   = 2
-  numeric     = true
-  min_numeric = 2
-  special     = true
-  min_special = 2
-  override_special = "#-_"   # use only special characters in this list
+  length           = 12
+  upper            = true
+  min_upper        = 2
+  lower            = true
+  min_lower        = 2
+  numeric          = true
+  min_numeric      = 2
+  special          = true
+  min_special      = 2
+  override_special = "#-_" # use only special characters in this list
 }
 
-resource random_string demo34_user2_password {
+resource "random_string" "demo34_user2_password" {
   # must contains at least 2 upper case letters, 2 lower case letters, 2 numbers and 2 special characters
-  length      = 12
-  upper       = true
-  min_upper   = 2
-  lower       = true
-  min_lower   = 2
-  numeric     = true
-  min_numeric = 2
-  special     = true
-  min_special = 2
-  override_special = "#-_"   # use only special characters in this list
+  length           = 12
+  upper            = true
+  min_upper        = 2
+  lower            = true
+  min_lower        = 2
+  numeric          = true
+  min_numeric      = 2
+  special          = true
+  min_special      = 2
+  override_special = "#-_" # use only special characters in this list
 }
 
 # ------ Display the complete ssh command needed to connect to the instance
 locals {
-  username   = "ec2-user"
-  ami        = data.aws_ami.al2_x86_64.id
-  script     = var.cloud_init_script_al2
-  username2  = "chris"
-  password   = random_string.demo34_user1_password.result
-  password2  = random_string.demo34_user2_password.result
+  username  = "ec2-user"
+  ami       = data.aws_ami.al2_x86_64.id
+  script    = var.cloud_init_script_al2
+  username2 = "chris"
+  password  = random_string.demo34_user1_password.result
+  password2 = random_string.demo34_user2_password.result
 }
 
-output Instance {
+output "Instance" {
   value = <<EOF
 
 ---- You can SSH directly to the Linux instance by typing the following ssh command

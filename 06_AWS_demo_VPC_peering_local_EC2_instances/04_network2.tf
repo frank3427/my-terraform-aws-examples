@@ -1,18 +1,18 @@
 # ------ Create a VPC 
-resource aws_vpc demo06_2 {
+resource "aws_vpc" "demo06_2" {
   cidr_block           = var.cidr_vpc2
   enable_dns_hostnames = true
   tags                 = { Name = "demo06-vpc2" }
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo06_2 {
+resource "aws_internet_gateway" "demo06_2" {
   vpc_id = aws_vpc.demo06_2.id
   tags   = { Name = "demo06-igw2" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo06_2 {
+resource "aws_default_route_table" "demo06_2" {
   default_route_table_id = aws_vpc.demo06_2.default_route_table_id
   tags                   = { Name = "demo06-rt2" }
 
@@ -20,7 +20,7 @@ resource aws_default_route_table demo06_2 {
     cidr_block = var.cidr_public1
     gateway_id = aws_vpc_peering_connection.demo06_1.id
   }
-  
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.demo06_2.id
@@ -28,12 +28,12 @@ resource aws_default_route_table demo06_2 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo06_2 {
+resource "aws_default_network_acl" "demo06_2" {
   default_network_acl_id = aws_vpc.demo06_2.default_network_acl_id
   tags                   = { Name = "demo06_2-acl" }
-  subnet_ids             = [ aws_subnet.demo06_public2.id ]
+  subnet_ids             = [aws_subnet.demo06_public2.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -64,7 +64,7 @@ resource aws_default_network_acl demo06_2 {
     from_port  = 1024
     to_port    = 65535
   }
-  
+
   egress {
     protocol   = -1
     rule_no    = 100
@@ -76,7 +76,7 @@ resource aws_default_network_acl demo06_2 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo06_public2 {
+resource "aws_subnet" "demo06_public2" {
   vpc_id                  = aws_vpc.demo06_2.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_public2
@@ -85,38 +85,12 @@ resource aws_subnet demo06_public2 {
 }
 
 # ------ Create a security group for the EC2 instance
-resource aws_security_group demo06_sg2 {
+resource "aws_security_group" "demo06_sg2" {
   name        = "demo06-sg2"
   description = "Description for demo06-sg2"
   vpc_id      = aws_vpc.demo06_2.id
   tags        = { Name = "demo06-sg2" }
 
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow SSH access from authorized public IP addresses"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.authorized_ips
-  }
-
-  # ingress rule: allow traffic from other VPC
-  ingress {
-    description = "allow traffic from other VPC"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ var.cidr_public1 ]
-  }
-
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
 }
 
 # # ------ Peering connection to other VPC
@@ -126,3 +100,35 @@ resource aws_security_group demo06_sg2 {
 #   auto_accept   = true
 #   tags          = { Name = "demo06-pcx2" }
 # }
+
+
+resource "aws_vpc_security_group_ingress_rule" "demo06_sg2_ingress_ssh_0" {
+  count             = length(var.authorized_ips)
+  security_group_id = aws_security_group.demo06_sg2.id
+  description       = "allow SSH access from authorized public IP addresses"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.authorized_ips[count.index]
+  tags              = { Name = "demo06_sg2-sgr-ingress-ssh-0" }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "demo06_sg2_ingress_all_1" {
+  security_group_id = aws_security_group.demo06_sg2.id
+  description       = "allow traffic from other VPC"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = var.cidr_public1
+  tags              = { Name = "demo06_sg2-sgr-ingress-all-1" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo06_sg2_egress_all_2" {
+  security_group_id = aws_security_group.demo06_sg2.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo06_sg2-sgr-egress-all-2" }
+}

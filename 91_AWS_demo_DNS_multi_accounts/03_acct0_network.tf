@@ -1,5 +1,5 @@
 # ------ Create a VPC 
-resource aws_vpc demo91_acct0 {
+resource "aws_vpc" "demo91_acct0" {
   provider             = aws.acct0
   cidr_block           = var.acct0_cidr_vpc
   enable_dns_hostnames = true
@@ -7,14 +7,14 @@ resource aws_vpc demo91_acct0 {
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo91_acct0 {
+resource "aws_internet_gateway" "demo91_acct0" {
   provider = aws.acct0
   vpc_id   = aws_vpc.demo91_acct0.id
   tags     = { Name = "demo91-acct0-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo91_acct0 {
+resource "aws_default_route_table" "demo91_acct0" {
   provider               = aws.acct0
   default_route_table_id = aws_vpc.demo91_acct0.default_route_table_id
   tags                   = { Name = "demo91-acct0-rt" }
@@ -26,13 +26,13 @@ resource aws_default_route_table demo91_acct0 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo91_acct0 {
+resource "aws_default_network_acl" "demo91_acct0" {
   provider               = aws.acct0
   default_network_acl_id = aws_vpc.demo91_acct0.default_network_acl_id
   tags                   = { Name = "demo91-acct0-acl" }
-  subnet_ids             = [ aws_subnet.demo91_acct0_public.id ]
+  subnet_ids             = [aws_subnet.demo91_acct0_public.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -65,7 +65,7 @@ resource aws_default_network_acl demo91_acct0 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo91_acct0_public {
+resource "aws_subnet" "demo91_acct0_public" {
   provider                = aws.acct0
   vpc_id                  = aws_vpc.demo91_acct0.id
   availability_zone       = "${var.aws_region}${var.az}"
@@ -75,26 +75,31 @@ resource aws_subnet demo91_acct0_public {
 }
 
 # ------ Customize the security group for the EC2 instance
-resource aws_default_security_group demo91_acct0 {
+resource "aws_default_security_group" "demo91_acct0" {
   provider = aws.acct0
   vpc_id   = aws_vpc.demo91_acct0.id
   tags     = { Name = "demo91-acct0-sg1" }
 
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow SSH access from authorized public IP addresses"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.authorized_ips
-  }
+}
 
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
+
+resource "aws_vpc_security_group_ingress_rule" "demo91_acct0_ingress_ssh_0" {
+  count             = length(var.authorized_ips)
+  security_group_id = aws_default_security_group.demo91_acct0.id
+  description       = "allow SSH access from authorized public IP addresses"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.authorized_ips[count.index]
+  tags              = { Name = "demo91_acct0-sgr-ingress-ssh-0" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo91_acct0_egress_all_1" {
+  security_group_id = aws_default_security_group.demo91_acct0.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo91_acct0-sgr-egress-all-1" }
 }

@@ -1,9 +1,9 @@
 locals {
-  username   = (var.linux == "ubuntu") ? "ubuntu" : "ec2-user"
-  script     = (var.linux == "ubuntu") ? var.cloud_init_script_ubuntu : var.cloud_init_script_al
+  username = (var.linux == "ubuntu") ? "ubuntu" : "ec2-user"
+  script   = (var.linux == "ubuntu") ? var.cloud_init_script_ubuntu : var.cloud_init_script_al
 }
 
-output Instructions {
+output "Instructions" {
   value = <<EOF
 
 

@@ -1,18 +1,18 @@
 # ------ Create a VPC 
-resource aws_vpc demo02 {
+resource "aws_vpc" "demo02" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo02-vpc" }
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo02 {
+resource "aws_internet_gateway" "demo02" {
   vpc_id = aws_vpc.demo02.id
   tags   = { Name = "demo02-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo02 {
+resource "aws_default_route_table" "demo02" {
   default_route_table_id = aws_vpc.demo02.default_route_table_id
   tags                   = { Name = "demo02-rt" }
 
@@ -23,12 +23,12 @@ resource aws_default_route_table demo02 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo02 {
+resource "aws_default_network_acl" "demo02" {
   default_network_acl_id = aws_vpc.demo02.default_network_acl_id
   tags                   = { Name = "demo02-acl" }
-  subnet_ids             = [ aws_subnet.demo02_public.id ]
+  subnet_ids             = [aws_subnet.demo02_public.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -49,7 +49,7 @@ resource aws_default_network_acl demo02 {
     from_port  = 1024
     to_port    = 65535
   }
-  
+
   egress {
     protocol   = -1
     rule_no    = 100
@@ -61,7 +61,7 @@ resource aws_default_network_acl demo02 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo02_public {
+resource "aws_subnet" "demo02_public" {
   vpc_id                  = aws_vpc.demo02.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet1
@@ -69,28 +69,31 @@ resource aws_subnet demo02_public {
   tags                    = { Name = "demo02-public" }
 }
 
-# ------ Create a security group for the EC2 instance
-resource aws_security_group demo02_sg1 {
+# ------ Create a security group for the EC2 instance (no inline rules)
+resource "aws_security_group" "demo02_sg1" {
   name        = "demo02-sg1"
   description = "Description for demo02-sg1"
   vpc_id      = aws_vpc.demo02.id
   tags        = { Name = "demo02-sg1" }
+}
 
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow RDP access from authorized public IP addresses"
-    from_port   = 3389
-    to_port     = 3389
-    protocol    = "tcp"
-    cidr_blocks = var.authorized_ips
-  }
+# ------ Ingress rule: allow RDP from authorized public IP addresses
+resource "aws_vpc_security_group_ingress_rule" "demo02_rdp" {
+  count             = length(var.authorized_ips)
+  security_group_id = aws_security_group.demo02_sg1.id
+  description       = "allow RDP access from authorized public IP addresses"
+  from_port         = 3389
+  to_port           = 3389
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.authorized_ips[count.index]
+  tags              = { Name = "demo02-sgr-rdp-${count.index}" }
+}
 
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
+# ------ Egress rule: allow all traffic
+resource "aws_vpc_security_group_egress_rule" "demo02_all" {
+  security_group_id = aws_security_group.demo02_sg1.id
+  description       = "allow all traffic"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo02-sgr-egress-all" }
 }

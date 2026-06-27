@@ -3,32 +3,32 @@ locals {
 }
 
 # ------ Create 3 VPCs 
-resource aws_vpc demo06c {
-  depends_on           = [ aws_ec2_transit_gateway.demo06c ]
+resource "aws_vpc" "demo06c" {
+  depends_on           = [aws_ec2_transit_gateway.demo06c]
   count                = local.nb_vpcs
   cidr_block           = var.cidrs_vpc[count.index]
   enable_dns_hostnames = true
-  tags                 = { Name = "demo06c-vpc${count.index+1}" }
+  tags                 = { Name = "demo06c-vpc${count.index + 1}" }
 }
 
 # ====== Private subnets for TGW attachments
 
 # ------ 1 Transit gateway (attached to all VPCs)
-resource aws_ec2_transit_gateway demo06c {
+resource "aws_ec2_transit_gateway" "demo06c" {
   tags        = { Name = "demo06c-tgw" }
   description = "demo06c-tgw"
 }
 
-output tgwid {
+output "tgwid" {
   value = aws_ec2_transit_gateway.demo06c.id
 }
 
 # ------ Add a name and route rule to the default route table for each VPC
-resource aws_default_route_table demo06c {
-  lifecycle { ignore_changes = [ route ] }    # needed as additional routes are added automatically by TGW attachements
+resource "aws_default_route_table" "demo06c" {
+  lifecycle { ignore_changes = [route] } # needed as additional routes are added automatically by TGW attachements
   count                  = local.nb_vpcs
   default_route_table_id = aws_vpc.demo06c[count.index].default_route_table_id
-  tags                   = { Name = "demo06c-vpc${count.index+1}-rt-default" }
+  tags                   = { Name = "demo06c-vpc${count.index + 1}-rt-default" }
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -37,12 +37,12 @@ resource aws_default_route_table demo06c {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo06c {
-  lifecycle { ignore_changes = [ subnet_ids ] } 
+resource "aws_default_network_acl" "demo06c" {
+  lifecycle { ignore_changes = [subnet_ids] }
 
   count                  = local.nb_vpcs
   default_network_acl_id = aws_vpc.demo06c[count.index].default_network_acl_id
-  tags                   = { Name = "demo06c-vpc${count.index+1}-acl-default" }
+  tags                   = { Name = "demo06c-vpc${count.index + 1}-acl-default" }
 
   ingress {
     protocol   = -1 # all
@@ -65,22 +65,22 @@ resource aws_default_network_acl demo06c {
 
 # ------ Create a private subnet dedicated to TGW attachment (1 needed for each AZ we want to use)
 #        (use the default route table and default network ACL)
-resource aws_subnet demo06c_tgw {
+resource "aws_subnet" "demo06c_tgw" {
   count                   = local.nb_vpcs
   vpc_id                  = aws_vpc.demo06c[count.index].id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidrs_subnet_tgw[count.index]
   map_public_ip_on_launch = false
-  tags                    = { Name = "demo06c-vpc${count.index+1}-tgw" }
+  tags                    = { Name = "demo06c-vpc${count.index + 1}-tgw" }
 }
 
 # ------ Transit gateway attachment to VPC
-resource aws_ec2_transit_gateway_vpc_attachment demo06c {
+resource "aws_ec2_transit_gateway_vpc_attachment" "demo06c" {
   count              = local.nb_vpcs
-  subnet_ids         = [ aws_subnet.demo06c_tgw[count.index].id ]
+  subnet_ids         = [aws_subnet.demo06c_tgw[count.index].id]
   transit_gateway_id = aws_ec2_transit_gateway.demo06c.id
   vpc_id             = aws_vpc.demo06c[count.index].id
-  tags               = { Name = "demo06c-vpc${count.index+1}-tgw-attachment" }
+  tags               = { Name = "demo06c-vpc${count.index + 1}-tgw-attachment" }
   # Do not associate VPC #1 with default TGW RT as we will use a dedicated TGW route table.
   transit_gateway_default_route_table_association = (count.index != 0)
   # Only propagate route for VPC #1 in default TGW RT
@@ -88,47 +88,47 @@ resource aws_ec2_transit_gateway_vpc_attachment demo06c {
 }
 
 # ------ Transit gateway route table, with association(s) and propagation(s)
-resource aws_ec2_transit_gateway_route_table demo06c_rt2 {
+resource "aws_ec2_transit_gateway_route_table" "demo06c_rt2" {
   transit_gateway_id = aws_ec2_transit_gateway.demo06c.id
   tags               = { Name = "demo06c-tgw-rt2" }
 }
 
-resource aws_ec2_transit_gateway_route_table_association demo06c_vpc1 {
+resource "aws_ec2_transit_gateway_route_table_association" "demo06c_vpc1" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.demo06c[0].id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.demo06c_rt2.id
 }
 
-resource aws_ec2_transit_gateway_route_table_propagation demo06c_rt2 {
+resource "aws_ec2_transit_gateway_route_table_propagation" "demo06c_rt2" {
   count                          = local.nb_vpcs - 1
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.demo06c[count.index+1].id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.demo06c[count.index + 1].id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.demo06c_rt2.id
 }
 
 # ====== Public subnets for EC2 instancs
 
 # ------ Create an internet gateway in each VPC
-resource aws_internet_gateway demo06c {
+resource "aws_internet_gateway" "demo06c" {
   count  = local.nb_vpcs
   vpc_id = aws_vpc.demo06c[count.index].id
-  tags   = { Name = "demo06c-vpc${count.index+1}-igw" }
+  tags   = { Name = "demo06c-vpc${count.index + 1}-igw" }
 }
 
 # ------ Create a new route table for EC2 subnet in each VPC
-resource aws_route_table demo06c_ec2 {
-  lifecycle { ignore_changes = [ route ] }    # needed as additional routes are added automatically by TGW attachements
-  depends_on = [ aws_ec2_transit_gateway.demo06c ]
-  count  = local.nb_vpcs
-  vpc_id = aws_vpc.demo06c[count.index].id
-  tags   = { Name = "demo06c-vpc${count.index+1}-rt-ec2" }
+resource "aws_route_table" "demo06c_ec2" {
+  lifecycle { ignore_changes = [route] } # needed as additional routes are added automatically by TGW attachements
+  depends_on = [aws_ec2_transit_gateway.demo06c]
+  count      = local.nb_vpcs
+  vpc_id     = aws_vpc.demo06c[count.index].id
+  tags       = { Name = "demo06c-vpc${count.index + 1}-rt-ec2" }
 
-  dynamic route {
+  dynamic "route" {
     for_each = setsubtract(var.cidrs_vpc, [var.cidrs_vpc[count.index]])
     content {
       cidr_block = route.value
       gateway_id = aws_ec2_transit_gateway.demo06c.id
     }
   }
-  
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.demo06c[count.index].id
@@ -136,13 +136,13 @@ resource aws_route_table demo06c_ec2 {
 }
 
 # ------ Create a new network ACL for EC2 subnet in each VPC
-resource aws_network_acl demo06c_ec2 {
+resource "aws_network_acl" "demo06c_ec2" {
   count      = local.nb_vpcs
   vpc_id     = aws_vpc.demo06c[count.index].id
-  tags       = { Name = "demo06c-vpc${count.index+1}-nacl-ec2" }
-  subnet_ids = [ aws_subnet.demo06c_ec2[count.index].id ]
+  tags       = { Name = "demo06c-vpc${count.index + 1}-nacl-ec2" }
+  subnet_ids = [aws_subnet.demo06c_ec2[count.index].id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -163,8 +163,8 @@ resource aws_network_acl demo06c_ec2 {
     from_port  = 1024
     to_port    = 65535
   }
-  
-  dynamic ingress {
+
+  dynamic "ingress" {
     for_each = var.cidrs_vpc
     content {
       protocol   = "all"
@@ -175,7 +175,7 @@ resource aws_network_acl demo06c_ec2 {
       to_port    = 0
     }
   }
-  
+
   egress {
     protocol   = -1
     rule_no    = 100
@@ -188,54 +188,58 @@ resource aws_network_acl demo06c_ec2 {
 
 
 # ------ Create a public subnet for EC2 instances in each VPC 
-resource aws_subnet demo06c_ec2 {
+resource "aws_subnet" "demo06c_ec2" {
   count                   = local.nb_vpcs
   vpc_id                  = aws_vpc.demo06c[count.index].id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidrs_subnet_ec2[count.index]
   map_public_ip_on_launch = true
-  tags                    = { Name = "demo06c-vpc${count.index+1}-ec2" }
+  tags                    = { Name = "demo06c-vpc${count.index + 1}-ec2" }
 }
 
 # ------ Associate the route table to the EC2 subnet in each VPC
-resource aws_route_table_association demlo06b_ec2 {
+resource "aws_route_table_association" "demlo06b_ec2" {
   count          = local.nb_vpcs
   subnet_id      = aws_subnet.demo06c_ec2[count.index].id
   route_table_id = aws_route_table.demo06c_ec2[count.index].id
 }
 
 # ------ Create a security group for the EC2 instance in each VPC
-resource aws_security_group demo06c_sg_ec2 {
+resource "aws_security_group" "demo06c_sg_ec2" {
   count       = local.nb_vpcs
-  name        = "demo06c-vpc${count.index+1}-sg-ec2"
-  description = "secgrp for EC2 instance in VPC ${count.index+1}-sg-ec2"
+  name        = "demo06c-vpc${count.index + 1}-sg-ec2"
+  description = "secgrp for EC2 instance in VPC ${count.index + 1}-sg-ec2"
   vpc_id      = aws_vpc.demo06c[count.index].id
-  tags        = { Name = "demo06c-vpc${count.index+1}-sg-ec2" }
+  tags        = { Name = "demo06c-vpc${count.index + 1}-sg-ec2" }
 
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow SSH access from authorized public IP addresses"
-    cidr_blocks = var.authorized_ips
-    protocol    = "tcp"
-    from_port   = 22
-    to_port     = 22
-  }
+}
 
-  # ingress rule: allow traffic from all VPCs
-  ingress {
-    description = "allow all traffic from the VPCs"
-    cidr_blocks = var.cidrs_vpc
-    protocol   = "all"
-    from_port  = 0
-    to_port    = 0
-  }
 
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    cidr_blocks = [ "0.0.0.0/0" ]
-    protocol    = "all"
-    from_port   = 0
-    to_port     = 0
-  }
+resource "aws_vpc_security_group_ingress_rule" "demo06c_sg_ec2_ingress_ssh_0" {
+  count             = local.nb_vpcs * length(var.authorized_ips)
+  security_group_id = aws_security_group.demo06c_sg_ec2[floor(count.index / length(var.authorized_ips))].id
+  description       = "allow SSH access from authorized public IP addresses"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.authorized_ips[count.index % length(var.authorized_ips)]
+  tags              = { Name = "demo06c-vpc${floor(count.index / length(var.authorized_ips)) + 1}-sgr-ingress-ssh-${count.index % length(var.authorized_ips)}" }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "demo06c_sg_ec2_ingress_all_1" {
+  count             = local.nb_vpcs * length(var.cidrs_vpc)
+  security_group_id = aws_security_group.demo06c_sg_ec2[floor(count.index / length(var.cidrs_vpc))].id
+  description       = "allow all traffic from the VPCs"
+  ip_protocol       = "-1"
+  cidr_ipv4         = var.cidrs_vpc[count.index % length(var.cidrs_vpc)]
+  tags              = { Name = "demo06c-vpc${floor(count.index / length(var.cidrs_vpc)) + 1}-sgr-ingress-all-${count.index % length(var.cidrs_vpc)}" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo06c_sg_ec2_egress_all_2" {
+  count             = local.nb_vpcs
+  security_group_id = aws_security_group.demo06c_sg_ec2[count.index].id
+  description       = "allow all traffic"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo06c-vpc${count.index + 1}-sgr-egress-all" }
 }

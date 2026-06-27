@@ -1,19 +1,19 @@
 # ------ optional: Create an Elastic IP address
 # ------           to have a public IP address for EC2 instance persistent across stop/start
-resource aws_eip demo37_inst1 {
+resource "aws_eip" "demo37_inst1" {
   instance = aws_instance.demo37_inst1.id
   domain   = "vpc"
   tags     = { Name = "demo37-inst1" }
 }
 
-resource aws_eip demo37_inst2 {
+resource "aws_eip" "demo37_inst2" {
   instance = aws_instance.demo37_inst2.id
   domain   = "vpc"
   tags     = { Name = "demo37-inst2" }
 }
 
 # ------ Create an EC2 instance
-resource aws_instance demo37_inst1 {
+resource "aws_instance" "demo37_inst1" {
   # ignore change in cloud-init file after provisioning
   lifecycle {
     ignore_changes = [
@@ -24,20 +24,20 @@ resource aws_instance demo37_inst1 {
   ami                    = local.ami
   key_name               = aws_key_pair.demo37.id
   subnet_id              = aws_subnet.demo37_public1.id
-  vpc_security_group_ids = [ aws_default_security_group.demo37.id ] 
+  vpc_security_group_ids = [aws_default_security_group.demo37.id]
   tags                   = { Name = "demo37-inst1" }
-  user_data_base64       = base64encode(file(local.script)) 
-  private_ip             = var.inst1_private_ip   # optional 
+  user_data_base64       = base64encode(file(local.script))
+  private_ip             = var.inst1_private_ip # optional 
   # ipv6_address_count     = 1  # automatic IPv6 address
-  ipv6_addresses         = [ cidrhost(aws_subnet.demo37_public1.ipv6_cidr_block, 101) ]   # OR manual IPv6 address
+  ipv6_addresses = [cidrhost(aws_subnet.demo37_public1.ipv6_cidr_block, 101)] # OR manual IPv6 address
   root_block_device {
-    encrypted   = true      # use default KMS key aws/ebs
+    encrypted   = true # use default KMS key aws/ebs
     volume_type = "gp3"
     tags        = { "Name" = "demo37-inst1-boot" }
   }
 }
 
-resource aws_instance demo37_inst2 {
+resource "aws_instance" "demo37_inst2" {
   # ignore change in cloud-init file after provisioning
   lifecycle {
     ignore_changes = [
@@ -48,14 +48,14 @@ resource aws_instance demo37_inst2 {
   ami                    = local.ami
   key_name               = aws_key_pair.demo37.id
   subnet_id              = aws_subnet.demo37_public2.id
-  vpc_security_group_ids = [ aws_default_security_group.demo37.id ] 
+  vpc_security_group_ids = [aws_default_security_group.demo37.id]
   tags                   = { Name = "demo37-inst2" }
-  user_data_base64       = base64encode(file(local.script)) 
-  private_ip             = var.inst2_private_ip   # optional  
-  ipv6_address_count     = 1  # automatic IPv6 address
+  user_data_base64       = base64encode(file(local.script))
+  private_ip             = var.inst2_private_ip # optional  
+  ipv6_address_count     = 1                    # automatic IPv6 address
   # ipv6_addresses         = [ cidrhost(aws_subnet.demo37_public1.ipv6_cidr_block, 102) ]   # OR manual IPv6 address
   root_block_device {
-    encrypted   = true      # use default KMS key aws/ebs
+    encrypted   = true # use default KMS key aws/ebs
     volume_type = "gp3"
     tags        = { "Name" = "demo37-inst2-boot" }
   }
@@ -69,7 +69,7 @@ locals {
   inst2_ipv6 = aws_instance.demo37_inst2.ipv6_addresses[0]
 }
 
-output Instances {
+output "Instances" {
   value = <<EOF
 
 

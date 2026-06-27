@@ -1,18 +1,18 @@
 # ------ Create a VPC 
-resource aws_vpc demo14 {
+resource "aws_vpc" "demo14" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo14-vpc" }
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo14 {
+resource "aws_internet_gateway" "demo14" {
   vpc_id = aws_vpc.demo14.id
   tags   = { Name = "demo14-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo14 {
+resource "aws_default_route_table" "demo14" {
   default_route_table_id = aws_vpc.demo14.default_route_table_id
   tags                   = { Name = "demo14-rt" }
 
@@ -23,12 +23,12 @@ resource aws_default_route_table demo14 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo14 {
+resource "aws_default_network_acl" "demo14" {
   default_network_acl_id = aws_vpc.demo14.default_network_acl_id
   tags                   = { Name = "demo14-acl" }
-  subnet_ids             = [ aws_subnet.demo14_public.id ]
+  subnet_ids             = [aws_subnet.demo14_public.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -61,7 +61,7 @@ resource aws_default_network_acl demo14 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo14_public {
+resource "aws_subnet" "demo14_public" {
   vpc_id                  = aws_vpc.demo14.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet1
@@ -70,25 +70,30 @@ resource aws_subnet demo14_public {
 }
 
 # ------ Customize the security group for the EC2 instance
-resource aws_default_security_group demo14 {
-  vpc_id      = aws_vpc.demo14.id
-  tags        = { Name = "demo14-sg1" }
+resource "aws_default_security_group" "demo14" {
+  vpc_id = aws_vpc.demo14.id
+  tags   = { Name = "demo14-sg1" }
 
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow SSH access from authorized public IP addresses"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.authorized_ips
-  }
+}
 
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
+
+resource "aws_vpc_security_group_ingress_rule" "demo14_ingress_ssh_0" {
+  count             = length(var.authorized_ips)
+  security_group_id = aws_default_security_group.demo14.id
+  description       = "allow SSH access from authorized public IP addresses"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.authorized_ips[count.index]
+  tags              = { Name = "demo14-sgr-ingress-ssh-0" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo14_egress_all_1" {
+  security_group_id = aws_default_security_group.demo14.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo14-sgr-egress-all-1" }
 }

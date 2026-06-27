@@ -1,12 +1,12 @@
-data aws_caller_identity current {}
+data "aws_caller_identity" "current" {}
 
 # -- S3 bucket to store canary artifacts
-resource aws_s3_bucket demo33_canary {
+resource "aws_s3_bucket" "demo33_canary" {
   bucket        = "demo33-canary-artifacts-${data.aws_caller_identity.current.account_id}"
   force_destroy = true
 }
 
-resource aws_s3_bucket_public_access_block demo33_canary {
+resource "aws_s3_bucket_public_access_block" "demo33_canary" {
   bucket                  = aws_s3_bucket.demo33_canary.id
   block_public_acls       = true
   block_public_policy     = true
@@ -15,7 +15,7 @@ resource aws_s3_bucket_public_access_block demo33_canary {
 }
 
 # -- IAM role for the canary
-data aws_iam_policy_document demo33_canary_assume {
+data "aws_iam_policy_document" "demo33_canary_assume" {
   statement {
     effect = "Allow"
     principals {
@@ -26,7 +26,7 @@ data aws_iam_policy_document demo33_canary_assume {
   }
 }
 
-data aws_iam_policy_document demo33_canary {
+data "aws_iam_policy_document" "demo33_canary" {
   statement {
     effect = "Allow"
     actions = [
@@ -59,19 +59,19 @@ data aws_iam_policy_document demo33_canary {
   }
 }
 
-resource aws_iam_role demo33_canary {
+resource "aws_iam_role" "demo33_canary" {
   name               = "demo33_iam_for_canary"
   assume_role_policy = data.aws_iam_policy_document.demo33_canary_assume.json
 }
 
-resource aws_iam_role_policy demo33_canary {
+resource "aws_iam_role_policy" "demo33_canary" {
   name   = "demo33_canary_policy"
   role   = aws_iam_role.demo33_canary.id
   policy = data.aws_iam_policy_document.demo33_canary.json
 }
 
 # -- Canary script (inline via local file)
-resource aws_synthetics_canary demo33_api {
+resource "aws_synthetics_canary" "demo33_api" {
   name                 = "demo33-api-check"
   artifact_s3_location = "s3://${aws_s3_bucket.demo33_canary.bucket}/canary/"
   execution_role_arn   = aws_iam_role.demo33_canary.arn
@@ -92,7 +92,7 @@ resource aws_synthetics_canary demo33_api {
   zip_file = data.archive_file.demo33_canary.output_path
 }
 
-data archive_file demo33_canary {
+data "archive_file" "demo33_canary" {
   type        = "zip"
   output_path = "${path.module}/canary_payload.zip"
 
@@ -127,6 +127,6 @@ data archive_file demo33_canary {
   }
 }
 
-output canary_console_url {
+output "canary_console_url" {
   value = "https://${var.aws_region}.console.aws.amazon.com/cloudwatch/home?region=${var.aws_region}#synthetics:canary/detail/demo33-api-check"
 }

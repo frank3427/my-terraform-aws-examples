@@ -1,5 +1,5 @@
 # ------ Display the complete ssh command needed to connect to the instance
-output Instructions {
+output "Instructions" {
   value = <<EOF
 
 ---- PostgreSQL details

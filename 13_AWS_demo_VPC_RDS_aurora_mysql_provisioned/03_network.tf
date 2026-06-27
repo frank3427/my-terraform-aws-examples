@@ -1,18 +1,18 @@
 # ------ Create a VPC 
-resource aws_vpc demo13 {
+resource "aws_vpc" "demo13" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo13-vpc" }
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo13 {
+resource "aws_internet_gateway" "demo13" {
   vpc_id = aws_vpc.demo13.id
   tags   = { Name = "demo13-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo13 {
+resource "aws_default_route_table" "demo13" {
   default_route_table_id = aws_vpc.demo13.default_route_table_id
   tags                   = { Name = "demo13-rt" }
 
@@ -23,12 +23,12 @@ resource aws_default_route_table demo13 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo13 {
+resource "aws_default_network_acl" "demo13" {
   default_network_acl_id = aws_vpc.demo13.default_network_acl_id
   tags                   = { Name = "demo13-acl" }
-  subnet_ids             = [ aws_subnet.demo13_db_client.id, aws_subnet.demo13_rds[0].id, aws_subnet.demo13_rds[1].id, aws_subnet.demo13_rds[2].id ]
+  subnet_ids             = [aws_subnet.demo13_db_client.id, aws_subnet.demo13_rds[0].id, aws_subnet.demo13_rds[1].id, aws_subnet.demo13_rds[2].id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -49,7 +49,7 @@ resource aws_default_network_acl demo13 {
     from_port  = 1024
     to_port    = 65535
   }
-  
+
   egress {
     protocol   = -1
     rule_no    = 100
@@ -61,7 +61,7 @@ resource aws_default_network_acl demo13 {
 }
 
 # ------ Create a public subnet for db client (use the default route table and default network ACL)
-resource aws_subnet demo13_db_client {
+resource "aws_subnet" "demo13_db_client" {
   vpc_id                  = aws_vpc.demo13.id
   availability_zone       = "${var.aws_region}${var.db_client_az}"
   cidr_block              = var.cidr_client_subnet
@@ -70,7 +70,7 @@ resource aws_subnet demo13_db_client {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo13_rds {
+resource "aws_subnet" "demo13_rds" {
   count                   = 3
   vpc_id                  = aws_vpc.demo13.id
   availability_zone       = "${var.aws_region}${var.aurora_subnets_azs[count.index]}"

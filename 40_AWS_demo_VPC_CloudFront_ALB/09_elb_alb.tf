@@ -102,15 +102,6 @@ resource "aws_security_group" "demo40_sg_alb" {
   vpc_id      = aws_vpc.demo40.id
   tags        = { Name = "demo40-sg-alb" }
 
-  ingress {
-    description = "Allow HTTP from anywhere"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    # cidr_blocks = ["0.0.0.0/0"]
-    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id] # CloudFront only access
-  }
-
   # # egress rule: allow only HTTP traffic to web servers
   # egress {
   #   description     = "allow only HTTP traffic to web servers"
@@ -120,12 +111,25 @@ resource "aws_security_group" "demo40_sg_alb" {
   #   security_groups = [ aws_security_group.demo40_sg_websrv.id ]
   # }
 
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1" # all protocols
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "demo40_sg_alb_ingress_http_0" {
+  security_group_id = aws_security_group.demo40_sg_alb.id
+  description       = "Allow HTTP from anywhere"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+  prefix_list_id    = data.aws_ec2_managed_prefix_list.cloudfront.id
+  tags              = { Name = "demo40_sg_alb-sgr-ingress-http-0" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo40_sg_alb_egress_all_1" {
+  security_group_id = aws_security_group.demo40_sg_alb.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo40_sg_alb-sgr-egress-all-1" }
 }

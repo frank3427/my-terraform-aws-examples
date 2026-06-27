@@ -1,5 +1,5 @@
 # ------ Create an EC2 instances for web servers
-resource aws_instance demo21_websrv {
+resource "aws_instance" "demo21_websrv" {
   # wait for NAT gateway to be ready (needed by cloud-init script)
   depends_on = [
     aws_nat_gateway.demo21
@@ -15,18 +15,18 @@ resource aws_instance demo21_websrv {
   ami                    = data.aws_ami.al2_arm64.id
   key_name               = aws_key_pair.demo21_websrv.id
   subnet_id              = aws_subnet.demo21_private_websrv[count.index % 2].id
-  vpc_security_group_ids = [ aws_security_group.demo21_sg_websrv.id ]
+  vpc_security_group_ids = [aws_security_group.demo21_sg_websrv.id]
   tags                   = { Name = "demo21-websrv${count.index + 1}" }
-  user_data_base64       = base64encode(replace(file(var.websrv_cloud_init_script),"<HOSTNAME>","websrv${count.index + 1}"))        
+  user_data_base64       = base64encode(replace(file(var.websrv_cloud_init_script), "<HOSTNAME>", "websrv${count.index + 1}"))
   root_block_device {
-    encrypted   = true      # use default KMS key aws/ebs
+    encrypted   = true # use default KMS key aws/ebs
     volume_type = "gp3"
     tags        = { "Name" = "demo21-websrv${count.index + 1}-boot" }
   }
 }
 
 # ------ Create a security group
-resource aws_security_group demo21_sg_websrv {
+resource "aws_security_group" "demo21_sg_websrv" {
   name        = "demo21-sg-websrv"
   description = "Description for demo21-sg-websrv"
   vpc_id      = aws_vpc.demo21.id
@@ -42,24 +42,6 @@ resource aws_security_group demo21_sg_websrv {
   #   security_groups = [ aws_security_group.demo21_sg_alb.id ]
   # }
 
-  # ingress rule: allow HTTP
-  ingress {
-    description = "allow HTTP access from VPC"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [ var.cidr_vpc ]
-  }
-
-  # ingress rule: allow SSH from bastion host
-  ingress {
-    description     = "allow SSH access from bastion host"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [ aws_security_group.demo21_sg_bastion.id ]
-  }
-
   # # ingress rule: allow SSH
   # ingress {
   #   description = "allow SSH access from public subnet"
@@ -69,12 +51,35 @@ resource aws_security_group demo21_sg_websrv {
   #   cidr_blocks = [ var.cidr_vpc ]
   # }
 
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "demo21_sg_websrv_ingress_http_0" {
+  security_group_id = aws_security_group.demo21_sg_websrv.id
+  description       = "allow HTTP access from VPC"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.cidr_vpc
+  tags              = { Name = "demo21_sg_websrv-sgr-ingress-http-0" }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "demo21_sg_websrv_ingress_ssh_1" {
+  security_group_id            = aws_security_group.demo21_sg_websrv.id
+  description                  = "allow SSH access from bastion host"
+  from_port                    = 22
+  to_port                      = 22
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.demo21_sg_bastion.id
+  tags                         = { Name = "demo21_sg_websrv-sgr-ingress-ssh-1" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo21_sg_websrv_egress_all_2" {
+  security_group_id = aws_security_group.demo21_sg_websrv.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo21_sg_websrv-sgr-egress-all-2" }
 }

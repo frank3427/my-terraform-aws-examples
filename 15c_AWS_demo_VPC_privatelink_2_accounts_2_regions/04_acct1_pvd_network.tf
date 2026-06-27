@@ -1,5 +1,5 @@
 # ------ Create a VPC for AWS private link PROVIDER (acct1_pvd=provider)
-resource aws_vpc demo15c_acct1_pvd {
+resource "aws_vpc" "demo15c_acct1_pvd" {
   provider             = aws.acct1
   cidr_block           = var.acct1_pvd_cidr_vpc
   enable_dns_hostnames = true
@@ -9,14 +9,14 @@ resource aws_vpc demo15c_acct1_pvd {
 # ========== Public subnets for bastion and ELB_NLB
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo15c_acct1_pvd {
+resource "aws_internet_gateway" "demo15c_acct1_pvd" {
   provider = aws.acct1
   vpc_id   = aws_vpc.demo15c_acct1_pvd.id
   tags     = { Name = "demo15c-acct1_pvd-igw" }
 }
 
 # ------ Create 2 public subnets (use the default route table and default network ACL)
-resource aws_subnet demo15c_acct1_pvd_public {
+resource "aws_subnet" "demo15c_acct1_pvd_public" {
   count                   = length(var.acct1_pvd_cidr_subnets_public)
   provider                = aws.acct1
   vpc_id                  = aws_vpc.demo15c_acct1_pvd.id
@@ -27,7 +27,7 @@ resource aws_subnet demo15c_acct1_pvd_public {
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo15c_acct1_pvd {
+resource "aws_default_route_table" "demo15c_acct1_pvd" {
   provider               = aws.acct1
   default_route_table_id = aws_vpc.demo15c_acct1_pvd.default_route_table_id
   tags                   = { Name = "demo15c-acct1_pvd-public-rt" }
@@ -40,13 +40,13 @@ resource aws_default_route_table demo15c_acct1_pvd {
 
 # ------ Add a name to the default network ACL and modify ingress rules 
 #        (will be used by public subnet)
-resource aws_default_network_acl demo15c_acct1_pvd {
+resource "aws_default_network_acl" "demo15c_acct1_pvd" {
   provider               = aws.acct1
   default_network_acl_id = aws_vpc.demo15c_acct1_pvd.default_network_acl_id
   tags                   = { Name = "demo15c-acct1_pvd-public-acl" }
   subnet_ids             = aws_subnet.demo15c_acct1_pvd_public[*].id
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -105,7 +105,7 @@ resource aws_default_network_acl demo15c_acct1_pvd {
 # resource aws_route_table demo15c_acct1_pvd_public {
 #   vpc_id = aws_vpc.demo15c_acct1_pvd.id
 #   tags   = { Name = "demo15c-acct1_pvd-public-rt" }
-  
+
 #   route {
 #     cidr_block = "0.0.0.0/0"
 #     gateway_id = aws_internet_gateway.demo15c_acct1_pvd.id
@@ -121,7 +121,7 @@ resource aws_default_network_acl demo15c_acct1_pvd {
 # ========== Private subnets for web servers
 
 # ------ Create elastic IP addresses for the NAT gateways
-resource aws_eip demo15c_acct1_pvd_natgw {
+resource "aws_eip" "demo15c_acct1_pvd_natgw" {
   provider = aws.acct1
   count    = length(var.acct1_azs)
   domain   = "vpc"
@@ -129,7 +129,7 @@ resource aws_eip demo15c_acct1_pvd_natgw {
 }
 
 # ------ Create NAT gateways (1 per AZ)
-resource aws_nat_gateway demo15c_acct1_pvd {
+resource "aws_nat_gateway" "demo15c_acct1_pvd" {
   provider          = aws.acct1
   count             = length(var.acct1_azs)
   connectivity_type = "public"
@@ -139,7 +139,7 @@ resource aws_nat_gateway demo15c_acct1_pvd {
 }
 
 # ------ Create 2 new route tables (1 pêr NAT gateway)
-resource aws_route_table demo15c_acct1_pvd_private {
+resource "aws_route_table" "demo15c_acct1_pvd_private" {
   provider = aws.acct1
   count    = length(var.acct1_azs)
   vpc_id   = aws_vpc.demo15c_acct1_pvd.id
@@ -151,12 +151,12 @@ resource aws_route_table demo15c_acct1_pvd_private {
 }
 
 # ------ Create a new network ACL for private subnets
-resource aws_network_acl demo15c_acct1_pvd_private {
+resource "aws_network_acl" "demo15c_acct1_pvd_private" {
   provider   = aws.acct1
   vpc_id     = aws_vpc.demo15c_acct1_pvd.id
   tags       = { Name = "demo15c-acct1_pvd-private-acl" }
   subnet_ids = aws_subnet.demo15c_acct1_pvd_private[*].id
- 
+
   # allow all traffic from public subnets
   dynamic "ingress" {
     for_each = var.acct1_pvd_cidr_subnets_public
@@ -171,7 +171,7 @@ resource aws_network_acl demo15c_acct1_pvd_private {
   }
 
   # needed
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -213,7 +213,7 @@ resource aws_network_acl demo15c_acct1_pvd_private {
 }
 
 # ------ Create the private subnets
-resource aws_subnet demo15c_acct1_pvd_private {
+resource "aws_subnet" "demo15c_acct1_pvd_private" {
   provider                = aws.acct1
   count                   = length(var.acct1_azs)
   vpc_id                  = aws_vpc.demo15c_acct1_pvd.id
@@ -224,7 +224,7 @@ resource aws_subnet demo15c_acct1_pvd_private {
 }
 
 # ------ Associate the route tables with subnets
-resource aws_route_table_association demo15c_acct1_pvd_private {
+resource "aws_route_table_association" "demo15c_acct1_pvd_private" {
   provider       = aws.acct1
   count          = length(var.acct1_azs)
   subnet_id      = aws_subnet.demo15c_acct1_pvd_private[count.index].id
