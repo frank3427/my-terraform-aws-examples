@@ -8,7 +8,10 @@ variable "project_prefix" {
   default = "demo33c"
 }
 
-variable "apigw_path1" {}
+variable "apigw_path1" {
+  type        = string
+  description = "API Gateway resource path"
+}
 
 variable "cognito_user_name" {
   type = string

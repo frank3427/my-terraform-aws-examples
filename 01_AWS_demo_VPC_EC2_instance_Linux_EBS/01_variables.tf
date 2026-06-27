@@ -1,8 +1,23 @@
-variable "aws_region" {}
-variable "cidr_vpc" {}
-variable "cidr_subnet1" {}
-variable "authorized_ips" {}
-variable "inst1_type" {}
+variable "aws_region" {
+  type        = string
+  description = "AWS region"
+}
+variable "cidr_vpc" {
+  type        = string
+  description = "CIDR block for the VPC"
+}
+variable "cidr_subnet1" {
+  type        = string
+  description = "CIDR block for the subnet"
+}
+variable "authorized_ips" {
+  type        = list(string)
+  description = "List of authorized public IP CIDR blocks for ingress rules"
+}
+variable "inst1_type" {
+  type        = string
+  description = "EC2 instance type"
+}
 variable "arch" {
   type        = string
   description = "arm64 for Graviton-based EC2 instances or x86_64 for AMD/Intel based EC2 instances"
@@ -27,11 +42,35 @@ variable "az" {
     error_message = "Valid values for az are a, b and c"
   }
 }
-variable "inst1_private_ip" {}
-variable "public_sshkey_path" {}
-variable "private_sshkey_path" {}
-variable "cloud_init_script_al" {}
-variable "cloud_init_script_ubuntu" {}
-variable "cloud_init_script_sles" {}
-variable "cloud_init_script_rhel" {}
-variable "ebs_device_name" {}
+variable "inst1_private_ip" {
+  type        = string
+  description = "Private IP address for the EC2 instance"
+}
+variable "public_sshkey_path" {
+  type        = string
+  description = "Path to SSH key file"
+}
+variable "private_sshkey_path" {
+  type        = string
+  description = "Path to SSH key file"
+}
+variable "cloud_init_script_al" {
+  type        = string
+  description = "Path to cloud-init script"
+}
+variable "cloud_init_script_ubuntu" {
+  type        = string
+  description = "Path to cloud-init script"
+}
+variable "cloud_init_script_sles" {
+  type        = string
+  description = "Path to cloud-init script"
+}
+variable "cloud_init_script_rhel" {
+  type        = string
+  description = "Path to cloud-init script"
+}
+variable "ebs_device_name" {
+  type        = string
+  description = "Device name for EBS volume"
+}
