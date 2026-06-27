@@ -183,7 +183,11 @@ resource "aws_iam_role" "demo35_msk" {
       }
     ]
   })
-  managed_policy_arns = [aws_iam_policy.demo35_msk.arn]
+}
+
+resource "aws_iam_role_policy_attachment" "demo35_msk" {
+  role       = aws_iam_role.demo35_msk.name
+  policy_arn = aws_iam_policy.demo35_msk.arn
 }
 
 resource "aws_iam_instance_profile" "demo35_msk" {
