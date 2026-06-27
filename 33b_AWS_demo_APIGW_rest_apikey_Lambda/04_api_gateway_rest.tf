@@ -17,9 +17,13 @@ data "aws_iam_policy" "demo33b_apigw" {
 }
 
 resource "aws_iam_role" "demo33b_apigw" {
-  name                = "demo33b_iam_for_apigw"
-  assume_role_policy  = data.aws_iam_policy_document.demo33b_apigw.json
-  managed_policy_arns = [data.aws_iam_policy.demo33b_apigw.arn]
+  name               = "demo33b_iam_for_apigw"
+  assume_role_policy = data.aws_iam_policy_document.demo33b_apigw.json
+}
+
+resource "aws_iam_role_policy_attachment" "demo33b_apigw_cloudwatch_logs" {
+  role       = aws_iam_role.demo33b_apigw.name
+  policy_arn = data.aws_iam_policy.demo33b_apigw.arn
 }
 
 # -- CloudWatch Logs for API gateway

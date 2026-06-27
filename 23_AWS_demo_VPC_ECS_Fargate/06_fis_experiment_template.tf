@@ -28,9 +28,6 @@ resource "aws_iam_role" "demo23_fis_role" {
 }
 EOF
 
-  # add managed policy AWSFaultInjectionSimulatorECSAccess to iam role
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSFaultInjectionSimulatorECSAccess"]
-
   # autorise ecs stop task and cloudwatch put logs
   inline_policy {
     name   = "demo23_fis_to_cloudwatch_logs"
@@ -58,6 +55,11 @@ EOF
 }
 EOF
   }
+}
+
+resource "aws_iam_role_policy_attachment" "demo23_fis_ecs_access" {
+  role       = aws_iam_role.demo23_fis_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSFaultInjectionSimulatorECSAccess"
 }
 
 resource "aws_fis_experiment_template" "demo23_stop_ecs_tasks" {
