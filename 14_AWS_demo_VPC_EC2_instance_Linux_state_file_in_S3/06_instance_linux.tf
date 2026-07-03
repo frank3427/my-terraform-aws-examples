@@ -21,7 +21,7 @@ resource "aws_instance" "demo14_inst1" {
   subnet_id              = aws_subnet.demo14_public.id
   vpc_security_group_ids = [aws_default_security_group.demo14.id]
   tags                   = { Name = "demo14-inst1" }
-  user_data_base64       = base64encode(file(var.cloud_init_script_al2))
+  user_data_base64       = base64encode(file(var.cloud_init_script_al2023))
   private_ip             = var.inst1_private_ip # optional  
   root_block_device {
     encrypted   = true # use default KMS key aws/ebs
@@ -33,7 +33,7 @@ resource "aws_instance" "demo14_inst1" {
 # ------ Display the complete ssh command needed to connect to the instance
 locals {
   username = "ec2-user"
-  ami      = (var.arch == "arm64") ? data.aws_ami.al2_arm64.id : data.aws_ami.al2_x86_64.id
+  ami      = (var.arch == "arm64") ? data.aws_ami.al2023_arm64.id : data.aws_ami.al2023_x64.id
 }
 
 output "Instance" {
