@@ -26,6 +26,14 @@ variable "inst1_type" {
   type        = string
   description = "EC2 instance type"
 }
+variable "arch" {
+  type        = string
+  description = "arm64 for Graviton-based EC2 instances or x86_64 for AMD/Intel based EC2 instances"
+  validation {
+    condition     = var.arch == "arm64" || var.arch == "x86_64"
+    error_message = "Valid values for arch are arm64 and x86_64"
+  }
+}
 variable "public_sshkey_path" {
   type        = string
   description = "Path to SSH key file"

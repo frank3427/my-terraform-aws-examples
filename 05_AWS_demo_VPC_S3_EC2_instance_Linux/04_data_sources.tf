@@ -1,19 +1,29 @@
-data "aws_ami" "al2_arm64" {
+# ---- Get AWS account ID
+data "aws_caller_identity" "current" {}
+
+# ---- AMI for AL2023 x86_64 architecture
+data "aws_ami" "al2023_x64" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-5.10-hvm-2.0.202*-arm64-gp2"]
+    values = ["al2023-ami-2023*x86_64"]
   }
   owners = ["amazon"]
 }
 
-data "aws_ami" "al2_x86-64" {
+# ---- AMI for AL2023 ARM64 architecture
+data "aws_ami" "al2023_arm64" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-5.10-hvm-2.0.202*x86_64-gp2"]
+    values = ["al2023-ami-2023*arm64"]
   }
   owners = ["amazon"]
+}
+
+# ---- Get the right AMI based on arch variable
+locals {
+  ami = (var.arch == "arm64") ? data.aws_ami.al2023_arm64.id : data.aws_ami.al2023_x64.id
 }
