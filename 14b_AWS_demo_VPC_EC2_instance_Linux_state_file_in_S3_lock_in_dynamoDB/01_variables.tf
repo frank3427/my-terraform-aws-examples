@@ -38,7 +38,7 @@ variable "private_sshkey_path" {
   type        = string
   description = "Path to SSH key file"
 }
-variable "cloud_init_script_al2" {
+variable "cloud_init_script_al2023" {
   type        = string
-  description = "Path to cloud-init script"
+  description = "Path to cloud-init script for AL2023"
 }
