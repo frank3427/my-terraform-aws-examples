@@ -4,11 +4,10 @@
 exec 1> /var/log/cloud-init2.log 2>&1
 
 echo "========== Install some packages"
-yum install zsh nmap -y
+dnf install zsh nmap -y
 
 echo "========== Create script to generate load"
-amazon-linux-extras install epel -y
-yum install stress-ng -y
+dnf install stress-ng -y
 cat > /home/ec2-user/stress.sh << EOF
 stress-ng --vm 15 --vm-bytes 80% --vm-method all --verify -t 60m -v
 #stress-ng --vm 10 -c 10 --vm-bytes 80% --vm-method all --verify -t 60m -v
@@ -32,7 +31,7 @@ crontab -u ec2-user /tmp/crontab
 rm -f /tmp/crontab
 
 # echo "========== Install latest updates"
-# yum update -y
+# dnf update -y
 
 # echo "========== Final reboot"
 # reboot
