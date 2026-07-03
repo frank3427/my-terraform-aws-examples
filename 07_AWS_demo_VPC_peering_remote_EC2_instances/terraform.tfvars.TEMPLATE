@@ -13,7 +13,8 @@ authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
 
 # ---- Instance
 az                  = "a"
-inst_type           = "m6g.medium"
+arch                = "arm64"           # choose arm64 or x86_64
+inst_type           = "m6g.medium"      # arm64 arch (Graviton)
 public_sshkey_path  = "sshkeys_generated/ssh_key_demo06.pub"
 private_sshkey_path = "sshkeys_generated/ssh_key_demo06"
-cloud_init_script   = "cloud_init/cloud_init_al2.sh"
+cloud_init_script   = "cloud_init/cloud_init_al2023.sh"

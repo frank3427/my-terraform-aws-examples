@@ -18,7 +18,7 @@ resource "aws_instance" "demo07_r2" {
   provider               = aws.r2
   availability_zone      = "${var.aws_region2}${var.az}"
   instance_type          = var.inst_type
-  ami                    = data.aws_ami.al2_arm64_r2.id
+  ami                    = data.aws_ami.al2023_r2.id
   key_name               = aws_key_pair.demo07_kp_r2.id
   subnet_id              = aws_subnet.demo07_public_r2.id
   vpc_security_group_ids = [aws_security_group.demo07_sg_r2.id]

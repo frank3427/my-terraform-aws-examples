@@ -96,7 +96,6 @@ resource "aws_security_group" "demo07_sg_r1" {
   description = "Description for demo07-sg-r1"
   vpc_id      = aws_vpc.demo07_r1.id
   tags        = { Name = "demo07-sg-r1" }
-
 }
 
 # ------ Peering connection to other VPC: REQUESTER
@@ -108,8 +107,8 @@ resource "aws_vpc_peering_connection" "demo07_r1" {
   tags        = { Name = "demo07-pcx" }
 }
 
-
 resource "aws_vpc_security_group_ingress_rule" "demo07_sg_r1_ingress_ssh_0" {
+  provider          = aws.r1
   count             = length(var.authorized_ips)
   security_group_id = aws_security_group.demo07_sg_r1.id
   description       = "allow SSH access from authorized public IP addresses"
@@ -121,20 +120,18 @@ resource "aws_vpc_security_group_ingress_rule" "demo07_sg_r1_ingress_ssh_0" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "demo07_sg_r1_ingress_all_1" {
+  provider          = aws.r1
   security_group_id = aws_security_group.demo07_sg_r1.id
   description       = "allow traffic from other VPC"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = var.cidr_public_r2
   tags              = { Name = "demo07_sg_r1-sgr-ingress-all-1" }
 }
 
 resource "aws_vpc_security_group_egress_rule" "demo07_sg_r1_egress_all_2" {
+  provider          = aws.r1
   security_group_id = aws_security_group.demo07_sg_r1.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo07_sg_r1-sgr-egress-all-2" }
