@@ -13,7 +13,8 @@ s3_bucket_name = "demo05-bucket-cpa"
 
 # ---- Instance
 az                  = "a"
+arch                = "x86_64"          # choose arm64 or x86_64
 inst1_type          = "t3.medium"       # x86_64 arch
 public_sshkey_path  = "sshkeys/ssh_key_demo05.pub"
 private_sshkey_path = "sshkeys/ssh_key_demo05"
-cloud_init_script   = "cloud_init/cloud_init_al2.sh"
+cloud_init_script   = "cloud_init/cloud_init_al2023.sh"

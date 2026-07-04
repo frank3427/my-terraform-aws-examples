@@ -1,5 +1,5 @@
 # ------ Create a SSH config file
-resource local_file sshconfig {
+resource "local_file" "sshconfig" {
   content = <<EOF
 Host d04b-bastion
           Hostname ${aws_eip.demo04b_bastion.public_ip}
@@ -25,7 +25,7 @@ EOF
 }
 
 # ------ Display the complete ssh commands needed to connect to the compute instances
-output CONNECTIONS {
+output "CONNECTIONS" {
   value = <<EOF
 
   Wait a few minutes so that post-provisioning scripts can run on the compute instances

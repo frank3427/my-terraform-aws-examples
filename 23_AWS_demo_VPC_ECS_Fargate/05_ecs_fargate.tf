@@ -1,10 +1,10 @@
-resource aws_ecs_cluster demo23 {
+resource "aws_ecs_cluster" "demo23" {
   name = "demo23-cluster"
 }
 
-resource aws_ecs_cluster_capacity_providers demo23 {
+resource "aws_ecs_cluster_capacity_providers" "demo23" {
   cluster_name       = aws_ecs_cluster.demo23.name
-  capacity_providers = ["FARGATE","FARGATE_SPOT"]
+  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
 
   default_capacity_provider_strategy {
     base              = 1
@@ -18,14 +18,14 @@ resource aws_ecs_cluster_capacity_providers demo23 {
   }
 }
 
-resource aws_ecs_task_definition demo23_taskdef1 {
+resource "aws_ecs_task_definition" "demo23_taskdef1" {
   family                   = "demo23-taskdef1"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 512      # 512 cpu units = 0.5 vCPU
-  memory                   = 2048     # 2048 MB = 2 GB
+  cpu                      = 512  # 512 cpu units = 0.5 vCPU
+  memory                   = 2048 # 2048 MB = 2 GB
   # When networkMode=awsvpc, the host ports and container ports in port mappings must match
-  container_definitions    = <<EOF
+  container_definitions = <<EOF
   [
     {
       "name"      : "nginx",
@@ -87,16 +87,16 @@ EOF
 # }
 
 # ---- ECS service #2 with 3 tasks (1 per AZ/subnet) with LB
-resource aws_ecs_service demo23_svc2 {
+resource "aws_ecs_service" "demo23_svc2" {
   lifecycle {
-    ignore_changes = [task_definition,desired_count]
+    ignore_changes = [task_definition, desired_count]
   }
-  name             = "demo23-svc2"
-  cluster          = aws_ecs_cluster.demo23.id
-  task_definition  = aws_ecs_task_definition.demo23_taskdef1.id
-  desired_count    = 3
-  launch_type      = "FARGATE"
-  platform_version = "LATEST"
+  name                    = "demo23-svc2"
+  cluster                 = aws_ecs_cluster.demo23.id
+  task_definition         = aws_ecs_task_definition.demo23_taskdef1.id
+  desired_count           = 3
+  launch_type             = "FARGATE"
+  platform_version        = "LATEST"
   enable_ecs_managed_tags = true
   wait_for_steady_state   = true
 
@@ -118,8 +118,8 @@ resource aws_ecs_service demo23_svc2 {
 
   network_configuration {
     assign_public_ip = true
-    security_groups  = [ aws_default_security_group.demo23.id ]
-    subnets          = [ for subnet in aws_subnet.demo23_public: subnet.id ]
+    security_groups  = [aws_default_security_group.demo23.id]
+    subnets          = [for subnet in aws_subnet.demo23_public : subnet.id]
     #subnets          = [ aws_subnet.demo23_public[0].id, aws_subnet.demo23_public[1].id ]
   }
 
@@ -133,7 +133,7 @@ locals {
   demo23_svc2_lb_dns_name = aws_lb.demo23_alb.dns_name
 }
 
-output service2 {
+output "service2" {
   value = <<EOF
     You can access the web servers running in 3 tasks behind load balancer on service ${aws_ecs_service.demo23_svc2.name} by opening following URL in your web browser:
     http://${local.demo23_svc2_lb_dns_name}

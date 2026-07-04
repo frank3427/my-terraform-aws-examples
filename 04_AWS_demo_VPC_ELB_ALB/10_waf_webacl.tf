@@ -1,6 +1,6 @@
 # ------ Create WAF WebACL to block access from countries other than France
 resource "aws_wafv2_web_acl" "demo04_webacl" {
-  count        = var.alb_use_waf ? 1 : 0
+  count       = var.alb_use_waf ? 1 : 0
   name        = "demo04-webacl"
   description = "WebACL to allow access only from France"
   scope       = "REGIONAL"

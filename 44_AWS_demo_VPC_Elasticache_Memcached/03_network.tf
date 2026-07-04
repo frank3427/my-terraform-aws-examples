@@ -1,5 +1,5 @@
 # ------ Create a VPC 
-resource aws_vpc demo44 {
+resource "aws_vpc" "demo44" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo44-vpc" }
@@ -8,13 +8,13 @@ resource aws_vpc demo44 {
 # ========== Public subnet for EC2 instance
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo44 {
+resource "aws_internet_gateway" "demo44" {
   vpc_id = aws_vpc.demo44.id
   tags   = { Name = "demo44-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo44 {
+resource "aws_default_route_table" "demo44" {
   default_route_table_id = aws_vpc.demo44.default_route_table_id
   tags                   = { Name = "demo44-rt" }
 
@@ -25,12 +25,12 @@ resource aws_default_route_table demo44 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo44 {
+resource "aws_default_network_acl" "demo44" {
   default_network_acl_id = aws_vpc.demo44.default_network_acl_id
   tags                   = { Name = "demo44-acl" }
-  subnet_ids             = [ aws_subnet.demo44_public.id ]
+  subnet_ids             = [aws_subnet.demo44_public.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -63,7 +63,7 @@ resource aws_default_network_acl demo44 {
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo44_public {
+resource "aws_subnet" "demo44_public" {
   vpc_id                  = aws_vpc.demo44.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet_pub
@@ -74,13 +74,13 @@ resource aws_subnet demo44_public {
 # ========== Private subnet for Elasticache Memcached cluster
 
 # ------ Create an elastic IP address for the NAT gateway
-resource aws_eip demo44_natgw {
-  domain   = "vpc"
-  tags     = { Name = "demo44-natgw" }
+resource "aws_eip" "demo44_natgw" {
+  domain = "vpc"
+  tags   = { Name = "demo44-natgw" }
 }
 
 # ------ Create a NAT gateway
-resource aws_nat_gateway demo44 {
+resource "aws_nat_gateway" "demo44" {
   connectivity_type = "public"
   allocation_id     = aws_eip.demo44_natgw.id
   subnet_id         = aws_subnet.demo44_public.id
@@ -88,20 +88,20 @@ resource aws_nat_gateway demo44 {
 }
 
 # ------ Create a new route table
-resource aws_route_table demo44_private {
+resource "aws_route_table" "demo44_private" {
   vpc_id = aws_vpc.demo44.id
   tags   = { Name = "demo44-private-rt" }
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.demo44.id
   }
 }
 
 # ------ Create a new network ACL for private subnet
-resource aws_network_acl demo44_private {
+resource "aws_network_acl" "demo44_private" {
   vpc_id     = aws_vpc.demo44.id
   tags       = { Name = "demo44-private-acl" }
-  subnet_ids = [ aws_subnet.demo44_private.id ]
+  subnet_ids = [aws_subnet.demo44_private.id]
 
   # allow all traffic from public subnet
   ingress {
@@ -112,7 +112,7 @@ resource aws_network_acl demo44_private {
     from_port  = 0
     to_port    = 0
   }
-  
+
   egress {
     protocol   = -1
     rule_no    = 100
@@ -124,7 +124,7 @@ resource aws_network_acl demo44_private {
 }
 
 # ------ Create the private subnet
-resource aws_subnet demo44_private {
+resource "aws_subnet" "demo44_private" {
   vpc_id                  = aws_vpc.demo44.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet_priv
@@ -133,7 +133,7 @@ resource aws_subnet demo44_private {
 }
 
 # ------ Associate the route table with subnet
-resource aws_route_table_association demo44_private {
+resource "aws_route_table_association" "demo44_private" {
   subnet_id      = aws_subnet.demo44_private.id
   route_table_id = aws_route_table.demo44_private.id
 }

@@ -1,11 +1,11 @@
-resource aws_s3_bucket demo05 {
-  bucket = var.s3_bucket_name
-  tags  = { Name = "demo05" }
+resource "aws_s3_bucket" "demo05" {
+  bucket = "${var.s3_bucket_name}-${data.aws_caller_identity.current.account_id}"
+  tags   = { Name = "demo05" }
 }
 
 # ------ Create an S3 bucket policyt to allow access to the S2 bucket only thru S3 gateway endpoint 
 #        (blocks access from Internet)
-resource aws_s3_bucket_policy demo05 {
+resource "aws_s3_bucket_policy" "demo05" {
   bucket = aws_s3_bucket.demo05.id
 
   policy = <<POLICY

@@ -1,4 +1,4 @@
-output Connection {
+output "Connection" {
   value = <<EOF
 
 For security reasons, you cannot to the EC2 instances using SSH but you can do it using Session Manager:

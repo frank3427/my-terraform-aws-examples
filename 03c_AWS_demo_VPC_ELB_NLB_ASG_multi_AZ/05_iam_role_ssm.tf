@@ -1,5 +1,5 @@
 # ------ Create IAM role and instance profile for Session Manager
-resource aws_iam_role demo03c_ssm {
+resource "aws_iam_role" "demo03c_ssm" {
   name = "demo03c_ssm_for_ec2"
   tags = { Name = "demo03c_ssm_for_ec2" }
   assume_role_policy = jsonencode({
@@ -16,18 +16,18 @@ resource aws_iam_role demo03c_ssm {
   })
 }
 
-resource aws_iam_instance_profile demo03c_ssm {
+resource "aws_iam_instance_profile" "demo03c_ssm" {
   name = "demo03c_ssm_for_ec2_instprof"
   role = aws_iam_role.demo03c_ssm.name
 }
 
-resource aws_iam_role_policy_attachment demo03c_ssm_managed_instance {
+resource "aws_iam_role_policy_attachment" "demo03c_ssm_managed_instance" {
   role       = aws_iam_role.demo03c_ssm.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 # ------ Additional permissions for Session Manager logging
-resource aws_iam_role_policy demo03c_ssm_logging {
+resource "aws_iam_role_policy" "demo03c_ssm_logging" {
   name = "demo03c_ssm_logging_policy"
   role = aws_iam_role.demo03c_ssm.id
 

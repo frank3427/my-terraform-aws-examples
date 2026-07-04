@@ -1,4 +1,4 @@
-data aws_iam_policy_document demo32 {
+data "aws_iam_policy_document" "demo32" {
   statement {
     effect = "Allow"
 
@@ -11,18 +11,18 @@ data aws_iam_policy_document demo32 {
   }
 }
 
-resource aws_iam_role demo32 {
+resource "aws_iam_role" "demo32" {
   name               = "demo32_iam_for_lambda"
   assume_role_policy = data.aws_iam_policy_document.demo32.json
 }
 
-data archive_file demo32 {
+data "archive_file" "demo32" {
   type        = "zip"
   source_file = "lambda.py"
   output_path = "lambda_function_payload.zip"
 }
 
-resource aws_lambda_function demo32 {
+resource "aws_lambda_function" "demo32" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
   filename      = "lambda_function_payload.zip"

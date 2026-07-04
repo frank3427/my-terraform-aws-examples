@@ -1,5 +1,5 @@
 # ------ Create a VPC 
-resource aws_vpc demo03 {
+resource "aws_vpc" "demo03" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo03-vpc" }
@@ -8,24 +8,24 @@ resource aws_vpc demo03 {
 # ========== Public subnet for bastion and ELB_NLB
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo03-ig {
+resource "aws_internet_gateway" "demo03-ig" {
   vpc_id = aws_vpc.demo03.id
   tags   = { Name = "demo03-igw" }
 }
 
 # ------ Create a subnet (use the default route table and default network ACL)
-resource aws_subnet demo03_public {
+resource "aws_subnet" "demo03_public" {
   vpc_id                  = aws_vpc.demo03.id
-  availability_zone      = "${var.aws_region}${var.az}"
+  availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet_public
   map_public_ip_on_launch = true
   tags                    = { Name = "demo03-public" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo03 {
+resource "aws_default_route_table" "demo03" {
   default_route_table_id = aws_vpc.demo03.default_route_table_id
-  tags   = { Name = "demo03-public-rt" }
+  tags                   = { Name = "demo03-public-rt" }
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -35,12 +35,12 @@ resource aws_default_route_table demo03 {
 
 # ------ Add a name to the default network ACL and modify ingress rules
 #        (will be used by public subnet)
-resource aws_default_network_acl demo03 {
+resource "aws_default_network_acl" "demo03" {
   default_network_acl_id = aws_vpc.demo03.default_network_acl_id
   tags                   = { Name = "demo03-acl" }
-  subnet_ids             = [ aws_subnet.demo03_public.id ]
+  subnet_ids             = [aws_subnet.demo03_public.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -51,8 +51,8 @@ resource aws_default_network_acl demo03 {
       to_port    = 22
     }
   }
- 
-  dynamic ingress {
+
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -80,7 +80,7 @@ resource aws_default_network_acl demo03 {
     rule_no    = 400
     action     = "allow"
     cidr_block = var.cidr_subnet_private
-    from_port  = 0  
+    from_port  = 0
     to_port    = 0
   }
 
@@ -98,7 +98,7 @@ resource aws_default_network_acl demo03 {
 # resource aws_route_table demo03_public {
 #   vpc_id = aws_vpc.demo03.id
 #   tags   = { Name = "demo03-public-rt" }
-  
+
 #   route {
 #     cidr_block = "0.0.0.0/0"
 #     gateway_id = aws_internet_gateway.demo03-ig.id
@@ -114,13 +114,13 @@ resource aws_default_network_acl demo03 {
 # ========== Private subnet for web servers
 
 # ------ Create an elastic IP address for the NAT gateway
-resource aws_eip demo03_natgw {
-  domain   = "vpc"
-  tags     = { Name = "demo03-natgw" }
+resource "aws_eip" "demo03_natgw" {
+  domain = "vpc"
+  tags   = { Name = "demo03-natgw" }
 }
 
 # ------ Create a NAT gatewat
-resource aws_nat_gateway demo03 {
+resource "aws_nat_gateway" "demo03" {
   connectivity_type = "public"
   allocation_id     = aws_eip.demo03_natgw.id
   subnet_id         = aws_subnet.demo03_public.id
@@ -128,20 +128,20 @@ resource aws_nat_gateway demo03 {
 }
 
 # ------ Create a new route table
-resource aws_route_table demo03_private {
+resource "aws_route_table" "demo03_private" {
   vpc_id = aws_vpc.demo03.id
   tags   = { Name = "demo03-private-rt" }
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.demo03.id
   }
 }
 
 # ------ Create a new network ACL for private subnet
-resource aws_network_acl demo03_private {
+resource "aws_network_acl" "demo03_private" {
   vpc_id     = aws_vpc.demo03.id
   tags       = { Name = "demo03-private-acl" }
-  subnet_ids = [ aws_subnet.demo03_private.id ]
+  subnet_ids = [aws_subnet.demo03_private.id]
 
   # allow all traffic from public subnet
   ingress {
@@ -152,9 +152,9 @@ resource aws_network_acl demo03_private {
     from_port  = 0
     to_port    = 0
   }
-  
+
   # needed
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -187,7 +187,7 @@ resource aws_network_acl demo03_private {
 }
 
 # ------ Create the private subnet
-resource aws_subnet demo03_private {
+resource "aws_subnet" "demo03_private" {
   vpc_id                  = aws_vpc.demo03.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet_private
@@ -196,7 +196,7 @@ resource aws_subnet demo03_private {
 }
 
 # ------ Associate the route table with subnet
-resource aws_route_table_association demo03_private {
+resource "aws_route_table_association" "demo03_private" {
   subnet_id      = aws_subnet.demo03_private.id
   route_table_id = aws_route_table.demo03_private.id
 }

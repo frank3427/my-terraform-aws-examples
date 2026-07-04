@@ -1,20 +1,20 @@
 ## see https://repost.aws/knowledge-center/ec2-systems-manager-vpc-endpoints
 
 # ------ Create a VPC 
-resource aws_vpc demo20b {
+resource "aws_vpc" "demo20b" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo20b-vpc" }
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo20b {
+resource "aws_internet_gateway" "demo20b" {
   vpc_id = aws_vpc.demo20b.id
   tags   = { Name = "demo20b-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo20b {
+resource "aws_default_route_table" "demo20b" {
   default_route_table_id = aws_vpc.demo20b.default_route_table_id
   tags                   = { Name = "demo20b-public-rt" }
 
@@ -25,7 +25,7 @@ resource aws_default_route_table demo20b {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo20b {
+resource "aws_default_network_acl" "demo20b" {
   default_network_acl_id = aws_vpc.demo20b.default_network_acl_id
   tags                   = { Name = "demo20b-public-acl" }
   subnet_ids             = tolist(aws_subnet.demo20b_public[*].id)
@@ -60,70 +60,53 @@ resource aws_default_network_acl demo20b {
 }
 
 # ------ Create public subnets (use the default route table and default network ACL)
-resource aws_subnet demo20b_public {
+resource "aws_subnet" "demo20b_public" {
   count                   = 2
   vpc_id                  = aws_vpc.demo20b.id
   availability_zone       = "${var.aws_region}${var.azs[count.index]}"
   cidr_block              = var.cidr_subnets_public[count.index]
   map_public_ip_on_launch = true
-  tags                    = { Name = "demo20b-public-${count.index+1}" }
+  tags                    = { Name = "demo20b-public-${count.index + 1}" }
 }
 
 # ------ Customize the security group for the EC2 instance
-resource aws_default_security_group demo20b {
-  vpc_id      = aws_vpc.demo20b.id
-  tags        = { Name = "demo20b-sg1" }
+resource "aws_default_security_group" "demo20b" {
+  vpc_id = aws_vpc.demo20b.id
+  tags   = { Name = "demo20b-sg1" }
 
-  # ingress rule: allow HTTPS for Systems Manager
-  ingress {
-    description = "allow HTTPS access from VPC (required by Systems Manager)"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [ var.cidr_vpc ]
-  }
-
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
 }
 
 # ========== Private subnets in HA mode (NAT gateway and VPC endpoints in 2 AZs)
 
 # ------ Create elastic IP addresses for the NAT gateways
-resource aws_eip demo20b_natgw {
+resource "aws_eip" "demo20b_natgw" {
   count  = 2
   domain = "vpc"
-  tags   = { Name = "demo20b-natgw-${count.index+1}" }
+  tags   = { Name = "demo20b-natgw-${count.index + 1}" }
 }
 
 # ------ Create NAT gateways
-resource aws_nat_gateway demo20b {
+resource "aws_nat_gateway" "demo20b" {
   count             = 2
   connectivity_type = "public"
   allocation_id     = aws_eip.demo20b_natgw[count.index].id
   subnet_id         = aws_subnet.demo20b_public[count.index].id
-  tags              = { Name = "demo20b-natgw-${count.index+1}" }
+  tags              = { Name = "demo20b-natgw-${count.index + 1}" }
 }
 
 # ------ Create 2 new route tables
-resource aws_route_table demo20b_private {
+resource "aws_route_table" "demo20b_private" {
   count  = 2
   vpc_id = aws_vpc.demo20b.id
   tags   = { Name = "demo20b-private-rt" }
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.demo20b[count.index].id
   }
 }
 
 # ------ Create a new network ACL for private subnet
-resource aws_network_acl demo20b_private {
+resource "aws_network_acl" "demo20b_private" {
   vpc_id     = aws_vpc.demo20b.id
   tags       = { Name = "demo20b-private-acl" }
   subnet_ids = tolist(aws_subnet.demo20b_private[*].id)
@@ -169,17 +152,17 @@ resource aws_network_acl demo20b_private {
 }
 
 # ------ Create 2 private subnets
-resource aws_subnet demo20b_private {
+resource "aws_subnet" "demo20b_private" {
   count                   = 2
   vpc_id                  = aws_vpc.demo20b.id
   availability_zone       = "${var.aws_region}${var.azs[count.index]}"
   cidr_block              = var.cidr_subnets_private[count.index]
   map_public_ip_on_launch = false
-  tags                    = { Name = "demo20b-private-${count.index+1}" }
+  tags                    = { Name = "demo20b-private-${count.index + 1}" }
 }
 
 # ------ Associate the route tables with subnets
-resource aws_route_table_association demo20b_private {
+resource "aws_route_table_association" "demo20b_private" {
   count          = 2
   subnet_id      = aws_subnet.demo20b_private[count.index].id
   route_table_id = aws_route_table.demo20b_private[count.index].id
@@ -187,16 +170,37 @@ resource aws_route_table_association demo20b_private {
 
 # ------ Create VPC endpoints for System Manager attached to both AZ (in private subnets)
 locals {
-  ssm_endp = [ "ssm", "ec2messages", "ssmmessages"]
+  ssm_endp = ["ssm", "ec2messages", "ssmmessages"]
 }
 
-resource aws_vpc_endpoint demo20b_ssm {
-  count               = length(local.ssm_endp)  
+resource "aws_vpc_endpoint" "demo20b_ssm" {
+  count               = length(local.ssm_endp)
   vpc_id              = aws_vpc.demo20b.id
-  service_name        = "com.amazonaws.${var.aws_region}.${local.ssm_endp[count.index]}" 
+  service_name        = "com.amazonaws.${var.aws_region}.${local.ssm_endp[count.index]}"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   tags                = { Name = "demo20b-${local.ssm_endp[count.index]}" }
   subnet_ids          = aws_subnet.demo20b_private[*].id
-  security_group_ids  = [ aws_default_security_group.demo20b.id ]
+  security_group_ids  = [aws_default_security_group.demo20b.id]
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "demo20b_ingress_https_0" {
+  security_group_id = aws_default_security_group.demo20b.id
+  description       = "allow HTTPS access from VPC (required by Systems Manager)"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.cidr_vpc
+  tags              = { Name = "demo20b-sgr-ingress-https-0" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo20b_egress_all_1" {
+  security_group_id = aws_default_security_group.demo20b.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo20b-sgr-egress-all-1" }
 }

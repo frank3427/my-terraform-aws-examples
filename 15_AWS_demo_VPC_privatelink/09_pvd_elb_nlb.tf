@@ -1,36 +1,36 @@
 # ------ create an NLB (Network Load Balancer)
-resource aws_lb demo15_pvd_nlb {
+resource "aws_lb" "demo15_pvd_nlb" {
   name               = "demo15-pvd-nlb"
-  internal           = false        # public facing
+  internal           = false # public facing
   load_balancer_type = "network"
-  subnets            = [ aws_subnet.demo15_pvd_public.id ]
+  subnets            = [aws_subnet.demo15_pvd_public.id]
 
   enable_deletion_protection = false
 
-#   # -- optionally, uses Elastic IP addresses instead of ephemeral IP addresses for public NLB
-#   subnet_mapping {
-#     subnet_id     = aws_subnet.example1.id
-#     allocation_id = aws_eip.example1.id
-#   }
+  #   # -- optionally, uses Elastic IP addresses instead of ephemeral IP addresses for public NLB
+  #   subnet_mapping {
+  #     subnet_id     = aws_subnet.example1.id
+  #     allocation_id = aws_eip.example1.id
+  #   }
 
-#   subnet_mapping {
-#     subnet_id     = aws_subnet.example2.id
-#     allocation_id = aws_eip.example2.id
-#   }
+  #   subnet_mapping {
+  #     subnet_id     = aws_subnet.example2.id
+  #     allocation_id = aws_eip.example2.id
+  #   }
 
-#   access_logs {
-#     bucket  = aws_s3_bucket.lb_logs.bucket
-#     prefix  = "test-lb"
-#     enabled = true
-#   }
+  #   access_logs {
+  #     bucket  = aws_s3_bucket.lb_logs.bucket
+  #     prefix  = "test-lb"
+  #     enabled = true
+  #   }
 
-#   tags = {
-#     Environment = "production"
-#   }
+  #   tags = {
+  #     Environment = "production"
+  #   }
 }
 
 # ------ Create a target group (empty)
-resource aws_lb_target_group demo15_pvd_tg1 {
+resource "aws_lb_target_group" "demo15_pvd_tg1" {
   name     = "demo15-pvd-tg1"
   port     = 80
   protocol = "TCP"
@@ -47,7 +47,7 @@ resource aws_lb_target_group demo15_pvd_tg1 {
 }
 
 # ------ Attach the 2 webservers EC2 instances to the target group
-resource aws_lb_target_group_attachment demo15_pvd_websrv {
+resource "aws_lb_target_group_attachment" "demo15_pvd_websrv" {
   count            = 2
   target_group_arn = aws_lb_target_group.demo15_pvd_tg1.arn
   target_id        = aws_instance.demo15_pvd_websrv[count.index].id
@@ -55,7 +55,7 @@ resource aws_lb_target_group_attachment demo15_pvd_websrv {
 }
 
 # ------ Create a listener for the NLB
-resource aws_lb_listener demo15_pvd_listener80 {
+resource "aws_lb_listener" "demo15_pvd_listener80" {
   load_balancer_arn = aws_lb.demo15_pvd_nlb.arn
   port              = "80"
   protocol          = "TCP" # must be one of 'TLS, TCP, TCP_UDP, UDP'

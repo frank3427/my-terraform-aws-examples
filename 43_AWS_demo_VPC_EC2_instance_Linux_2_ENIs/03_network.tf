@@ -1,18 +1,18 @@
 # ------ Create a VPC 
-resource aws_vpc demo43 {
+resource "aws_vpc" "demo43" {
   cidr_block           = var.cidr_vpc
   enable_dns_hostnames = true
   tags                 = { Name = "demo43-vpc" }
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo43 {
+resource "aws_internet_gateway" "demo43" {
   vpc_id = aws_vpc.demo43.id
   tags   = { Name = "demo43-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo43 {
+resource "aws_default_route_table" "demo43" {
   default_route_table_id = aws_vpc.demo43.default_route_table_id
   tags                   = { Name = "demo43-rt" }
 
@@ -23,12 +23,12 @@ resource aws_default_route_table demo43 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo43 {
+resource "aws_default_network_acl" "demo43" {
   default_network_acl_id = aws_vpc.demo43.default_network_acl_id
   tags                   = { Name = "demo43-acl1" }
-  subnet_ids             = [ aws_subnet.demo43_public1.id ]
+  subnet_ids             = [aws_subnet.demo43_public1.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -61,12 +61,12 @@ resource aws_default_network_acl demo43 {
 }
 
 # ------ Create a second Network ACL for the HTTP subnet
-resource aws_network_acl demo43_acl2 {
+resource "aws_network_acl" "demo43_acl2" {
   vpc_id     = aws_vpc.demo43.id
   tags       = { Name = "demo43-acl2" }
-  subnet_ids = [ aws_subnet.demo43_public2.id ]
+  subnet_ids = [aws_subnet.demo43_public2.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips
     content {
       protocol   = "tcp"
@@ -98,7 +98,7 @@ resource aws_network_acl demo43_acl2 {
 }
 
 # ------ Create a public subnet for SSH (use the default route table and default network ACL)
-resource aws_subnet demo43_public1 {
+resource "aws_subnet" "demo43_public1" {
   vpc_id                  = aws_vpc.demo43.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet1
@@ -107,7 +107,7 @@ resource aws_subnet demo43_public1 {
 }
 
 # ------ Create a public subnet for HTTP (use the default route table and specific network ACL)
-resource aws_subnet demo43_public2 {
+resource "aws_subnet" "demo43_public2" {
   vpc_id                  = aws_vpc.demo43.id
   availability_zone       = "${var.aws_region}${var.az}"
   cidr_block              = var.cidr_subnet2
@@ -116,56 +116,65 @@ resource aws_subnet demo43_public2 {
 }
 
 # ------ Associate new network ACL with HTTP subnet
-resource aws_network_acl_association demo43_public2 {
+resource "aws_network_acl_association" "demo43_public2" {
   network_acl_id = aws_network_acl.demo43_acl2.id
   subnet_id      = aws_subnet.demo43_public2.id
 }
 
 # ------ Customize the default security group for the primary ENI of EC2 instance (SSH)
-resource aws_default_security_group demo43_sg1 {
-  vpc_id      = aws_vpc.demo43.id
-  tags        = { Name = "demo43-sg1" }
+resource "aws_default_security_group" "demo43_sg1" {
+  vpc_id = aws_vpc.demo43.id
+  tags   = { Name = "demo43-sg1" }
 
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow SSH access from authorized public IP addresses"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.authorized_ips
-  }
-
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
 }
 
 # ------ Create a new security group for the secondary ENI of EC2 instance (HTTP)
-resource aws_security_group demo43_sg2 {
-  vpc_id      = aws_vpc.demo43.id
-  name        = "demo43-sg2"
-  tags        = { Name = "demo43-sg2" }
+resource "aws_security_group" "demo43_sg2" {
+  vpc_id = aws_vpc.demo43.id
+  name   = "demo43-sg2"
+  tags   = { Name = "demo43-sg2" }
 
-  # ingress rule: allow SSH
-  ingress {
-    description = "allow HTTP access from authorized public IP addresses"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = var.authorized_ips
-  }
+}
 
-  # egress rule: allow all traffic
-  egress {
-    description = "allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"    # all protocols
-    cidr_blocks = [ "0.0.0.0/0" ]
-  }
+
+resource "aws_vpc_security_group_ingress_rule" "demo43_sg1_ingress_ssh_0" {
+  count             = length(var.authorized_ips)
+  security_group_id = aws_default_security_group.demo43_sg1.id
+  description       = "allow SSH access from authorized public IP addresses"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.authorized_ips[count.index]
+  tags              = { Name = "demo43_sg1-sgr-ingress-ssh-0" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo43_sg1_egress_all_1" {
+  security_group_id = aws_default_security_group.demo43_sg1.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo43_sg1-sgr-egress-all-1" }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "demo43_sg2_ingress_http_0" {
+  count             = length(var.authorized_ips)
+  security_group_id = aws_security_group.demo43_sg2.id
+  description       = "allow HTTP access from authorized public IP addresses"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.authorized_ips[count.index]
+  tags              = { Name = "demo43_sg2-sgr-ingress-http-0" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo43_sg2_egress_all_1" {
+  security_group_id = aws_security_group.demo43_sg2.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  tags              = { Name = "demo43_sg2-sgr-egress-all-1" }
 }

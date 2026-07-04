@@ -1,4 +1,4 @@
-data aws_ami win2022 {
+data "aws_ami" "win2022" {
   most_recent = true
 
   filter {
@@ -6,7 +6,7 @@ data aws_ami win2022 {
     values = ["Windows_Server-2022-English-Full-Base-202*"]
   }
 
-   owners = ["amazon"]
+  owners = ["amazon"]
 }
 
 # -------------------------------------------------------------------------------

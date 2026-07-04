@@ -1,12 +1,12 @@
 terraform {
   backend "s3" {
     region         = "eu-west-3"
-    bucket         = "cpa7777"
+    bucket         = "terraform-state-cpa-mb1"
     key            = "terraform/demo14b.tfstate"
-    dynamodb_table = "TerraformLock"
+    use_lockfile   = true
   }
 }
 
 provider "aws" {
-  region     = var.aws_region
+  region = var.aws_region
 }

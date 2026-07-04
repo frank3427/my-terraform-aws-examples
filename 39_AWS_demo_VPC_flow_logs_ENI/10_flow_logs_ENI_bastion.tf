@@ -1,5 +1,5 @@
 # -------- IAM role used by VPC flow logs
-resource aws_iam_role demo39_flow_log {
+resource "aws_iam_role" "demo39_flow_log" {
   name = "demo39-eni-flow-log-role"
 
   assume_role_policy = jsonencode({
@@ -16,7 +16,7 @@ resource aws_iam_role demo39_flow_log {
   })
 }
 
-resource aws_iam_role_policy demo39_flow_log {
+resource "aws_iam_role_policy" "demo39_flow_log" {
   name = "demo39-eni-flow-log-policy"
   role = aws_iam_role.demo39_flow_log.id
 
@@ -39,13 +39,13 @@ resource aws_iam_role_policy demo39_flow_log {
 }
 
 # -------- CloudWatch log group
-resource aws_cloudwatch_log_group demo39_flow_log_eni {
+resource "aws_cloudwatch_log_group" "demo39_flow_log_eni" {
   name              = "/aws/eni-flow-logs"
   retention_in_days = 7
 }
 
 # -------- VPC flow log for ENI
-resource aws_flow_log demo39_flow_log_eni {
+resource "aws_flow_log" "demo39_flow_log_eni" {
   iam_role_arn    = aws_iam_role.demo39_flow_log.arn
   log_destination = aws_cloudwatch_log_group.demo39_flow_log_eni.arn
   traffic_type    = "ALL"

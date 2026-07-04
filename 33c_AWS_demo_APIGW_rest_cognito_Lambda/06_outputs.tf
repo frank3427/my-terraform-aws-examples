@@ -1,4 +1,4 @@
-output test_curl {
+output "test_curl" {
   value = <<EOF
 You can test access to API with following command:
 

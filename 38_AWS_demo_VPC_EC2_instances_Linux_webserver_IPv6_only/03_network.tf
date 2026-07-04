@@ -1,5 +1,5 @@
 # ------ Create a VPC 
-resource aws_vpc demo38 {
+resource "aws_vpc" "demo38" {
   cidr_block                       = var.cidr_vpc
   assign_generated_ipv6_cidr_block = true
   enable_dns_hostnames             = true
@@ -7,13 +7,13 @@ resource aws_vpc demo38 {
 }
 
 # ------ Create an internet gateway in the new VPC
-resource aws_internet_gateway demo38 {
+resource "aws_internet_gateway" "demo38" {
   vpc_id = aws_vpc.demo38.id
   tags   = { Name = "demo38-igw" }
 }
 
 # ------ Add a name and route rule to the default route table
-resource aws_default_route_table demo38 {
+resource "aws_default_route_table" "demo38" {
   default_route_table_id = aws_vpc.demo38.default_route_table_id
   tags                   = { Name = "demo38-rt" }
 
@@ -29,12 +29,12 @@ resource aws_default_route_table demo38 {
 }
 
 # ------ Add a name to the default network ACL and modify ingress rules
-resource aws_default_network_acl demo38 {
+resource "aws_default_network_acl" "demo38" {
   default_network_acl_id = aws_vpc.demo38.default_network_acl_id
   tags                   = { Name = "demo38-acl" }
-  subnet_ids             = [ aws_subnet.demo38_public1.id, aws_subnet.demo38_public2.id ]
+  subnet_ids             = [aws_subnet.demo38_public1.id, aws_subnet.demo38_public2.id]
 
-  dynamic ingress {
+  dynamic "ingress" {
     for_each = var.authorized_ips_v6
     content {
       protocol        = "tcp"
@@ -45,8 +45,8 @@ resource aws_default_network_acl demo38 {
       to_port         = 22
     }
   }
-  
-  dynamic ingress {
+
+  dynamic "ingress" {
     for_each = var.authorized_ips_v6
     content {
       protocol        = "tcp"
@@ -89,7 +89,7 @@ resource aws_default_network_acl demo38 {
 }
 
 # ------ Create public subnets using only IPv6 (use the default route table and default network ACL)
-resource aws_subnet demo38_public1 {
+resource "aws_subnet" "demo38_public1" {
   vpc_id                                         = aws_vpc.demo38.id
   availability_zone                              = "${var.aws_region}${var.az1}"
   ipv6_native                                    = true
@@ -99,7 +99,7 @@ resource aws_subnet demo38_public1 {
   tags                                           = { Name = "demo38-public1" }
 }
 
-resource aws_subnet demo38_public2 {
+resource "aws_subnet" "demo38_public2" {
   vpc_id                                         = aws_vpc.demo38.id
   availability_zone                              = "${var.aws_region}${var.az2}"
   ipv6_native                                    = true
@@ -110,29 +110,11 @@ resource aws_subnet demo38_public2 {
 }
 
 # ------ Customize the security group for the EC2 instances
-resource aws_default_security_group demo38 {
-  vpc_id      = aws_vpc.demo38.id
-  tags        = { Name = "demo38-sg1" }
+resource "aws_default_security_group" "demo38" {
+  vpc_id = aws_vpc.demo38.id
+  tags   = { Name = "demo38-sg1" }
 
   # -- IP v6
-
-  # ingress rule: allow SSH
-  ingress {
-    description      = "allow SSH access from authorized public IP v6 addresses"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    ipv6_cidr_blocks = var.authorized_ips_v6
-  }
-
-  # ingress rule: allow HTTP
-  ingress {
-    description      = "allow HTTP access from authorized public IP v6 addresses"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    ipv6_cidr_blocks = var.authorized_ips_v6
-  }
 
   # # ingress rule: allow ping6
   # ingress {
@@ -143,21 +125,45 @@ resource aws_default_security_group demo38 {
   #   ipv6_cidr_blocks = [ aws_vpc.demo38.ipv6_cidr_block ]
   # }
 
-  # ingress rule: allow IPv6
-  ingress {
-    description      = "allow all IPv6 traffic from the VPC"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "all"
-    ipv6_cidr_blocks = [ aws_vpc.demo38.ipv6_cidr_block ]
-  }
+}
 
-  # egress rule: allow all traffic
-  egress {
-    description      = "allow all traffic"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"    # all protocols
-    ipv6_cidr_blocks = [ "::/0" ]
-  }
+
+resource "aws_vpc_security_group_ingress_rule" "demo38_ingress_ssh_0" {
+  count             = length(var.authorized_ips_v6)
+  security_group_id = aws_default_security_group.demo38.id
+  description       = "allow SSH access from authorized public IP v6 addresses"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+  cidr_ipv6         = var.authorized_ips_v6[count.index]
+  tags              = { Name = "demo38-sgr-ingress-ssh-0" }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "demo38_ingress_http_1" {
+  count             = length(var.authorized_ips_v6)
+  security_group_id = aws_default_security_group.demo38.id
+  description       = "allow HTTP access from authorized public IP v6 addresses"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+  cidr_ipv6         = var.authorized_ips_v6[count.index]
+  tags              = { Name = "demo38-sgr-ingress-http-1" }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "demo38_ingress_all_2" {
+  security_group_id = aws_default_security_group.demo38.id
+  description       = "allow all IPv6 traffic from the VPC"
+  ip_protocol       = "-1"
+  cidr_ipv6         = aws_vpc.demo38.ipv6_cidr_block
+  tags              = { Name = "demo38-sgr-ingress-all-2" }
+}
+
+resource "aws_vpc_security_group_egress_rule" "demo38_egress_all_3" {
+  security_group_id = aws_default_security_group.demo38.id
+  description       = "allow all traffic"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv6         = "::/0"
+  tags              = { Name = "demo38-sgr-egress-all-3" }
 }

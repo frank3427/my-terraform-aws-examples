@@ -4,10 +4,10 @@
 exec 1> /var/log/cloud-init2.log 2>&1
 
 echo "========== Install some packages"
-yum install zsh nmap -y
+dnf install zsh nmap -y
 
 echo "========== Install latest updates"
-yum update -y
+dnf update -y
 
 echo "========== Final reboot"
 reboot

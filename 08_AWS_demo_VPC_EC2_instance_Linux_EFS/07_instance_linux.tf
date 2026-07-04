@@ -1,13 +1,13 @@
 # ------ optional: Create an Elastic IP address
 # ------           to have a public IP address for EC2 instance persistent across stop/start
-resource aws_eip demo08 {
+resource "aws_eip" "demo08" {
   instance = aws_instance.demo08.id
   domain   = "vpc"
   tags     = { Name = "demo08" }
 }
 
 # ------ Create an EC2 instance
-resource aws_instance demo08 {
+resource "aws_instance" "demo08" {
   # ignore change in cloud-init file after provisioning
   lifecycle {
     ignore_changes = [
@@ -19,16 +19,16 @@ resource aws_instance demo08 {
   ami                    = data.aws_ami.al2023_arm64.id
   key_name               = aws_key_pair.demo08.id
   subnet_id              = aws_subnet.demo08_public.id
-  vpc_security_group_ids = [ aws_default_security_group.demo08.id ] 
+  vpc_security_group_ids = [aws_default_security_group.demo08.id]
   tags                   = { Name = "demo08" }
-  user_data_base64       = base64encode(templatefile(var.cloud_init_script, {
-                              dns_name    = aws_efs_file_system.demo08.dns_name,
-                              mount_point = var.efs_mount_point,
-                              fs_id       = aws_efs_file_system.demo08.id
+  user_data_base64 = base64encode(templatefile(var.cloud_init_script, {
+    dns_name    = aws_efs_file_system.demo08.dns_name,
+    mount_point = var.efs_mount_point,
+    fs_id       = aws_efs_file_system.demo08.id
   }))
-  private_ip             = var.private_ip   # optional        
+  private_ip = var.private_ip # optional        
   root_block_device {
-    encrypted   = true      # use default KMS key aws/ebs
+    encrypted   = true # use default KMS key aws/ebs
     volume_type = "gp3"
     tags        = { "Name" = "demo08-boot" }
   }
@@ -37,10 +37,10 @@ resource aws_instance demo08 {
 # ------ Display the complete ssh command needed to connect to the instance
 locals {
   username   = "ec2-user"
-  cloud_init = replace(file(var.cloud_init_script),"<MOUNT_POINT>",var.efs_mount_point)
+  cloud_init = replace(file(var.cloud_init_script), "<MOUNT_POINT>", var.efs_mount_point)
 }
 
-output Instance {
+output "Instance" {
   value = <<EOF
 
 
