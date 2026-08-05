@@ -78,6 +78,31 @@ resource "aws_subnet" "demo28_private_efa" {
   tags                    = { Name = "demo28-private-EFA" }
 }
 
+# ------ Network ACL for the private EFA subnet (allow all traffic for MPI/EFA)
+resource "aws_network_acl" "demo28_efa" {
+  vpc_id     = aws_vpc.demo28.id
+  subnet_ids = [aws_subnet.demo28_private_efa.id]
+  tags       = { Name = "demo28-acl-efa" }
+
+  ingress {
+    protocol   = -1
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+
+  egress {
+    protocol   = -1
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+}
+
 # ------ Customize the security group for the EC2 instances
 resource "aws_default_security_group" "demo28" {
   vpc_id = aws_vpc.demo28.id
@@ -106,11 +131,17 @@ resource "aws_vpc_security_group_ingress_rule" "demo28_ingress_ssh_0" {
   tags              = { Name = "demo28-sgr-ingress-ssh-0" }
 }
 
+resource "aws_vpc_security_group_ingress_rule" "demo28_ingress_internal" {
+  security_group_id            = aws_default_security_group.demo28.id
+  description                  = "allow all traffic between instances in this security group"
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_default_security_group.demo28.id
+  tags                         = { Name = "demo28-sgr-ingress-internal" }
+}
+
 resource "aws_vpc_security_group_egress_rule" "demo28_egress_all_1" {
   security_group_id = aws_default_security_group.demo28.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo28-sgr-egress-all-1" }
@@ -127,8 +158,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo28_efa_ingress_all_0" {
 resource "aws_vpc_security_group_egress_rule" "demo28_efa_egress_all_1" {
   security_group_id = aws_security_group.demo28_efa.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo28_efa-sgr-egress-all-1" }

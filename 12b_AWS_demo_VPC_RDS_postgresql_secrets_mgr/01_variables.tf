@@ -16,7 +16,14 @@ variable "cidr_subnet2" {
 }
 variable "authorized_ips" {
   type        = list(string)
-  description = "List of authorized public IP CIDR blocks for ingress rules"
+  description = "List of authorized public IPv4 CIDR blocks for SSH ingress rules"
+
+  validation {
+    condition = length(var.authorized_ips) > 0 && alltrue([
+      for cidr in var.authorized_ips : can(cidrnetmask(cidr))
+    ])
+    error_message = "authorized_ips must contain at least one valid IPv4 CIDR block, such as 203.0.113.10/32. Include the public egress IP of the machine running Terraform."
+  }
 }
 variable "public_sshkey_path" {
   type        = string
@@ -34,15 +41,15 @@ variable "az2" {
   type        = string
   description = "Availability zone suffix (e.g., a, b, c)"
 }
-variable "al2_private_ip" {
+variable "al2023_private_ip" {
   type        = string
   description = "Private IP address"
 }
-variable "al2_inst_type" {
+variable "al2023_inst_type" {
   type        = string
   description = "EC2 instance type"
 }
-variable "al2_cloud_init_script" {
+variable "al2023_cloud_init_script" {
   type        = string
   description = "Path to cloud-init script"
 }

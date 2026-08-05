@@ -13,7 +13,7 @@ User    : ${var.docdb_user}
 Password: ${local.docdb_pwd}
 
 ---- You can SSH directly to the Linux instance with MongoDB Client by typing the following ssh command
-ssh -i ${var.private_sshkey_path} ${local.username}@${aws_eip.demo26_al2.public_ip}
+ssh -i ${var.private_sshkey_path} ${local.username}@${aws_eip.demo26_al2023.public_ip}
 
 ---- Once connected to the Linux instance, you can connect to the DocumentDB cluster / MongoDB database using the following script:
 ./docdb.sh

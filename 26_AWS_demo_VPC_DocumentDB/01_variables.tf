@@ -34,15 +34,15 @@ variable "az2" {
   type        = string
   description = "Availability zone suffix (e.g., a, b, c)"
 }
-variable "al2_private_ip" {
+variable "al2023_private_ip" {
   type        = string
   description = "Private IP address"
 }
-variable "al2_inst_type" {
+variable "al2023_inst_type" {
   type        = string
   description = "EC2 instance type"
 }
-variable "al2_cloud_init_script" {
+variable "al2023_cloud_init_script" {
   type        = string
   description = "Path to cloud-init script"
 }

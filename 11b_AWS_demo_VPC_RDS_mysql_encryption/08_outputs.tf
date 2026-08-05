@@ -12,7 +12,7 @@ User    : ${aws_db_instance.demo11b_mysql.username}
 Password: ${random_string.demo11b-db-passwd.result}
 
 ---- You can SSH directly to the Linux instance with Oracle Instance Client by typing the following ssh command
-ssh -i ${var.private_sshkey_path} ${local.username}@${aws_eip.demo11b_al2.public_ip}
+ssh -i ${var.private_sshkey_path} ${local.username}@${aws_eip.demo11b_al2023.public_ip}
 
 ---- Once connected, you can connect to the MySQL database using the following command
 ./mysql.sh              should fail (no encryption)

@@ -8,7 +8,7 @@ User    : ${local.rds_username}
 Password: ${local.rds_password}
 
 ---- You can SSH directly to the Linux instance with PostgreSQL Client by typing the following ssh command:
-ssh -i ${var.private_sshkey_path} ${local.ec2_username}@${aws_eip.demo12b_al2.public_ip}
+ssh -i ${var.private_sshkey_path} ${local.ec2_username}@${aws_eip.demo12b_al2023.public_ip}
 
 ---- Once connected, you can connect to the PostgreSQL database using the following command:
 ./psql.sh

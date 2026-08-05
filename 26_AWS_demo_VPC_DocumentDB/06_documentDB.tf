@@ -89,8 +89,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo26_docdb_ingress_all_0" {
 resource "aws_vpc_security_group_egress_rule" "demo26_docdb_egress_all_1" {
   security_group_id = aws_security_group.demo26_docdb.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo26_docdb-sgr-egress-all-1" }

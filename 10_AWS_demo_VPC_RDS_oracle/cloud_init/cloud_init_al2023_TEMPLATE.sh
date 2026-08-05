@@ -7,9 +7,9 @@ echo "========== Install Oracle Instant Client 21c"
 wget https://download.oracle.com/otn_software/linux/instantclient/218000/oracle-instantclient-basic-21.8.0.0.0-1.x86_64.rpm
 wget https://download.oracle.com/otn_software/linux/instantclient/218000/oracle-instantclient-sqlplus-21.8.0.0.0-1.x86_64.rpm
 wget https://download.oracle.com/otn_software/linux/instantclient/218000/oracle-instantclient-tools-21.8.0.0.0-1.x86_64.rpm
-yum install -y ./oracle-instantclient-basic-21.8.0.0.0-1.x86_64.rpm
-yum install -y ./oracle-instantclient-tools-21.8.0.0.0-1.x86_64.rpm 
-yum install -y ./oracle-instantclient-sqlplus-21.8.0.0.0-1.x86_64.rpm
+dnf install -y ./oracle-instantclient-basic-21.8.0.0.0-1.x86_64.rpm
+dnf install -y ./oracle-instantclient-tools-21.8.0.0.0-1.x86_64.rpm 
+dnf install -y ./oracle-instantclient-sqlplus-21.8.0.0.0-1.x86_64.rpm
 
 echo "========== Configure Oracle Instant client for ec2-user"
 mkdir -p /home/ec2-user/oradb
@@ -38,10 +38,10 @@ chown ec2-user:ec2-user /home/ec2-user/sqlplus.sh
 chmod 700 /home/ec2-user/sqlplus.sh
 
 echo "========== Install some packages"
-yum install zsh nmap -y
+dnf install nmap -y
 
 # echo "========== Install latest updates"
-# yum update -y
+# dnf update -y
 
 # echo "========== Final reboot"
 # reboot

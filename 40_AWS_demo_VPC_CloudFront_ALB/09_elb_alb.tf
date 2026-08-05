@@ -127,8 +127,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo40_sg_alb_ingress_http_0" {
 resource "aws_vpc_security_group_egress_rule" "demo40_sg_alb_egress_all_1" {
   security_group_id = aws_security_group.demo40_sg_alb.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo40_sg_alb-sgr-egress-all-1" }

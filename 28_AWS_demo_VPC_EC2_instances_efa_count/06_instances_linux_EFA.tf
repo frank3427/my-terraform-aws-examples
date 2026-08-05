@@ -1,12 +1,13 @@
-# ------ Create the default network interfaces 
-resource "aws_network_interface" "demo28_eth0" {
-  count       = var.nb_instances
-  subnet_id   = aws_subnet.demo28_public.id
-  private_ips = [var.inst_private_ip[count.index]]
-  tags        = { Name = "demo28-nic0-${count.index + 1}" }
+# ------ Create standard network interfaces (device_index 0) for EC2 instances
+resource "aws_network_interface" "demo28_primary" {
+  count           = var.nb_instances
+  subnet_id       = aws_subnet.demo28_public.id
+  private_ips     = [var.inst_private_ip[count.index]]
+  security_groups = [aws_default_security_group.demo28.id]
+  tags            = { Name = "demo28-nic0-primary-${count.index + 1}" }
 }
 
-# ------ Create EFA network interfaces to be attached to supported EC2 instances (1 nic per instance)
+# ------ Create EFA network interfaces (device_index 1) for EC2 instances
 resource "aws_network_interface" "demo28_efa" {
   count           = var.nb_instances
   interface_type  = "efa"
@@ -16,22 +17,13 @@ resource "aws_network_interface" "demo28_efa" {
   tags            = { Name = "demo28-nic1-efa-${count.index + 1}" }
 }
 
-# ------ optional: Create an Elastic IP address
-# ------           to have a public IP address for EC2 instance persistent across stop/start
-resource "aws_eip" "demo28_inst" {
-  count             = var.nb_instances
-  network_interface = aws_network_interface.demo28_eth0[count.index].id
-  domain            = "vpc"
-  tags              = { Name = "demo28-inst${count.index + 1}" }
-}
-
 # ------ Create a placement group for EC2 instances (type CLUSTER)
 resource "aws_placement_group" "demo28" {
   name     = "demo28-cluster"
   strategy = "cluster"
 }
 
-# ------ Create an EC2 instance
+# ------ Create EC2 instances with both NICs attached at launch
 resource "aws_instance" "demo28_inst" {
   # ignore change in cloud-init file after provisioning
   lifecycle {
@@ -46,15 +38,23 @@ resource "aws_instance" "demo28_inst" {
   ami               = local.ami
   key_name          = aws_key_pair.demo28.id
   tags              = { Name = "demo28-inst${count.index + 1}" }
-  user_data_base64  = base64encode(file(local.script))
+  user_data_base64  = base64encode(templatefile(local.script, {
+    ssh_private_key  = tls_private_key.ssh_demo28.private_key_pem
+    hostfile_content = join("\n", [for ip in var.inst_private_ip_efa : "${ip} slots=4"])
+  }))
+
+  # Primary network interface (standard)
   network_interface {
+    network_interface_id = aws_network_interface.demo28_primary[count.index].id
     device_index         = 0
-    network_interface_id = aws_network_interface.demo28_eth0[count.index].id
   }
+
+  # EFA network interface - attached at launch (required for EFA)
   network_interface {
-    device_index         = 1
     network_interface_id = aws_network_interface.demo28_efa[count.index].id
+    device_index         = 1
   }
+
   root_block_device {
     encrypted   = true # use default KMS key aws/ebs
     volume_type = "gp3"
@@ -62,7 +62,17 @@ resource "aws_instance" "demo28_inst" {
   }
 }
 
-# ------ Display the complete ssh command needed to connect to the instance
+# ------ Create Elastic IP addresses for EC2 instances
+resource "aws_eip" "demo28_inst" {
+  count                     = var.nb_instances
+  domain                    = "vpc"
+  network_interface         = aws_network_interface.demo28_primary[count.index].id
+  associate_with_private_ip = var.inst_private_ip[count.index]
+  tags                      = { Name = "demo28-inst${count.index + 1}" }
+  depends_on                = [aws_internet_gateway.demo28]
+}
+
+# ------ Locals
 locals {
   username   = (var.linux == "al") ? "ec2-user" : "ubuntu"
   ami_arm64  = (var.linux == "al") ? data.aws_ami.al_arm64.id : data.aws_ami.ubuntu_2204_arm64.id
@@ -70,14 +80,6 @@ locals {
   ami        = (var.arch == "arm64") ? local.ami_arm64 : local.ami_x86_64
   script     = (var.linux == "al") ? var.cloud_init_script_al : var.cloud_init_script_ubuntu
 }
-
-# output SSH_connections {
-#   value = [
-#     for eip in aws_eip.demo28_inst.*:
-#       "ssh -i ${var.private_sshkey_path} ${local.username}@${eip.public_ip}"
-#   ]
-# }
-
 
 # ------ Create a SSH config file
 resource "local_file" "sshconfig" {

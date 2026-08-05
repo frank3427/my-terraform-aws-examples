@@ -35,7 +35,7 @@ resource "aws_instance" "demo13d_db_client" {
 }
 
 # ------ Copy local SQL scripts to EC2 instance
-resource "null_resource" "copy_sql" {
+resource "terraform_data" "copy_sql" {
   provisioner "file" {
     connection {
       host        = aws_eip.demo13d_db_client.public_ip
@@ -69,8 +69,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo13d_ec2_ingress_ssh_0" {
 resource "aws_vpc_security_group_ingress_rule" "demo13d_ec2_ingress_all_1" {
   security_group_id = aws_default_security_group.demo13d_ec2.id
   description       = "allow all traffic from VPC"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = var.cidr_vpc
   tags              = { Name = "demo13d_ec2-sgr-ingress-all-1" }
@@ -79,8 +77,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo13d_ec2_ingress_all_1" {
 resource "aws_vpc_security_group_egress_rule" "demo13d_ec2_egress_all_2" {
   security_group_id = aws_default_security_group.demo13d_ec2.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo13d_ec2-sgr-egress-all-2" }

@@ -1,5 +1,5 @@
 # ------ Get the public IP addresses of the compute nodes using tags
-resource "null_resource" "wait_for_nodes" {
+resource "terraform_data" "wait_for_nodes" {
   depends_on = [awscc_pcs_compute_node_group.demo45a_ng1]
   provisioner "local-exec" {
     command = "sleep 60"
@@ -7,7 +7,7 @@ resource "null_resource" "wait_for_nodes" {
 }
 
 data "aws_instances" "cpt_nodes" {
-  depends_on = [null_resource.wait_for_nodes]
+  depends_on = [terraform_data.wait_for_nodes]
   filter {
     name   = "tag:aws:pcs:compute-node-group-id"
     values = [awscc_pcs_compute_node_group.demo45a_ng1.compute_node_group_id]

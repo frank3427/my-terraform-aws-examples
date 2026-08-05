@@ -53,8 +53,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo36_sg_db_client_ingress_ssh_
 resource "aws_vpc_security_group_egress_rule" "demo36_sg_db_client_egress_all_1" {
   security_group_id = aws_security_group.demo36_sg_db_client.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo36_sg_db_client-sgr-egress-all-1" }

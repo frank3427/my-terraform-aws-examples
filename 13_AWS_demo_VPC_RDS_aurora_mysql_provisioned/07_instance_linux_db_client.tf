@@ -57,8 +57,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo13_ec2_ingress_ssh_0" {
 resource "aws_vpc_security_group_ingress_rule" "demo13_ec2_ingress_all_1" {
   security_group_id = aws_default_security_group.demo13_ec2.id
   description       = "allow all traffic from VPC"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = var.cidr_vpc
   tags              = { Name = "demo13_ec2-sgr-ingress-all-1" }
@@ -67,8 +65,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo13_ec2_ingress_all_1" {
 resource "aws_vpc_security_group_egress_rule" "demo13_ec2_egress_all_2" {
   security_group_id = aws_default_security_group.demo13_ec2.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo13_ec2-sgr-egress-all-2" }

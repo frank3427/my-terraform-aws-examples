@@ -116,8 +116,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo06_sg2_ingress_ssh_0" {
 resource "aws_vpc_security_group_ingress_rule" "demo06_sg2_ingress_all_1" {
   security_group_id = aws_security_group.demo06_sg2.id
   description       = "allow traffic from other VPC"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = var.cidr_public1
   tags              = { Name = "demo06_sg2-sgr-ingress-all-1" }
@@ -126,8 +124,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo06_sg2_ingress_all_1" {
 resource "aws_vpc_security_group_egress_rule" "demo06_sg2_egress_all_2" {
   security_group_id = aws_security_group.demo06_sg2.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo06_sg2-sgr-egress-all-2" }

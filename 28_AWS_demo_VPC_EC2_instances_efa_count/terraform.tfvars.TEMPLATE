@@ -1,0 +1,23 @@
+# ---- region
+aws_region     = "eu-north-1"    # Stockholm
+
+# ---- CIDR network
+cidr_vpc         = "192.168.0.0/16"
+cidr_subnet1     = "192.168.0.0/24"
+cidr_subnet2_efa = "192.168.7.0/24"
+
+# ---- Authorized public IPs ingress
+authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+
+# ---- Instance
+nb_instances             = "2"
+inst_private_ip          = [ "192.168.0.11", "192.168.0.12" ]
+inst_private_ip_efa      = [ "192.168.7.11", "192.168.7.12" ]
+inst_type                = "c5n.9xlarge"     # Select instance type with EFA (~$1.94/hr)
+arch                     = "x86_64"          # choose arm64 or x86_64
+linux                    = "al"              # choose al or ubuntu
+az                       = "b"
+public_sshkey_path       = "sshkeys_generated/ssh_key_demo28.pub"
+private_sshkey_path      = "sshkeys_generated/ssh_key_demo28"
+cloud_init_script_al     = "cloud_init/cloud_init_al.sh"
+cloud_init_script_ubuntu = "cloud_init/cloud_init_ubuntu.sh"

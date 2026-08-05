@@ -199,8 +199,6 @@ resource "aws_iam_instance_profile" "demo35_msk" {
 resource "aws_vpc_security_group_ingress_rule" "demo35_msk_ingress_all_0" {
   security_group_id = aws_security_group.demo35_msk.id
   description       = "allow Kafka traffic from Kafka client"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = var.cidr_vpc
   tags              = { Name = "demo35_msk-sgr-ingress-all-0" }
@@ -209,8 +207,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo35_msk_ingress_all_0" {
 resource "aws_vpc_security_group_egress_rule" "demo35_msk_egress_all_1" {
   security_group_id = aws_security_group.demo35_msk.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo35_msk-sgr-egress-all-1" }

@@ -12,12 +12,14 @@ This Terraform project demonstrates AWS RDS PostgreSQL database deployment with 
 ## Infrastructure Components
 
 ### Network
+
 - VPC with configurable CIDR block
 - Multiple public subnets for RDS high availability
 - DB subnet group spanning multiple AZs
 - Security groups for database and client access
 
 ### Database
+
 - **RDS PostgreSQL Instance**: Configurable version and instance class
 - **Multi-AZ Deployment**: Enabled for high availability
 - **Performance Insights**: Enabled with 7-day retention
@@ -26,7 +28,8 @@ This Terraform project demonstrates AWS RDS PostgreSQL database deployment with 
 - **Private access**: Database accessible only within VPC
 
 ### Compute
-- **EC2 Client Instance**: Amazon Linux 2 with PostgreSQL client tools
+
+- **EC2 Client Instance**: Amazon Linux 2023 with PostgreSQL client tools
 - **PostgreSQL Client**: Pre-installed psql command-line interface
 - **Elastic IP**: Persistent public IP for SSH access
 
@@ -41,9 +44,11 @@ This Terraform project demonstrates AWS RDS PostgreSQL database deployment with 
 1. **Clone and navigate to the project directory**
 
 2. **Configure variables**
+
    ```bash
    cp terraform.tfvars.TEMPLATE terraform.tfvars
    ```
+
    Edit `terraform.tfvars` with your specific values:
    - AWS region and availability zones
    - VPC and subnet CIDR blocks
@@ -52,11 +57,13 @@ This Terraform project demonstrates AWS RDS PostgreSQL database deployment with 
    - Instance type and SSH key paths
 
 3. **Initialize Terraform**
+
    ```bash
    terraform init
    ```
 
 4. **Plan the deployment**
+
    ```bash
    terraform plan
    ```
@@ -68,28 +75,30 @@ This Terraform project demonstrates AWS RDS PostgreSQL database deployment with 
 
 ## Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `01_variables.tf` | Variable definitions for PostgreSQL and client |
-| `02_provider.tf` | AWS provider configuration |
-| `03_network.tf` | VPC and networking components |
-| `04_data_sources.tf` | AWS data sources |
-| `05_ssh_key_pair.tf` | SSH key pair configuration |
-| `06_rds_postgresql.tf` | RDS PostgreSQL database configuration |
-| `07_instance_linux_al2.tf` | EC2 client instance |
-| `08_outputs.tf` | Output values and connection instructions |
+| File                          | Purpose                                        |
+| ----------------------------- | ---------------------------------------------- |
+| `01_variables.tf`             | Variable definitions for PostgreSQL and client |
+| `02_provider.tf`              | AWS provider configuration                     |
+| `03_network.tf`               | VPC and networking components                  |
+| `04_data_sources.tf`          | AWS data sources                               |
+| `05_ssh_key_pair.tf`          | SSH key pair configuration                     |
+| `06_rds_postgresql.tf`        | RDS PostgreSQL database configuration          |
+| `07_instance_linux_al2023.tf` | EC2 client instance                            |
+| `08_outputs.tf`               | Output values and connection instructions      |
 
 ## Usage
 
 After deployment, Terraform will output SSH connection instructions, database endpoint, and password.
 
 ### SSH Access
+
 ```bash
 # Connect to the PostgreSQL client instance
 ssh -i <private_key_path> ec2-user@<instance_public_ip>
 ```
 
 ### Database Connection
+
 Once connected to the EC2 instance:
 
 ```bash
@@ -103,6 +112,7 @@ postgres=> \dt                   # List tables
 ```
 
 ### SQL Script Execution
+
 The demo includes pre-written SQL scripts:
 
 ```bash
@@ -120,6 +130,7 @@ The demo includes pre-written SQL scripts:
 ```
 
 ### Manual SQL Operations
+
 ```sql
 -- Create a sample table
 CREATE TABLE tblEmployee (
@@ -133,7 +144,7 @@ CREATE TABLE tblEmployee (
 );
 
 -- Insert sample data
-INSERT INTO tblEmployee (employee_id, employee_first_name, employee_last_name, employee_joining_date) 
+INSERT INTO tblEmployee (employee_id, employee_first_name, employee_last_name, employee_joining_date)
 VALUES (1, 'John', 'Doe', '2024-01-15');
 
 -- Query data
@@ -175,6 +186,7 @@ SELECT * FROM tblEmployee;
 ## Cleanup
 
 To destroy the infrastructure:
+
 ```bash
 terraform destroy
 ```

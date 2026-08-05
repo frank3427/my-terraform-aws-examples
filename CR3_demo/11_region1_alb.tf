@@ -108,8 +108,6 @@ resource "aws_vpc_security_group_ingress_rule" "cr3_r1_sg_alb_ingress_https_1" {
 resource "aws_vpc_security_group_egress_rule" "cr3_r1_sg_alb_egress_all_2" {
   security_group_id = aws_security_group.cr3_r1_sg_alb.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "cr3_r1_sg_alb-sgr-egress-all-2" }

@@ -161,8 +161,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo38_ingress_all_2" {
 resource "aws_vpc_security_group_egress_rule" "demo38_egress_all_3" {
   security_group_id = aws_default_security_group.demo38.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv6         = "::/0"
   tags              = { Name = "demo38-sgr-egress-all-3" }

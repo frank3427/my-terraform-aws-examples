@@ -88,8 +88,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo13_rds_ingress_all_0" {
 resource "aws_vpc_security_group_egress_rule" "demo13_rds_egress_all_1" {
   security_group_id = aws_security_group.demo13_rds.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo13_rds-sgr-egress-all-1" }

@@ -11,14 +11,14 @@ data "aws_ami" "ubuntu_2204_arm64" {
   owners = ["amazon"]
 }
 
-# ---- AMI for Amazon Linux 2 on ARM64 architecture
+# ---- AMI for Amazon Linux 2023 on ARM64 architecture
 # missing in awscc
-data "aws_ami" "al2_arm64" {
+data "aws_ami" "al2023_arm64" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-5.10-hvm-2.0.202*arm64-gp2"]
+    values = ["al2023-ami-2023*arm64"]
   }
   owners = ["amazon"]
 }
@@ -36,14 +36,14 @@ data "aws_ami" "ubuntu_2204_x86_64" {
   owners = ["amazon"]
 }
 
-# ---- AMI for Amazon Linux 2 on X86_64 architecture
+# ---- AMI for Amazon Linux 2023 on X86_64 architecture
 # missing in awscc
-data "aws_ami" "al2_x86_64" {
+data "aws_ami" "al2023_x86_64" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-5.10-hvm-2.0.202*x86_64-gp2"]
+    values = ["al2023-ami-2023*x86_64"]
   }
   owners = ["amazon"]
 }

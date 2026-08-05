@@ -77,8 +77,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo22_sg_websrv_ingress_ssh_1" 
 resource "aws_vpc_security_group_egress_rule" "demo22_sg_websrv_egress_all_2" {
   security_group_id = aws_security_group.demo22_sg_websrv.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo22_sg_websrv-sgr-egress-all-2" }

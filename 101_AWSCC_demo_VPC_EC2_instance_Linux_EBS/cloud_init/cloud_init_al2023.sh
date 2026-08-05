@@ -21,15 +21,15 @@ mount /mnt/ebs1
 chown ec2-user:ec2-user /mnt/ebs1
 
 echo "========== Install some packages"
-yum install zsh nmap -y
+dnf install zsh nmap -y
 
 echo "========== Install Docker"
-amazon-linux-extras install docker -y
+dnf install docker -y
 systemctl enable docker --now
 usermod -a -G docker ec2-user
 
 # echo "========== Install latest updates"
-# yum update -y
+# dnf update -y
 
 # echo "========== Final reboot"
 # reboot

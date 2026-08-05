@@ -39,8 +39,6 @@ resource "aws_vpc_security_group_ingress_rule" "memcached_ingress_all_0" {
 resource "aws_vpc_security_group_egress_rule" "memcached_egress_all_1" {
   security_group_id = aws_security_group.memcached.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "memcached-sgr-egress-all-1" }

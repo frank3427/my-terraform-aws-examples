@@ -32,11 +32,11 @@ resource "aws_instance" "demo101_inst1" {
 
 # ------ Display the complete ssh command needed to connect to the instance
 locals {
-  username   = (var.linux == "al2") ? "ec2-user" : "ubuntu"
-  ami_arm64  = (var.linux == "al2") ? data.aws_ami.al2_arm64.id : data.aws_ami.ubuntu_2204_arm64.id
-  ami_x86_64 = (var.linux == "al2") ? data.aws_ami.al2_x86_64.id : data.aws_ami.ubuntu_2204_x86_64.id
+  username   = (var.linux == "al2023") ? "ec2-user" : "ubuntu"
+  ami_arm64  = (var.linux == "al2023") ? data.aws_ami.al2023_arm64.id : data.aws_ami.ubuntu_2204_arm64.id
+  ami_x86_64 = (var.linux == "al2023") ? data.aws_ami.al2023_x86_64.id : data.aws_ami.ubuntu_2204_x86_64.id
   ami        = (var.arch == "arm64") ? local.ami_arm64 : local.ami_x86_64
-  script     = (var.linux == "al2") ? var.cloud_init_script_al2 : var.cloud_init_script_ubuntu
+  script     = (var.linux == "al2023") ? var.cloud_init_script_al2023 : var.cloud_init_script_ubuntu
 }
 
 output "Instance" {

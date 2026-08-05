@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 1.4"
+}
+
 provider "aws" {
   alias   = "acct0"
   region  = var.aws_region

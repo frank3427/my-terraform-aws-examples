@@ -55,8 +55,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo41_sg_test_ingress_ssh_0" {
 resource "aws_vpc_security_group_egress_rule" "demo41_sg_test_egress_all_1" {
   security_group_id = aws_security_group.demo41_sg_test.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo41_sg_test-sgr-egress-all-1" }

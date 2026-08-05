@@ -83,13 +83,13 @@ locals {
 }
 
 # ------ Copy test_curl.sh script to test instance
-resource "null_resource" "copy_test_script" {
+resource "terraform_data" "copy_test_script" {
   # Trigger when the test script content changes or instance changes
-  triggers = {
-    script_content = local_file.test_script.content
-    instance_id    = aws_instance.demo41_test.id
-    public_ip      = aws_eip.demo41_test.public_ip
-  }
+  triggers_replace = [
+    local_file.test_script.content,
+    aws_instance.demo41_test.id,
+    aws_eip.demo41_test.public_ip
+  ]
 
   # Copy the test script to the test instance
   provisioner "file" {

@@ -127,7 +127,7 @@ resource "aws_route53_resolver_rule_association" "demo91_acct2" {
   vpc_id           = aws_vpc.demo91_acct2.id
 }
 
-# resource null_resource demo91_wait_2_minutes {
+# resource terraform_data demo91_wait_2_minutes {
 #   depends_on = [ aws_ram_principal_association.demo91_acct0_for_acct1, aws_ram_principal_association.demo91_acct0_for_acct2 ]
 #   provisioner "local-exec" {
 #     command = "sleep 120"
@@ -135,14 +135,14 @@ resource "aws_route53_resolver_rule_association" "demo91_acct2" {
 # }
 
 # resource aws_route53_resolver_rule_association demo91_acct1 {
-#   depends_on       = [ null_resource.demo91_wait_2_minutes ]
+#   depends_on       = [ terraform_data.demo91_wait_2_minutes ]
 #   provider         = aws.acct1
 #   resolver_rule_id = aws_route53_resolver_rule.demo91.id
 #   vpc_id           = aws_vpc.demo91_acct1.id
 # }
 
 # resource aws_route53_resolver_rule_association demo91_acct2 {
-#   depends_on       = [ null_resource.demo91_wait_2_minutes ]
+#   depends_on       = [ terraform_data.demo91_wait_2_minutes ]
 #   provider         = aws.acct2
 #   resolver_rule_id = aws_route53_resolver_rule.demo91.id
 #   vpc_id           = aws_vpc.demo91_acct2.id
@@ -172,8 +172,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo91_acct0_inbound_ingress_dns
 resource "aws_vpc_security_group_egress_rule" "demo91_acct0_inbound_egress_all_2" {
   security_group_id = aws_security_group.demo91_acct0_inbound.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo91_acct0_inbound-sgr-egress-all-2" }
@@ -182,8 +180,6 @@ resource "aws_vpc_security_group_egress_rule" "demo91_acct0_inbound_egress_all_2
 resource "aws_vpc_security_group_egress_rule" "demo91_acct0_outbound_egress_all_0" {
   security_group_id = aws_security_group.demo91_acct0_outbound.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo91_acct0_outbound-sgr-egress-all-0" }

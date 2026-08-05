@@ -4,8 +4,7 @@
 exec 1> /var/log/cloud-init2.log 2>&1
 
 echo "========== Install some packages"
-amazon-linux-extras enable postgresql14
-yum install zsh postgresql nmap -y
+dnf install postgresql17 nmap zsh -y
 
 echo "========== Create a script to connect to PostgreSQL Database"
 cat << EOF > /home/ec2-user/psql.sh
@@ -26,7 +25,7 @@ chown ec2-user:ec2-user /home/ec2-user/.pgpass
 chmod 600 /home/ec2-user/.pgpass
 
 # echo "========== Install latest updates"
-# yum update -y
+# dnf update -y
 
 # echo "========== Final reboot"
 # reboot

@@ -198,8 +198,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo20b_ingress_https_0" {
 resource "aws_vpc_security_group_egress_rule" "demo20b_egress_all_1" {
   security_group_id = aws_default_security_group.demo20b.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo20b-sgr-egress-all-1" }

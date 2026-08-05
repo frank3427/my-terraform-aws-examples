@@ -43,7 +43,7 @@ resource "aws_security_group" "cr3_sg_r2" {
 }
 
 # ------ Post provisioning by remote-exec
-resource "null_resource" "cr3_r2_dr" {
+resource "terraform_data" "cr3_r2_dr" {
 
   provisioner "file" {
     connection {
@@ -99,8 +99,6 @@ resource "aws_vpc_security_group_ingress_rule" "cr3_sg_r2_ingress_http_1" {
 resource "aws_vpc_security_group_ingress_rule" "cr3_sg_r2_ingress_all_2" {
   security_group_id = aws_security_group.cr3_sg_r2.id
   description       = "allow traffic from other VPC"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = var.cidr_vpc_r1
   tags              = { Name = "cr3_sg_r2-sgr-ingress-all-2" }
@@ -109,8 +107,6 @@ resource "aws_vpc_security_group_ingress_rule" "cr3_sg_r2_ingress_all_2" {
 resource "aws_vpc_security_group_egress_rule" "cr3_sg_r2_egress_all_3" {
   security_group_id = aws_security_group.cr3_sg_r2.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "cr3_sg_r2-sgr-egress-all-3" }

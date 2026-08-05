@@ -19,19 +19,28 @@ chown ec2-user:ec2-user /home/ec2-user/docdb.sh
 chmod 700 /home/ec2-user/docdb.sh
 
 # https://www.mongodb.com/docs/mongodb-shell/install/
+echo "========== Wait for any ongoing dnf/yum process to finish"
+while fuser /var/lib/rpm/.rpm.lock >/dev/null 2>&1; do
+  echo "Waiting for RPM lock to be released..."
+  sleep 5
+done
+
 echo "========== Install mongo shell"
-cat << EOF > /etc/yum.repos.d/mongodb-org-6.0.repo
-[mongodb-org-6.0]
+cat << EOF > /etc/yum.repos.d/mongodb-org-7.0.repo
+[mongodb-org-7.0]
 name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/amazon/\$releasever/mongodb-org/6.0/\$basearch/
+baseurl=https://repo.mongodb.org/yum/amazon/2023/mongodb-org/7.0/\$basearch/
 gpgcheck=1
 enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
+gpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc
 EOF
-yum install -y mongodb-mongosh
+dnf install -y mongodb-mongosh
+
+echo "========== Install some packages"
+dnf install nmap -y
 
 # echo "========== Install latest updates"
-# yum update -y
+# dnf update -y
 
 # echo "========== Final reboot"
 # reboot

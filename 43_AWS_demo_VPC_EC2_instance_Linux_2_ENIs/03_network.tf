@@ -151,8 +151,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo43_sg1_ingress_ssh_0" {
 resource "aws_vpc_security_group_egress_rule" "demo43_sg1_egress_all_1" {
   security_group_id = aws_default_security_group.demo43_sg1.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo43_sg1-sgr-egress-all-1" }
@@ -172,8 +170,6 @@ resource "aws_vpc_security_group_ingress_rule" "demo43_sg2_ingress_http_0" {
 resource "aws_vpc_security_group_egress_rule" "demo43_sg2_egress_all_1" {
   security_group_id = aws_security_group.demo43_sg2.id
   description       = "allow all traffic"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags              = { Name = "demo43_sg2-sgr-egress-all-1" }

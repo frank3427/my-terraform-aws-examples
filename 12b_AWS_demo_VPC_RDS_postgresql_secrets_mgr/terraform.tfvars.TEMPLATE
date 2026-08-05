@@ -6,8 +6,11 @@ cidr_vpc       = "192.168.0.0/16"
 cidr_subnet1   = "192.168.0.0/24"
 cidr_subnet2   = "192.168.1.0/24"
 
-# ---- Authorized public IPs ingress
-authorized_ips = [ "x.x.x.x/n", "y.y.y.y/m" ]
+# ---- Authorized public IPv4 CIDRs permitted to connect by SSH
+# Include the public egress IPv4 address of the machine running Terraform.
+# To determine it, run: curl -4 https://checkip.amazonaws.com
+# Replace the documentation addresses below; do not use 0.0.0.0/0.
+authorized_ips = ["203.0.113.10/32", "198.51.100.20/32"]
 
 # ---- generated SSH key pair
 public_sshkey_path   = "sshkeys_generated/ssh_key_demo12b.pub"
@@ -17,10 +20,10 @@ private_sshkey_path  = "sshkeys_generated/ssh_key_demo12b"
 az                       = "b"
 az2                      = "a"
 
-# ---- Instance Amazon Linux 2
-al2_private_ip         = "192.168.0.11"
-al2_inst_type          = "t3a.large"
-al2_cloud_init_script  = "cloud_init/cloud_init_al2_TEMPLATE.sh"
+# ---- Instance Amazon Linux 2023
+al2023_private_ip         = "192.168.0.11"
+al2023_inst_type          = "t3a.large"
+al2023_cloud_init_script  = "cloud_init/cloud_init_al2023_TEMPLATE.sh"
 
 # ---- RDS postgresql
 postgresql_identifier      = "demo12b-rds-postgresql"
@@ -28,5 +31,5 @@ postgresql_instance_class  = "db.r6g.large"
 postgresql_size_in_gbs     = "40"
 postgresql_max_size_in_gbs = "100"
 postgresql_db_name         = "demo12b"
-postgresql_version         = "15.4"
+postgresql_version         = "17.7"
 postgresql_storage_type    = "gp3"
